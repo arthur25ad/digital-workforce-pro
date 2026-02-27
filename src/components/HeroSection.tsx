@@ -22,7 +22,7 @@ const HeroSection = () => {
   const [demoOpen, setDemoOpen] = useState(false);
 
   return (
-    <section className="blue-ambient relative min-h-screen overflow-hidden pt-24 md:pt-32">
+    <section className="blue-ambient relative overflow-hidden pt-24 pb-16 md:pt-32 md:pb-20">
       <div className="mx-auto max-w-[1600px] px-6 md:px-12 lg:px-16">
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-20 xl:gap-28">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }} className="text-center lg:text-left">
