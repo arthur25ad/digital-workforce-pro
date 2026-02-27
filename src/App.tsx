@@ -21,6 +21,7 @@ import PrivacyPage from "./pages/PrivacyPage";
 import TermsPage from "./pages/TermsPage";
 import AuthPage from "./pages/AuthPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
+import ChooseRolesPage from "./pages/ChooseRolesPage";
 
 const queryClient = new QueryClient();
 
@@ -62,6 +63,7 @@ const App = () => (
               <Route path="/auth" element={<AuthPage />} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />
               <Route path="/get-started" element={<ProtectedRoute><GetStartedPage /></ProtectedRoute>} />
+              <Route path="/choose-roles" element={<ProtectedRoute><ChooseRolesPage /></ProtectedRoute>} />
               <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
               <Route path="/privacy" element={<PrivacyPage />} />
               <Route path="/terms" element={<TermsPage />} />
