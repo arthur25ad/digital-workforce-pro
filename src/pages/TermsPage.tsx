@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 const TermsPage = () => (
   <PageLayout>
     <section className="section-padding blue-ambient">
-      <div className="mx-auto max-w-3xl">
+      <div className="mx-auto max-w-4xl">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <h1 className="font-display text-4xl font-bold text-foreground md:text-5xl mb-8">Terms of Service</h1>
           <p className="text-muted-foreground mb-8">Last updated: February 2026</p>

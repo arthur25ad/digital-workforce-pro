@@ -83,7 +83,7 @@ const accentStyles: Record<AccentColor, { border: string; iconBg: string; iconTe
 const IndustriesPage = () => (
   <PageLayout>
     <section className="section-padding blue-ambient pb-12 md:pb-16">
-      <div className="mx-auto max-w-7xl">
+      <div className="mx-auto max-w-[1600px]">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center">
           <h1 className="font-display text-4xl font-bold text-foreground md:text-5xl">
             Built for Businesses That Need <span className="gradient-text">More Output</span>
@@ -94,7 +94,7 @@ const IndustriesPage = () => (
     </section>
 
     <section className="px-4 pb-24 md:px-8 md:pb-32">
-      <div className="mx-auto max-w-6xl">
+      <div className="mx-auto max-w-[1400px]">
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {industries.map((ind, i) => {
             const s = accentStyles[ind.accent];

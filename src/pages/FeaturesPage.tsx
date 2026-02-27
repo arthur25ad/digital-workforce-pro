@@ -71,7 +71,7 @@ const FeaturesPage = () => (
   <PageLayout>
     {/* Hero */}
     <section className="section-padding blue-ambient pb-12 md:pb-16">
-      <div className="mx-auto max-w-7xl">
+      <div className="mx-auto max-w-[1600px]">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center">
           <h1 className="font-display text-4xl font-bold text-foreground md:text-5xl">
             Everything Your AI Team Needs to <span className="gradient-text">Get Work Done</span>
@@ -85,7 +85,7 @@ const FeaturesPage = () => (
 
     {/* Dashboard preview band */}
     <section className="px-4 pb-16 md:px-8 md:pb-24">
-      <div className="mx-auto max-w-5xl">
+      <div className="mx-auto max-w-[1200px]">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -128,7 +128,7 @@ const FeaturesPage = () => (
         key={group.heading}
         className={`px-4 md:px-8 ${gi === groups.length - 1 ? "pb-24 pt-8 md:pb-32" : "py-8 md:py-12"} ${gi === 1 ? "blue-ambient-bottom" : ""}`}
       >
-        <div className="mx-auto max-w-7xl">
+        <div className="mx-auto max-w-[1600px]">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}

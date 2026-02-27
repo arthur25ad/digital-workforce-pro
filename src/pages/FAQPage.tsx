@@ -19,7 +19,7 @@ const faqs = [
 const FAQPage = () => (
   <PageLayout>
     <section className="section-padding blue-ambient">
-      <div className="mx-auto max-w-3xl">
+      <div className="mx-auto max-w-4xl">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-14 text-center">
           <h1 className="font-display text-4xl font-bold text-foreground md:text-5xl">
             Frequently Asked <span className="gradient-text">Questions</span>

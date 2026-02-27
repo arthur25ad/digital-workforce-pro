@@ -36,7 +36,7 @@ const fadeUp = {
 const PublicView = () => (
   <>
     {/* ── Hero ── */}
-    <section className="relative overflow-hidden px-4 pt-24 pb-20 md:pt-32 md:pb-28 md:px-8">
+    <section className="relative overflow-hidden px-6 pt-24 pb-20 md:pt-32 md:pb-28 md:px-12 lg:px-16">
       <div className="pointer-events-none absolute inset-0" style={{
         background: "radial-gradient(ellipse 60% 50% at 50% 15%, hsl(280 70% 65% / 0.2), transparent)"
       }} />
@@ -44,11 +44,28 @@ const PublicView = () => (
         background: "radial-gradient(ellipse 35% 25% at 50% 5%, hsl(280 80% 75% / 0.12), transparent)"
       }} />
 
-      <div className="mx-auto max-w-5xl relative text-center">
-        {/* Title — massive, at the very top */}
+      <div className="mx-auto max-w-[1600px] relative text-center">
+        {/* Brain Icon — large, on top */}
+        <motion.div {...fadeUp} className="flex justify-center mb-8">
+          <div className="relative">
+            <div className="flex h-28 w-28 items-center justify-center rounded-[2rem] border border-border/50 bg-card" style={{
+              boxShadow: `0 0 80px hsl(280 70% 65% / 0.3), 0 0 160px hsl(280 70% 65% / 0.12), inset 0 1px 0 hsl(0 0% 100% / 0.05)`
+            }}>
+              <Brain size={56} style={{ color: PURPLE }} />
+            </div>
+            <div className="absolute -right-2 -top-2 flex h-9 w-9 items-center justify-center rounded-full border border-border/50 bg-card" style={{
+              boxShadow: `0 0 20px hsl(280 70% 65% / 0.35)`
+            }}>
+              <Zap size={16} style={{ color: PURPLE }} />
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Title — massive, below the brain */}
         <motion.h1
           {...fadeUp}
-          className="font-display text-5xl font-black tracking-tighter sm:text-6xl md:text-8xl lg:text-9xl leading-[0.9]"
+          transition={{ delay: 0.06 }}
+          className="font-display text-6xl font-black tracking-tighter sm:text-7xl md:text-8xl lg:text-9xl xl:text-[10rem] leading-[0.85]"
           style={{
             backgroundImage: "linear-gradient(135deg, hsl(280 70% 80%), hsl(280 70% 55%), hsl(0 0% 100% / 0.85), hsl(280 60% 50%))",
             WebkitBackgroundClip: "text",
@@ -59,27 +76,11 @@ const PublicView = () => (
           VANTABRAIN
         </motion.h1>
 
-        {/* Brain Icon — between title and subtitle */}
-        <motion.div {...fadeUp} transition={{ delay: 0.06 }} className="flex justify-center mt-8 mb-8">
-          <div className="relative">
-            <div className="flex h-20 w-20 items-center justify-center rounded-[1.5rem] border border-border/50 bg-card" style={{
-              boxShadow: `0 0 60px hsl(280 70% 65% / 0.25), 0 0 120px hsl(280 70% 65% / 0.1), inset 0 1px 0 hsl(0 0% 100% / 0.05)`
-            }}>
-              <Brain size={38} style={{ color: PURPLE }} />
-            </div>
-            <div className="absolute -right-1.5 -top-1.5 flex h-7 w-7 items-center justify-center rounded-full border border-border/50 bg-card" style={{
-              boxShadow: `0 0 16px hsl(280 70% 65% / 0.3)`
-            }}>
-              <Zap size={13} style={{ color: PURPLE }} />
-            </div>
-          </div>
-        </motion.div>
-
         {/* Subtitle */}
         <motion.p
           {...fadeUp}
-          transition={{ delay: 0.1 }}
-          className="mx-auto max-w-xl text-lg md:text-xl leading-relaxed"
+          transition={{ delay: 0.12 }}
+          className="mx-auto mt-6 max-w-2xl text-lg md:text-xl lg:text-2xl leading-relaxed"
           style={{ color: "hsl(280 70% 75% / 0.7)" }}
         >
           The intelligence layer that makes your entire AI team smarter.{" "}
@@ -87,7 +88,7 @@ const PublicView = () => (
         </motion.p>
 
         {/* CTA */}
-        <motion.div {...fadeUp} transition={{ delay: 0.15 }} className="mt-10 flex justify-center gap-4">
+        <motion.div {...fadeUp} transition={{ delay: 0.18 }} className="mt-10 flex justify-center gap-4">
           <Link
             to="/auth"
             className="inline-flex items-center gap-2 rounded-lg px-7 py-3 text-sm font-semibold uppercase tracking-wide transition-all duration-300 hover:-translate-y-0.5"
@@ -107,8 +108,8 @@ const PublicView = () => (
     </section>
 
     {/* ── Single condensed "What it does" section ── */}
-    <section className="px-4 pb-24 md:px-8">
-      <div className="mx-auto max-w-5xl">
+    <section className="px-6 pb-24 md:px-12 lg:px-16">
+      <div className="mx-auto max-w-[1400px]">
         {/* 3-Step Process — compact horizontal */}
         <motion.div {...fadeUp} transition={{ delay: 0.08 }} className="mb-16">
           <div className="rounded-2xl border border-border/40 bg-card p-6 md:p-8">
@@ -164,8 +165,8 @@ const PublicView = () => (
     </section>
 
     {/* ── Bottom CTA ── */}
-    <section className="px-4 pb-24 md:px-8">
-      <div className="mx-auto max-w-3xl text-center">
+    <section className="px-6 pb-24 md:px-12 lg:px-16">
+      <div className="mx-auto max-w-4xl text-center">
         <motion.div {...fadeUp}>
           <Brain size={28} className="mx-auto mb-3" style={{ color: PURPLE }} />
           <h2 className="font-display text-xl font-bold text-foreground md:text-2xl">
@@ -256,12 +257,12 @@ const AuthenticatedView = () => {
   return (
     <>
       {/* ── Hero ── */}
-      <section className="relative overflow-hidden px-4 pt-24 pb-2 md:pt-28 md:px-8">
+      <section className="relative overflow-hidden px-6 pt-24 pb-2 md:pt-28 md:px-12 lg:px-16">
         <div className="pointer-events-none absolute inset-0" style={{
           background: "radial-gradient(ellipse 60% 45% at 50% 10%, hsl(280 70% 65% / 0.14), transparent)"
         }} />
 
-        <div className="mx-auto max-w-5xl relative text-center">
+        <div className="mx-auto max-w-[1600px] relative text-center">
           <motion.h1
             {...fadeUp}
             className="font-display text-5xl font-black tracking-tight md:text-7xl lg:text-8xl"
@@ -282,8 +283,8 @@ const AuthenticatedView = () => {
       </section>
 
       {/* ── Dashboard ── */}
-      <section className="px-4 pb-20 md:px-8">
-        <div className="mx-auto max-w-6xl">
+      <section className="px-6 pb-20 md:px-12 lg:px-16">
+        <div className="mx-auto max-w-[1400px]">
 
           {/* Stats Row */}
           <motion.div {...fadeUp} transition={{ delay: 0.1 }} className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8 mt-8">

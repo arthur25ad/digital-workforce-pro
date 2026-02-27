@@ -22,7 +22,7 @@ const HowItWorksPage = () => (
   <PageLayout>
     {/* Hero steps */}
     <section className="section-padding blue-ambient pb-16 md:pb-20">
-      <div className="mx-auto max-w-7xl">
+      <div className="mx-auto max-w-[1600px]">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-20 text-center">
           <h1 className="font-display text-4xl font-bold text-foreground md:text-5xl">
             How <span className="gradient-text">VANTORY</span> Works
@@ -57,7 +57,7 @@ const HowItWorksPage = () => (
 
     {/* Setup walkthrough */}
     <section className="px-4 pb-24 md:px-8 md:pb-32">
-      <div className="mx-auto max-w-3xl">
+      <div className="mx-auto max-w-4xl">
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-14 text-center">
           <h2 className="font-display text-3xl font-bold text-foreground md:text-4xl">What Setup Actually Looks Like</h2>
           <p className="mt-4 text-muted-foreground">A quick walkthrough of the onboarding experience.</p>

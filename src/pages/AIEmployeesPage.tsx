@@ -30,7 +30,7 @@ const AIEmployeesPage = () => (
   <PageLayout>
     {/* Hero */}
     <section className="section-padding blue-ambient pb-10 md:pb-14">
-      <div className="mx-auto max-w-7xl">
+      <div className="mx-auto max-w-[1600px]">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center">
           <h1 className="font-display text-4xl font-bold text-foreground md:text-5xl">
             Specialized Digital Workers for <span className="gradient-text">Real Business Tasks</span>
@@ -44,7 +44,7 @@ const AIEmployeesPage = () => (
 
     {/* Intro band */}
     <section className="px-4 pb-10 md:px-8 md:pb-14">
-      <div className="mx-auto max-w-4xl">
+      <div className="mx-auto max-w-[1200px]">
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -66,7 +66,7 @@ const AIEmployeesPage = () => (
 
     {/* Role cards — 2×2, more breathing room */}
     <section className="px-4 pb-24 md:px-8 md:pb-32">
-      <div className="mx-auto max-w-5xl">
+      <div className="mx-auto max-w-[1400px]">
         <div className="grid gap-8 sm:grid-cols-2">
           {roles.map((role, i) => (
             <motion.div key={role.slug} initial={{ opacity: 0, y: 25 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: i * 0.1 }}>
