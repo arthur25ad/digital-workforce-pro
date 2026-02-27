@@ -34,14 +34,26 @@ const ScrollToTop = () => {
   return null;
 };
 
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user, loading } = useAuth();
+const ProtectedRoute = ({ children, skipRoleGuard }: { children: React.ReactNode; skipRoleGuard?: boolean }) => {
+  const { user, profile, loading } = useAuth();
   if (loading) return (
     <div className="min-h-screen bg-background flex items-center justify-center">
       <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
     </div>
   );
   if (!user) return <Navigate to="/auth" replace />;
+
+  // Guard: Starter/Growth users must choose roles before accessing the app
+  if (!skipRoleGuard && profile) {
+    const pkg = profile.active_package;
+    const hasSubscription = profile.subscription_status === "active";
+    const needsSelection = (pkg === "starter" || pkg === "growth") && hasSubscription;
+    const hasNoRoles = !profile.unlocked_roles || profile.unlocked_roles.length === 0;
+    if (needsSelection && hasNoRoles) {
+      return <Navigate to="/choose-roles" replace />;
+    }
+  }
+
   return <>{children}</>;
 };
 
@@ -66,7 +78,7 @@ const App = () => (
               <Route path="/auth" element={<AuthPage />} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />
               <Route path="/get-started" element={<ProtectedRoute><GetStartedPage /></ProtectedRoute>} />
-              <Route path="/choose-roles" element={<ProtectedRoute><ChooseRolesPage /></ProtectedRoute>} />
+              <Route path="/choose-roles" element={<ProtectedRoute skipRoleGuard><ChooseRolesPage /></ProtectedRoute>} />
               <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
               <Route path="/vantabrain" element={<VantaBrainPage />} />
               <Route path="/staff-portal" element={<ProtectedRoute><StaffPortalPage /></ProtectedRoute>} />
