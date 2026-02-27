@@ -256,51 +256,104 @@ const StaffPortalPage = () => {
           <TabsContent value="promos" className="space-y-6">
             <Card className="bg-card/50 border-border/50">
               <CardHeader><CardTitle className="text-sm">Create Promo Code</CardTitle></CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  <Input placeholder="CODE" value={promoCode} onChange={(e) => setPromoCode(e.target.value.toUpperCase())} className="font-mono" />
-                  <Input placeholder="Label / Headline" value={promoLabel} onChange={(e) => setPromoLabel(e.target.value)} />
-                  <Input placeholder="Description" value={promoDesc} onChange={(e) => setPromoDesc(e.target.value)} />
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  <Select value={promoType} onValueChange={setPromoType}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="percentage">Percentage (%)</SelectItem>
-                      <SelectItem value="fixed">Fixed ($)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Input placeholder="Default discount value" type="number" value={promoValue} onChange={(e) => setPromoValue(e.target.value)} />
-                  <Input placeholder="Max uses (optional)" type="number" value={promoMaxUses} onChange={(e) => setPromoMaxUses(e.target.value)} />
-                </div>
-
-                {/* Plan-specific discounts */}
+              <CardContent className="space-y-5">
+                {/* Section 1: Code identity */}
                 <div>
-                  <p className="text-xs font-medium text-muted-foreground mb-2">Plan-Specific Discounts (optional — overrides default)</p>
-                  <div className="grid grid-cols-3 gap-3">
-                    <Input placeholder="Starter" type="number" value={promoStarterDiscount} onChange={(e) => setPromoStarterDiscount(e.target.value)} />
-                    <Input placeholder="Growth" type="number" value={promoGrowthDiscount} onChange={(e) => setPromoGrowthDiscount(e.target.value)} />
-                    <Input placeholder="Team" type="number" value={promoTeamDiscount} onChange={(e) => setPromoTeamDiscount(e.target.value)} />
+                  <p className="text-xs font-semibold text-foreground mb-2">Code Details</p>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div>
+                      <Label htmlFor="promo-code" className="text-[11px] text-muted-foreground mb-1 block">Promo code (what users type)</Label>
+                      <Input id="promo-code" placeholder="e.g. SAVE20" value={promoCode} onChange={(e) => setPromoCode(e.target.value.toUpperCase())} className="font-mono" />
+                    </div>
+                    <div>
+                      <Label htmlFor="promo-label" className="text-[11px] text-muted-foreground mb-1 block">Banner headline (shown publicly)</Label>
+                      <Input id="promo-label" placeholder="e.g. Limited Time Offer" value={promoLabel} onChange={(e) => setPromoLabel(e.target.value)} />
+                    </div>
+                    <div>
+                      <Label htmlFor="promo-desc" className="text-[11px] text-muted-foreground mb-1 block">Internal note (staff only)</Label>
+                      <Input id="promo-desc" placeholder="e.g. Q1 launch campaign" value={promoDesc} onChange={(e) => setPromoDesc(e.target.value)} />
+                    </div>
                   </div>
                 </div>
 
-                {/* Toggle options */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="flex items-center gap-2">
-                    <Switch checked={promoVisibleHomepage} onCheckedChange={setPromoVisibleHomepage} id="hp" />
-                    <Label htmlFor="hp" className="text-xs">Show on homepage</Label>
+                {/* Section 2: Default discount */}
+                <div>
+                  <p className="text-xs font-semibold text-foreground mb-2">Default Discount</p>
+                  <p className="text-[11px] text-muted-foreground mb-2">Applied to all plans unless overridden below</p>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div>
+                      <Label className="text-[11px] text-muted-foreground mb-1 block">Discount type</Label>
+                      <Select value={promoType} onValueChange={setPromoType}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="percentage">Percentage (%)</SelectItem>
+                          <SelectItem value="fixed">Fixed amount ($)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label className="text-[11px] text-muted-foreground mb-1 block">Discount amount</Label>
+                      <Input placeholder={promoType === "percentage" ? "e.g. 20" : "e.g. 10"} type="number" value={promoValue} onChange={(e) => setPromoValue(e.target.value)} />
+                    </div>
+                    <div>
+                      <Label className="text-[11px] text-muted-foreground mb-1 block">Max total uses (leave empty = unlimited)</Label>
+                      <Input placeholder="e.g. 100" type="number" value={promoMaxUses} onChange={(e) => setPromoMaxUses(e.target.value)} />
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Switch checked={promoVisiblePricing} onCheckedChange={setPromoVisiblePricing} id="pr" />
-                    <Label htmlFor="pr" className="text-xs">Show on pricing</Label>
+                </div>
+
+                {/* Section 3: Plan-specific overrides */}
+                <div>
+                  <p className="text-xs font-semibold text-foreground mb-1">Per-Plan Discount Overrides</p>
+                  <p className="text-[11px] text-muted-foreground mb-2">Leave blank to use the default discount above. Fill in to give a specific plan a different discount.</p>
+                  <div className="grid grid-cols-3 gap-3">
+                    <div>
+                      <Label className="text-[11px] text-muted-foreground mb-1 block">Starter ({promoType === "percentage" ? "%" : "$"})</Label>
+                      <Input placeholder="—" type="number" value={promoStarterDiscount} onChange={(e) => setPromoStarterDiscount(e.target.value)} />
+                    </div>
+                    <div>
+                      <Label className="text-[11px] text-muted-foreground mb-1 block">Growth ({promoType === "percentage" ? "%" : "$"})</Label>
+                      <Input placeholder="—" type="number" value={promoGrowthDiscount} onChange={(e) => setPromoGrowthDiscount(e.target.value)} />
+                    </div>
+                    <div>
+                      <Label className="text-[11px] text-muted-foreground mb-1 block">Team ({promoType === "percentage" ? "%" : "$"})</Label>
+                      <Input placeholder="—" type="number" value={promoTeamDiscount} onChange={(e) => setPromoTeamDiscount(e.target.value)} />
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Switch checked={promoPrivate} onCheckedChange={setPromoPrivate} id="pv" />
-                    <Label htmlFor="pv" className="text-xs">Private code</Label>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Switch checked={promoFirstCycleOnly} onCheckedChange={setPromoFirstCycleOnly} id="fc" />
-                    <Label htmlFor="fc" className="text-xs">First month only</Label>
+                </div>
+
+                {/* Section 4: Visibility & behavior toggles */}
+                <div>
+                  <p className="text-xs font-semibold text-foreground mb-2">Visibility & Behavior</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="flex items-start gap-2 p-2 rounded-md bg-muted/10 border border-border/30">
+                      <Switch checked={promoVisibleHomepage} onCheckedChange={setPromoVisibleHomepage} id="hp" className="mt-0.5" />
+                      <div>
+                        <Label htmlFor="hp" className="text-xs font-medium block">Homepage banner</Label>
+                        <span className="text-[10px] text-muted-foreground">Show green promo strip on homepage</span>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-2 p-2 rounded-md bg-muted/10 border border-border/30">
+                      <Switch checked={promoVisiblePricing} onCheckedChange={setPromoVisiblePricing} id="pr" className="mt-0.5" />
+                      <div>
+                        <Label htmlFor="pr" className="text-xs font-medium block">Pricing badge</Label>
+                        <span className="text-[10px] text-muted-foreground">Show promo available on pricing page</span>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-2 p-2 rounded-md bg-muted/10 border border-border/30">
+                      <Switch checked={promoPrivate} onCheckedChange={setPromoPrivate} id="pv" className="mt-0.5" />
+                      <div>
+                        <Label htmlFor="pv" className="text-xs font-medium block">Private / hidden</Label>
+                        <span className="text-[10px] text-muted-foreground">Only works when manually entered</span>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-2 p-2 rounded-md bg-muted/10 border border-border/30">
+                      <Switch checked={promoFirstCycleOnly} onCheckedChange={setPromoFirstCycleOnly} id="fc" className="mt-0.5" />
+                      <div>
+                        <Label htmlFor="fc" className="text-xs font-medium block">First month only</Label>
+                        <span className="text-[10px] text-muted-foreground">Discount applies to 1st billing cycle, then full price</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
@@ -325,7 +378,7 @@ const StaffPortalPage = () => {
                             </span>
                             {p.label && <span className="text-xs text-muted-foreground">— {p.label}</span>}
                             {p.first_billing_cycle_only && (
-                              <Badge variant="outline" className="text-[9px] border-amber-500/40 text-amber-400"><Clock size={10} className="mr-1" />1st month</Badge>
+                              <Badge variant="outline" className="text-[9px] border-amber-500/40 text-amber-400"><Clock size={10} className="mr-1" />1st month only</Badge>
                             )}
                           </div>
                           <div className="flex items-center gap-2">
@@ -344,24 +397,24 @@ const StaffPortalPage = () => {
                             onClick={() => handleToggleField(p.id, "is_visible_on_homepage", !p.is_visible_on_homepage)}
                             className={`flex items-center gap-1 text-[10px] rounded-full px-2 py-0.5 border transition-colors ${p.is_visible_on_homepage ? "border-emerald-500/40 text-emerald-400 bg-emerald-500/10" : "border-border/40 text-muted-foreground"}`}
                           >
-                            {p.is_visible_on_homepage ? <Eye size={10} /> : <EyeOff size={10} />} Homepage
+                            {p.is_visible_on_homepage ? <Eye size={10} /> : <EyeOff size={10} />} Homepage banner
                           </button>
                           <button
                             onClick={() => handleToggleField(p.id, "is_visible_on_pricing", !p.is_visible_on_pricing)}
                             className={`flex items-center gap-1 text-[10px] rounded-full px-2 py-0.5 border transition-colors ${p.is_visible_on_pricing ? "border-emerald-500/40 text-emerald-400 bg-emerald-500/10" : "border-border/40 text-muted-foreground"}`}
                           >
-                            {p.is_visible_on_pricing ? <Eye size={10} /> : <EyeOff size={10} />} Pricing
+                            {p.is_visible_on_pricing ? <Eye size={10} /> : <EyeOff size={10} />} Pricing badge
                           </button>
                           <button
                             onClick={() => handleToggleField(p.id, "is_private", !p.is_private)}
                             className={`flex items-center gap-1 text-[10px] rounded-full px-2 py-0.5 border transition-colors ${p.is_private ? "border-amber-500/40 text-amber-400 bg-amber-500/10" : "border-border/40 text-muted-foreground"}`}
                           >
-                            {p.is_private ? <EyeOff size={10} /> : <Eye size={10} />} {p.is_private ? "Private" : "Public"}
+                            {p.is_private ? <EyeOff size={10} /> : <Eye size={10} />} {p.is_private ? "Hidden / private" : "Public"}
                           </button>
                           {/* Plan-specific badges */}
                           {(p.starter_discount > 0 || p.growth_discount > 0 || p.team_discount > 0) && (
                             <span className="text-[10px] text-muted-foreground">
-                              Plans: {p.starter_discount > 0 ? `S:${p.starter_discount}` : ""} {p.growth_discount > 0 ? `G:${p.growth_discount}` : ""} {p.team_discount > 0 ? `T:${p.team_discount}` : ""}
+                              Overrides: {p.starter_discount > 0 ? `Starter: ${p.starter_discount}` : ""} {p.growth_discount > 0 ? `Growth: ${p.growth_discount}` : ""} {p.team_discount > 0 ? `Team: ${p.team_discount}` : ""}
                             </span>
                           )}
                         </div>
