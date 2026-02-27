@@ -36,7 +36,6 @@ export const PACKAGES: Record<string, PackageConfig> = {
     stripeProductId: "prod_U3XrEJudX0PqCB",
     trialDays: 3,
     features: [
-      "3-day free trial",
       "1 AI employee of your choice",
       "Basic workflows",
       "Email support",
@@ -56,7 +55,6 @@ export const PACKAGES: Record<string, PackageConfig> = {
     stripeProductId: "prod_U3XsKaIFk0TD7K",
     trialDays: 7,
     features: [
-      "7-day free trial",
       "Choose 3 AI employees",
       "Multi-role support",
       "Priority setup",
