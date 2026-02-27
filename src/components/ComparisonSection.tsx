@@ -10,11 +10,11 @@ const traditional = [
 ];
 
 const ai = [
-  "24/7 support",
-  "Faster setup",
-  "Consistent execution",
-  "Lower operational overhead",
-  "Scalable support across tasks",
+  "Available 24/7",
+  "Ready in minutes",
+  "Consistent every time",
+  "No extra headcount",
+  "Scales with your business",
 ];
 
 const ComparisonSection = () => {
@@ -33,12 +33,11 @@ const ComparisonSection = () => {
         </motion.div>
 
         <div className="grid gap-6 md:grid-cols-2">
-          {/* Traditional */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="rounded-xl border border-border/50 bg-card p-6"
+            className="rounded-xl border border-border/50 border-t-2 border-t-red-400/30 bg-card p-6"
           >
             <h3 className="mb-5 font-display text-lg font-semibold text-muted-foreground">Traditional Hiring</h3>
             <div className="space-y-3">
@@ -51,19 +50,17 @@ const ComparisonSection = () => {
             </div>
           </motion.div>
 
-          {/* AI */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="card-glass rounded-xl p-6"
-            style={{ borderColor: "hsl(217 91% 60% / 0.2)" }}
+            className="rounded-xl border border-primary/20 border-t-2 border-t-[hsl(174,60%,50%)]/50 bg-card p-6"
           >
-            <h3 className="mb-5 font-display text-lg font-semibold text-primary">AI Employees</h3>
+            <h3 className="mb-5 font-display text-lg font-semibold text-[hsl(174,60%,50%)]">AI Employees</h3>
             <div className="space-y-3">
               {ai.map((item) => (
                 <div key={item} className="flex items-center gap-3">
-                  <Check size={16} className="text-primary" />
+                  <Check size={16} className="text-[hsl(174,60%,50%)]" />
                   <span className="text-sm text-foreground">{item}</span>
                 </div>
               ))}

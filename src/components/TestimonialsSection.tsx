@@ -6,22 +6,31 @@ const testimonials = [
     quote: "We finally respond faster without hiring another person.",
     name: "Jessica R.",
     role: "Med Spa Owner",
+    accent: "border-t-[hsl(262,60%,58%)]/40",
   },
   {
     quote: "Our follow-ups are more consistent and our inbox is easier to manage.",
     name: "Marcus T.",
     role: "Real Estate Agent",
+    accent: "border-t-primary/40",
   },
   {
     quote: "This feels like having extra hands without the extra payroll.",
     name: "Amanda K.",
     role: "Cleaning Company Founder",
+    accent: "border-t-[hsl(174,60%,50%)]/40",
   },
+];
+
+const quoteColors = [
+  "text-[hsl(262,60%,58%)]/40",
+  "text-primary/40",
+  "text-[hsl(174,60%,50%)]/40",
 ];
 
 const TestimonialsSection = () => {
   return (
-    <section className="section-padding blue-ambient-bottom">
+    <section className="section-padding violet-ambient-bottom">
       <div className="mx-auto max-w-7xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -33,7 +42,7 @@ const TestimonialsSection = () => {
             Made for Business Owners Who Need Help Now
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-muted-foreground">
-            This platform is designed for people who want real business help — not another complicated software system.
+            Real feedback from business owners using AI employees to save time every day.
           </p>
         </motion.div>
 
@@ -45,9 +54,9 @@ const TestimonialsSection = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: i * 0.1 }}
-              className="card-glass rounded-xl p-6"
+              className={`card-glass rounded-xl border-t-2 ${t.accent} p-6`}
             >
-              <Quote size={20} className="mb-4 text-primary/40" />
+              <Quote size={20} className={`mb-4 ${quoteColors[i]}`} />
               <p className="text-base leading-relaxed text-foreground">{t.quote}</p>
               <div className="mt-5 border-t border-border/40 pt-4">
                 <p className="text-sm font-semibold text-foreground">{t.name}</p>
