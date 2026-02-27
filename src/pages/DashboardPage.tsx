@@ -19,14 +19,14 @@ const roleColors = {
   "social-media-manager": { text: "text-blue-400", bg: "bg-blue-500/10", border: "border-blue-500/20", glow: "hsl(217 91% 60% / 0.15)", accent: "hsl(217 91% 60%)" },
   "email-marketer": { text: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/20", glow: "hsl(160 60% 45% / 0.15)", accent: "hsl(160 60% 45%)" },
   "customer-support": { text: "text-violet-400", bg: "bg-violet-500/10", border: "border-violet-500/20", glow: "hsl(262 60% 58% / 0.15)", accent: "hsl(262 60% 58%)" },
-  "virtual-assistant": { text: "text-amber-400", bg: "bg-amber-500/10", border: "border-amber-500/20", glow: "hsl(38 80% 55% / 0.15)", accent: "hsl(38 80% 55%)" },
+  "calendar-assistant": { text: "text-amber-400", bg: "bg-amber-500/10", border: "border-amber-500/20", glow: "hsl(38 80% 55% / 0.15)", accent: "hsl(38 80% 55%)" },
 };
 
 const roleConfig = [
   { icon: Share2, label: "Social Media", fullLabel: "Social Media Manager", slug: "social-media-manager" as const },
   { icon: Mail, label: "Email Marketing", fullLabel: "Email Marketer", slug: "email-marketer" as const },
   { icon: Headphones, label: "Customer Support", fullLabel: "Customer Support", slug: "customer-support" as const },
-  { icon: CalendarCheck, label: "Virtual Assistant", fullLabel: "Virtual Assistant", slug: "virtual-assistant" as const },
+  { icon: CalendarCheck, label: "Calendar Assistant", fullLabel: "AI Calendar Assistant", slug: "calendar-assistant" as const },
 ];
 
 function useRoleSummary() {
@@ -39,7 +39,7 @@ function useRoleSummary() {
     "social-media-manager": { count: drafts.length, unit: "drafts", trend: drafts.length > 0 ? "+24%" : null },
     "email-marketer": { count: emailCampaigns.length + emailDrafts.length, unit: "items", trend: emailCampaigns.length > 0 ? "+15%" : null },
     "customer-support": { count: supportTickets.length, unit: "tickets", trend: supportTickets.length > 0 ? "+32%" : null },
-    "virtual-assistant": { count: vaTasks.length + vaRequests.length, unit: "tasks", trend: vaTasks.length > 0 ? "+18%" : null },
+    "calendar-assistant": { count: vaTasks.length + vaRequests.length, unit: "tasks", trend: vaTasks.length > 0 ? "+18%" : null },
   };
 }
 
@@ -58,7 +58,7 @@ function getActivityRole(type: string) {
   if (type.includes("social") || type.includes("draft")) return "social-media-manager";
   if (type.includes("email") || type.includes("campaign")) return "email-marketer";
   if (type.includes("support") || type.includes("ticket")) return "customer-support";
-  return "virtual-assistant";
+  return "calendar-assistant";
 }
 
 function getActivityIcon(type: string) {

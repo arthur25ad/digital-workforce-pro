@@ -23,9 +23,9 @@ const roles = [
     color: "text-emerald-400", bg: "bg-emerald-500/10", hoverBorder: "hover:border-emerald-500/30",
   },
   {
-    icon: CalendarCheck, title: "Virtual Assistant", slug: "virtual-assistant",
-    value: "Stay organized with automated scheduling, tasks, and follow-ups.",
-    workflow: ["Tasks", "Tools", "Summaries", "Coordination"],
+    icon: CalendarCheck, title: "AI Calendar Assistant", slug: "calendar-assistant",
+    value: "Smart scheduling, appointment management, reminders, and follow-up timing.",
+    workflow: ["Appointments", "Scheduling", "Reminders", "Follow-ups"],
     color: "text-amber-400", bg: "bg-amber-500/10", hoverBorder: "hover:border-amber-500/30",
   },
 ];

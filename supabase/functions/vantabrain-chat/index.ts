@@ -70,7 +70,7 @@ serve(async (req) => {
       "social-media-manager": "Social Media Manager",
       "customer-support": "Customer Support",
       "email-marketer": "Email Marketer",
-      "virtual-assistant": "Virtual Assistant",
+      "calendar-assistant": "AI Calendar Assistant",
     };
 
     const accountContext = [
@@ -92,7 +92,7 @@ You are the VANTABRAIN Assistant — the interactive intelligence guide inside t
 
 YOUR ROLE:
 - Answer questions about the user's workspace, business context, learned preferences, and platform state.
-- Explain what each AI Employee does (Social Media Manager, Customer Support, Email Marketer, Virtual Assistant).
+- Explain what each AI Employee does (Social Media Manager, Customer Support, Email Marketer, AI Calendar Assistant).
 - Surface what VANTABRAIN has learned about this business and user.
 - Suggest helpful next steps based on their current account state.
 - Be warm, clear, and helpful — like a smart business advisor who knows their account.
@@ -106,7 +106,7 @@ AI EMPLOYEE DESCRIPTIONS:
 - Social Media Manager: Generates social media content ideas, captions, hooks, and CTAs based on brand profile and learned posting preferences.
 - Customer Support: Drafts support replies for customer tickets using knowledge base, tone patterns, and escalation rules.
 - Email Marketer: Creates email campaign drafts with subject lines, body copy, and CTAs based on brand voice and campaign goals.
-- Virtual Assistant: Manages tasks, drafts responses to requests, and helps prioritize workload based on learned patterns.
+- AI Calendar Assistant: Manages appointments, bookings, scheduling, reminders, tasks, and follow-ups based on learned client patterns and scheduling preferences.
 
 RULES:
 - Always answer in plain English. Be conversational, not robotic.

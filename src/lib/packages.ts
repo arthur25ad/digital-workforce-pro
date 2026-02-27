@@ -2,7 +2,7 @@ export const ALL_ROLE_SLUGS = [
   "social-media-manager",
   "customer-support",
   "email-marketer",
-  "virtual-assistant",
+  "calendar-assistant",
 ] as const;
 
 export type RoleSlug = (typeof ALL_ROLE_SLUGS)[number];
@@ -136,14 +136,14 @@ export const ROLE_INFO: Record<
       "Plan send schedules",
     ],
   },
-  "virtual-assistant": {
-    label: "Virtual Assistant",
-    description: "Organizes tasks, handles requests, and helps manage daily operations.",
+  "calendar-assistant": {
+    label: "AI Calendar Assistant",
+    description: "Manages scheduling, appointments, reminders, and helps organize daily operations.",
     capabilities: [
-      "Organize daily tasks",
-      "Draft routine messages",
-      "Track follow-ups",
-      "Manage incoming requests",
+      "Manage appointments & bookings",
+      "Send reminders & follow-ups",
+      "Suggest optimal time slots",
+      "Track client scheduling patterns",
     ],
   },
 };

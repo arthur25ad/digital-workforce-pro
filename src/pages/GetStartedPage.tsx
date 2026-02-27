@@ -17,7 +17,7 @@ const aiRoles = [
   { key: "social", icon: Share2, label: "Social Media Manager" },
   { key: "support", icon: Headphones, label: "Customer Support" },
   { key: "email", icon: Mail, label: "Email Marketer" },
-  { key: "assistant", icon: CalendarCheck, label: "Virtual Assistant" },
+  { key: "assistant", icon: CalendarCheck, label: "AI Calendar Assistant" },
 ];
 
 const platformGroups = [
@@ -49,7 +49,7 @@ const platformGroups = [
   },
 ];
 
-const roleLabels: Record<string, string> = { social: "Social Media Manager", support: "Customer Support", email: "Email Marketer", assistant: "Virtual Assistant" };
+const roleLabels: Record<string, string> = { social: "Social Media Manager", support: "Customer Support", email: "Email Marketer", assistant: "AI Calendar Assistant" };
 
 const GetStartedPage = () => {
   const [searchParams] = useSearchParams();

@@ -22,7 +22,7 @@ const roleStats = [
   { icon: Share2, label: "Social Media", ...roleColors.social, stat: "12", unit: "posts this week", trend: "+24%" },
   { icon: Mail, label: "Email Marketing", ...roleColors.email, stat: "8", unit: "campaigns active", trend: "+15%" },
   { icon: Headphones, label: "Customer Support", ...roleColors.support, stat: "47", unit: "replies drafted", trend: "+32%" },
-  { icon: CalendarCheck, label: "Virtual Assistant", ...roleColors.assistant, stat: "23", unit: "tasks managed", trend: "+18%" },
+  { icon: CalendarCheck, label: "Calendar Assistant", ...roleColors.assistant, stat: "23", unit: "appointments managed", trend: "+18%" },
 ];
 
 function AnimatedCounter({ target, duration = 2 }: { target: number; duration?: number }) {

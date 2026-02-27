@@ -16,7 +16,7 @@ const TermsPage = () => (
             </div>
             <div>
               <h2 className="font-display text-lg font-semibold text-foreground mb-3">2. Description of Service</h2>
-              <p>VANTORY provides AI-powered workforce automation tools including social media management, customer support, email marketing, and virtual assistant capabilities for small businesses.</p>
+              <p>VANTORY provides AI-powered workforce automation tools including social media management, customer support, email marketing, and calendar assistant capabilities for small businesses.</p>
             </div>
             <div>
               <h2 className="font-display text-lg font-semibold text-foreground mb-3">3. User Responsibilities</h2>

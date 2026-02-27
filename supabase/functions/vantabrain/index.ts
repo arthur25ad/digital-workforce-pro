@@ -165,7 +165,7 @@ serve(async (req) => {
         "social-media-manager": "posting times, platforms, content types, caption styles, CTA patterns, content themes, approval patterns, scheduling choices",
         "customer-support": "reply tone, reply structures, resolution patterns, escalation rules, reply length, policy language, issue-response pairings",
         "email-marketer": "send times, campaign timing, subject line styles, CTA patterns, audience segments, campaign types by season, approval preferences",
-        "virtual-assistant": "task priorities, follow-up cadence, next-step patterns, message style, admin workflows, request handling, approval tendencies",
+        "calendar-assistant": "scheduling patterns, appointment timing, client recurrence, reminder preferences, follow-up cadence, booking windows, reschedule tendencies, service durations, preferred days",
       };
 
       const focusAreas = rolePrompts[roleScope] || "general behavioral preferences";

@@ -35,11 +35,11 @@ const roles: Record<string, RoleConfig> = {
     capabilities: ["Create email roadmaps", "Draft newsletters", "Generate subject lines and CTAs", "Build promo campaigns", "Prepare post-purchase emails", "Coordinate re-engagement flows", "Summarize performance trends"],
     Demo: EmailMarketerDemo,
   },
-  "virtual-assistant": {
-    icon: CalendarCheck, title: "Your AI Virtual Assistant", roleKey: "assistant", slug: "virtual-assistant",
-    summary: "From scheduling to coordination, this AI role helps turn scattered requests into organized execution without constant follow-up.",
-    valuePoints: ["Understands your habits, priorities, and work context", "Organizes emails, schedules, and progress", "Helps keep work moving 24/7", "Supports scalable day-to-day operations"],
-    capabilities: ["Create task roadmaps", "Draft and summarize outputs", "Track progress", "Coordinate follow-ups", "Provide daily summaries", "Support ad-hoc requests", "Reduce interruptions"],
+  "calendar-assistant": {
+    icon: CalendarCheck, title: "Your AI Calendar Assistant", roleKey: "assistant", slug: "calendar-assistant",
+    summary: "From scheduling to coordination, this AI role helps manage appointments, bookings, reminders, and follow-up timing — so you never miss a client.",
+    valuePoints: ["Understands your scheduling habits and client patterns", "Manages appointments, rescheduling, and reminders", "Helps keep work moving 24/7", "Learns preferred booking windows over time"],
+    capabilities: ["Manage appointments & bookings", "Suggest optimal time slots", "Send appointment reminders", "Handle rescheduling requests", "Track client scheduling patterns", "Coordinate follow-ups", "Provide daily scheduling summaries"],
     Demo: VirtualAssistantDemo,
   },
 };

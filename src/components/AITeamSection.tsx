@@ -28,8 +28,8 @@ const roles = [
     tagColor: "text-[hsl(262,60%,58%)]/70",
   },
   {
-    icon: CalendarCheck, title: "Virtual Assistant", slug: "virtual-assistant", agent: "Admin Agent",
-    description: "Helps with scheduling, reminders, admin tasks, follow-ups, and business organization.",
+    icon: CalendarCheck, title: "AI Calendar Assistant", slug: "calendar-assistant", agent: "Scheduling Agent",
+    description: "Manages appointments, bookings, reminders, follow-ups, and daily scheduling for your business.",
     accentBorder: "hover:border-t-[hsl(38,80%,55%)]/60",
     iconBg: "bg-[hsl(38,80%,55%)]/10",
     iconColor: "text-[hsl(38,80%,55%)]",
