@@ -6,7 +6,7 @@ import { useVantaBrainMemories, useVantaBrainStats, useVantaBrainActions } from 
 import { useBrainSettings } from "@/hooks/useBrainSettings";
 import {
   Brain, Sparkles, Trash2, Eye, EyeOff, TrendingUp,
-  Lightbulb, Clock, Shield, Zap, Database,
+  Lightbulb, Clock, Shield, Database,
   Activity, Network, BarChart3, Layers, ArrowRight,
   Globe, Lock, Cpu, Mail, MessageSquare,
   Users, Plug, Settings, History, AlertCircle,
@@ -54,11 +54,6 @@ const PublicView = () => (
               boxShadow: `0 0 80px hsl(280 70% 65% / 0.3), 0 0 160px hsl(280 70% 65% / 0.12), inset 0 1px 0 hsl(0 0% 100% / 0.05)`
             }}>
               <Brain size={56} style={{ color: PURPLE }} />
-            </div>
-            <div className="absolute -right-2 -top-2 flex h-9 w-9 items-center justify-center rounded-full border border-border/50 bg-card" style={{
-              boxShadow: `0 0 20px hsl(280 70% 65% / 0.35)`
-            }}>
-              <Zap size={16} style={{ color: PURPLE }} />
             </div>
           </div>
         </motion.div>
