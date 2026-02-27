@@ -19,6 +19,7 @@ export interface PackageConfig {
   features: string[];
   stripePriceId: string;
   stripeProductId: string;
+  trialDays?: number;
 }
 
 export const PACKAGES: Record<string, PackageConfig> = {
@@ -33,7 +34,9 @@ export const PACKAGES: Record<string, PackageConfig> = {
     defaultRoles: [],
     stripePriceId: "price_1T5QmBK99ArQ30pFn7FGni9h",
     stripeProductId: "prod_U3XrEJudX0PqCB",
+    trialDays: 3,
     features: [
+      "3-day free trial",
       "1 AI employee of your choice",
       "Basic workflows",
       "Email support",
@@ -51,7 +54,9 @@ export const PACKAGES: Record<string, PackageConfig> = {
     defaultRoles: [],
     stripePriceId: "price_1T5QmTK99ArQ30pFmRrxLr1w",
     stripeProductId: "prod_U3XsKaIFk0TD7K",
+    trialDays: 7,
     features: [
+      "7-day free trial",
       "Choose 3 AI employees",
       "Multi-role support",
       "Priority setup",

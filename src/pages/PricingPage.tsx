@@ -93,6 +93,11 @@ const PricingPage = () => {
                   <div className="mt-6">
                     <span className="font-display text-4xl font-bold text-foreground">{plan.price}</span>
                     <span className="text-sm text-muted-foreground">{plan.period}</span>
+                    {plan.trialDays && (
+                      <p className="mt-2 text-xs font-medium text-primary">
+                        {plan.trialDays}-day free trial · auto-bills after
+                      </p>
+                    )}
                   </div>
                   <ul className="mt-8 space-y-3">
                     {plan.features.map((f) => (
@@ -106,7 +111,7 @@ const PricingPage = () => {
                       className={`mt-8 block w-full rounded-lg py-3 text-center text-sm font-semibold transition-all duration-300 disabled:opacity-50 ${
                         isPopular ? "btn-glow" : "btn-outline-glow"
                       }`}>
-                      {isLoading ? <Loader2 className="mx-auto h-4 w-4 animate-spin" /> : "Subscribe"}
+                      {isLoading ? <Loader2 className="mx-auto h-4 w-4 animate-spin" /> : plan.trialDays ? `Start ${plan.trialDays}-Day Free Trial` : "Subscribe"}
                     </button>
                   ) : (
                     <Link to="/auth"
