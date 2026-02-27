@@ -23,7 +23,7 @@ export const PACKAGES: Record<string, PackageConfig> = {
   starter: {
     key: "starter",
     name: "Starter",
-    price: "$64",
+    price: "$49",
     period: "/mo",
     description: "Good for solo operators",
     maxRoles: 1,
@@ -39,7 +39,7 @@ export const PACKAGES: Record<string, PackageConfig> = {
   growth: {
     key: "growth",
     name: "Growth",
-    price: "$149",
+    price: "$99",
     period: "/mo",
     description: "Best for growing businesses",
     maxRoles: 3,
@@ -56,7 +56,7 @@ export const PACKAGES: Record<string, PackageConfig> = {
   team: {
     key: "team",
     name: "Team",
-    price: "$199",
+    price: "$129",
     period: "/mo",
     description: "Best for operational scale",
     maxRoles: 4,
