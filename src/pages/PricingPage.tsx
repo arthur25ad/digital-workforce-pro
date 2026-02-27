@@ -94,7 +94,8 @@ const PricingPage = () => {
                     <span className="font-display text-4xl font-bold text-foreground">{plan.price}</span>
                     <span className="text-sm text-muted-foreground">{plan.period}</span>
                     {plan.trialDays && (
-                      <p className="mt-2 text-xs font-medium text-primary">
+                      <p className="mt-3 flex items-center gap-2 text-base font-semibold text-emerald-400">
+                        <Check size={20} className="text-emerald-400" />
                         {plan.trialDays}-day free trial · auto-bills after
                       </p>
                     )}
