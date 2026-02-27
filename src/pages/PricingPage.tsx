@@ -1,23 +1,37 @@
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Check } from "lucide-react";
 import PageLayout from "@/components/PageLayout";
 import { useAuth } from "@/hooks/useAuth";
-
-const plans = [
-  { name: "Starter", price: "$64", period: "/mo", key: "starter", description: "Good for solo operators", roles: ["social-media-manager"], features: ["1 AI employee (Social Media Manager)", "Basic workflows", "Email support", "Standard setup"], popular: false },
-  { name: "Growth", price: "$149", period: "/mo", key: "growth", description: "Best for growing businesses", roles: ["social-media-manager", "customer-support", "email-marketer"], features: ["3 AI employees", "Multi-role support", "Priority setup", "Custom workflows", "Platform integrations"], popular: true },
-  { name: "Team", price: "$199", period: "/mo", key: "team", description: "Best for operational scale", roles: ["social-media-manager", "customer-support", "email-marketer", "virtual-assistant"], features: ["Full AI team (4 roles)", "Cross-functional workflows", "Dedicated support", "Advanced integrations", "Custom reporting"], popular: false },
-];
+import { PACKAGES, PACKAGE_ORDER, packageNeedsRoleSelection } from "@/lib/packages";
+import { toast } from "@/hooks/use-toast";
 
 const PricingPage = () => {
   const { user, profile, updateProfile } = useAuth();
+  const navigate = useNavigate();
 
-  const handleSelectPlan = async (planKey: string, roles: string[]) => {
-    if (user && profile) {
-      await updateProfile({ active_package: planKey, unlocked_roles: roles });
+  const handleSelectPlan = async (planKey: string) => {
+    if (!user || !profile) return;
+
+    const pkg = PACKAGES[planKey];
+    if (!pkg) return;
+
+    // Update the package on the account
+    await updateProfile({ active_package: planKey });
+
+    if (pkg.autoUnlockAll) {
+      // Team: auto-unlock all roles
+      await updateProfile({ unlocked_roles: [...pkg.defaultRoles] });
+      toast({ title: `Upgraded to ${pkg.name}!`, description: "All AI Employees unlocked." });
+      navigate("/dashboard");
+    } else {
+      // Starter / Growth: needs role selection
+      toast({ title: `${pkg.name} plan activated`, description: "Now choose your AI Employees." });
+      navigate("/choose-roles");
     }
   };
+
+  const plans = PACKAGE_ORDER.map((key) => PACKAGES[key]);
 
   return (
     <PageLayout>
@@ -39,6 +53,7 @@ const PricingPage = () => {
           <div className="grid gap-8 md:grid-cols-3">
             {plans.map((plan, i) => {
               const isCurrentPlan = profile?.active_package === plan.key;
+              const isPopular = plan.key === "growth";
               return (
                 <motion.div
                   key={plan.name}
@@ -47,11 +62,11 @@ const PricingPage = () => {
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: i * 0.1 }}
                   className={`relative rounded-2xl border p-8 transition-all duration-300 ${
-                    plan.popular ? "border-primary/40 bg-card" : "border-border/50 bg-card"
+                    isPopular ? "border-primary/40 bg-card" : "border-border/50 bg-card"
                   }`}
-                  style={plan.popular ? { boxShadow: "0 0 40px hsl(217 91% 60% / 0.1)" } : {}}
+                  style={isPopular ? { boxShadow: "0 0 40px hsl(217 91% 60% / 0.1)" } : {}}
                 >
-                  {plan.popular && (
+                  {isPopular && (
                     <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-primary px-4 py-1 text-xs font-semibold text-primary-foreground">Most Popular</span>
                   )}
                   {isCurrentPlan && (
@@ -75,17 +90,17 @@ const PricingPage = () => {
                       </div>
                     ) : (
                       <button
-                        onClick={() => handleSelectPlan(plan.key, plan.roles)}
+                        onClick={() => handleSelectPlan(plan.key)}
                         className={`mt-8 block w-full rounded-lg py-3 text-center text-sm font-semibold transition-all duration-300 ${
-                          plan.popular ? "btn-glow" : "btn-outline-glow"
+                          isPopular ? "btn-glow" : "btn-outline-glow"
                         }`}>
-                        {profile && plans.findIndex(p => p.key === profile.active_package) < i ? "Upgrade" : "Switch Plan"}
+                        {profile && PACKAGE_ORDER.indexOf(profile.active_package) < PACKAGE_ORDER.indexOf(plan.key) ? "Upgrade" : "Switch Plan"}
                       </button>
                     )
                   ) : (
                     <Link to="/auth"
                       className={`mt-8 block w-full rounded-lg py-3 text-center text-sm font-semibold transition-all duration-300 ${
-                        plan.popular ? "btn-glow" : "btn-outline-glow"
+                        isPopular ? "btn-glow" : "btn-outline-glow"
                       }`}>
                       Get Started
                     </Link>

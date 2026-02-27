@@ -1,0 +1,149 @@
+export const ALL_ROLE_SLUGS = [
+  "social-media-manager",
+  "customer-support",
+  "email-marketer",
+  "virtual-assistant",
+] as const;
+
+export type RoleSlug = (typeof ALL_ROLE_SLUGS)[number];
+
+export interface PackageConfig {
+  key: string;
+  name: string;
+  price: string;
+  period: string;
+  description: string;
+  maxRoles: number;
+  autoUnlockAll: boolean;
+  defaultRoles: RoleSlug[];
+  features: string[];
+}
+
+export const PACKAGES: Record<string, PackageConfig> = {
+  starter: {
+    key: "starter",
+    name: "Starter",
+    price: "$64",
+    period: "/mo",
+    description: "Good for solo operators",
+    maxRoles: 1,
+    autoUnlockAll: false,
+    defaultRoles: [],
+    features: [
+      "1 AI employee of your choice",
+      "Basic workflows",
+      "Email support",
+      "Standard setup",
+    ],
+  },
+  growth: {
+    key: "growth",
+    name: "Growth",
+    price: "$149",
+    period: "/mo",
+    description: "Best for growing businesses",
+    maxRoles: 3,
+    autoUnlockAll: false,
+    defaultRoles: [],
+    features: [
+      "Choose 3 AI employees",
+      "Multi-role support",
+      "Priority setup",
+      "Custom workflows",
+      "Platform integrations",
+    ],
+  },
+  team: {
+    key: "team",
+    name: "Team",
+    price: "$199",
+    period: "/mo",
+    description: "Best for operational scale",
+    maxRoles: 4,
+    autoUnlockAll: true,
+    defaultRoles: [...ALL_ROLE_SLUGS],
+    features: [
+      "Full AI team (4 roles)",
+      "Cross-functional workflows",
+      "Dedicated support",
+      "Advanced integrations",
+      "Custom reporting",
+    ],
+  },
+};
+
+export const PACKAGE_ORDER = ["starter", "growth", "team"];
+
+export function getPackageConfig(key: string): PackageConfig | undefined {
+  return PACKAGES[key];
+}
+
+export function getMaxSelectableRoles(packageKey: string): number {
+  return PACKAGES[packageKey]?.maxRoles ?? 0;
+}
+
+export function packageNeedsRoleSelection(packageKey: string): boolean {
+  const pkg = PACKAGES[packageKey];
+  if (!pkg) return false;
+  return !pkg.autoUnlockAll;
+}
+
+export function getAutoUnlockRoles(packageKey: string): RoleSlug[] {
+  const pkg = PACKAGES[packageKey];
+  if (!pkg) return [];
+  if (pkg.autoUnlockAll) return [...ALL_ROLE_SLUGS];
+  return [];
+}
+
+export function userHasAccessToRole(
+  unlockedRoles: string[],
+  roleSlug: string
+): boolean {
+  return unlockedRoles.includes(roleSlug);
+}
+
+export const ROLE_INFO: Record<
+  RoleSlug,
+  { label: string; description: string; capabilities: string[] }
+> = {
+  "social-media-manager": {
+    label: "Social Media Manager",
+    description: "Creates post ideas, drafts content, and manages your social presence.",
+    capabilities: [
+      "Build content calendars",
+      "Draft captions & hashtags",
+      "Schedule across platforms",
+      "Track performance trends",
+    ],
+  },
+  "customer-support": {
+    label: "Customer Support",
+    description: "Drafts support replies, organizes tickets, and helps manage inboxes.",
+    capabilities: [
+      "Draft reply suggestions",
+      "Organize by urgency",
+      "Manage escalations",
+      "Generate FAQ content",
+    ],
+  },
+  "email-marketer": {
+    label: "Email Marketer",
+    description: "Creates campaigns, drafts emails, and manages sends and audiences.",
+    capabilities: [
+      "Draft email campaigns",
+      "Generate subject lines",
+      "Build audience segments",
+      "Plan send schedules",
+    ],
+  },
+  "virtual-assistant": {
+    label: "Virtual Assistant",
+    description: "Organizes tasks, handles requests, and helps manage daily operations.",
+    capabilities: [
+      "Organize daily tasks",
+      "Draft routine messages",
+      "Track follow-ups",
+      "Manage incoming requests",
+    ],
+  },
+};
