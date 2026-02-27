@@ -1,33 +1,37 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Check, Loader2 } from "lucide-react";
+import { Check, Loader2, Tag } from "lucide-react";
 import PageLayout from "@/components/PageLayout";
+import PromoCodeInput from "@/components/PromoCodeInput";
 import { useAuth } from "@/hooks/useAuth";
 import { PACKAGES, PACKAGE_ORDER } from "@/lib/packages";
+import { useActivePromos, getDiscountForPlan, applyDiscount, type PromoCode } from "@/hooks/useActivePromos";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
 const PricingPage = () => {
   const { user, profile } = useAuth();
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
+  const [appliedPromo, setAppliedPromo] = useState<PromoCode | null>(null);
+  const { pricingPromos } = useActivePromos();
+  const topPromo = pricingPromos[0] || null;
 
   const handleSelectPlan = async (planKey: string) => {
     if (!user) return;
-
     const pkg = PACKAGES[planKey];
     if (!pkg) return;
 
     setLoadingPlan(planKey);
     try {
       const { data, error } = await supabase.functions.invoke("create-checkout", {
-        body: { priceId: pkg.stripePriceId },
+        body: {
+          priceId: pkg.stripePriceId,
+          promoCode: appliedPromo?.code || null,
+        },
       });
-
       if (error) throw error;
-      if (data?.url) {
-        window.open(data.url, "_blank");
-      }
+      if (data?.url) window.open(data.url, "_blank");
     } catch (err: any) {
       toast({ title: "Error", description: err.message || "Failed to start checkout", variant: "destructive" });
     } finally {
@@ -40,9 +44,7 @@ const PricingPage = () => {
     try {
       const { data, error } = await supabase.functions.invoke("customer-portal");
       if (error) throw error;
-      if (data?.url) {
-        window.open(data.url, "_blank");
-      }
+      if (data?.url) window.open(data.url, "_blank");
     } catch (err: any) {
       toast({ title: "Error", description: err.message || "Failed to open billing portal", variant: "destructive" });
     } finally {
@@ -51,6 +53,7 @@ const PricingPage = () => {
   };
 
   const plans = PACKAGE_ORDER.map((key) => PACKAGES[key]);
+  const activePromo = appliedPromo || topPromo;
 
   return (
     <PageLayout>
@@ -63,16 +66,37 @@ const PricingPage = () => {
             <p className="mx-auto mt-5 max-w-xl text-muted-foreground">
               Start small, scale when you're ready. Every plan includes full platform access.
             </p>
+            {topPromo && !appliedPromo && (
+              <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-emerald-500/10 border border-emerald-500/30 px-4 py-1.5 text-sm text-emerald-400">
+                <Tag size={14} />
+                Use <span className="font-mono font-bold">{topPromo.code}</span> to save
+                {topPromo.first_billing_cycle_only && <span className="text-xs ml-1">(first month only)</span>}
+              </div>
+            )}
           </motion.div>
         </div>
       </section>
 
       <section className="px-4 pb-24 md:px-8 md:pb-32">
         <div className="mx-auto max-w-[1200px]">
+          {/* Promo code input */}
+          <div className="mx-auto max-w-xs mb-8">
+            <PromoCodeInput
+              onApply={setAppliedPromo}
+              onClear={() => setAppliedPromo(null)}
+              appliedPromo={appliedPromo}
+            />
+          </div>
+
           <div className="grid gap-8 md:grid-cols-3">
             {plans.map((plan, i) => {
               const isPopular = plan.key === "growth";
               const isLoading = loadingPlan === plan.key;
+              const priceNum = parseInt(plan.price.replace("$", ""));
+              const discount = activePromo ? getDiscountForPlan(activePromo, plan.key) : 0;
+              const hasDiscount = discount > 0;
+              const discountedPrice = hasDiscount ? applyDiscount(priceNum, discount, activePromo!.discount_type) : priceNum;
+
               return (
                 <motion.div
                   key={plan.name}
@@ -91,8 +115,18 @@ const PricingPage = () => {
                   <h3 className="font-display text-lg font-semibold text-foreground">{plan.name}</h3>
                   <p className="mt-1 text-sm text-muted-foreground">{plan.description}</p>
                   <div className="mt-6">
-                    <span className="font-display text-4xl font-bold text-foreground">{plan.price}</span>
+                    {hasDiscount ? (
+                      <>
+                        <span className="font-display text-2xl font-bold text-muted-foreground line-through mr-2">{plan.price}</span>
+                        <span className="font-display text-4xl font-bold text-foreground">${Math.round(discountedPrice)}</span>
+                      </>
+                    ) : (
+                      <span className="font-display text-4xl font-bold text-foreground">{plan.price}</span>
+                    )}
                     <span className="text-sm text-muted-foreground">{plan.period}</span>
+                    {hasDiscount && activePromo?.first_billing_cycle_only && (
+                      <p className="mt-1 text-xs text-emerald-400/70">First month only · then {plan.price}/mo</p>
+                    )}
                     {plan.trialDays && (
                       <p className="mt-3 flex items-center gap-2 text-base font-semibold text-emerald-400">
                         <Check size={20} className="text-emerald-400" />
