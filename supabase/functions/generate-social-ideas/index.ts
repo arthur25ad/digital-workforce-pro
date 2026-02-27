@@ -36,7 +36,7 @@ serve(async (req) => {
       });
     }
 
-    const { brandProfile } = await req.json();
+    const { brandProfile, brainContext } = await req.json();
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
@@ -63,7 +63,7 @@ Who they serve: ${brandProfile.targetAudience || "Small business owners"}
 Brand voice: ${brandProfile.brandVoice || "Professional yet approachable"}
 Content goals: ${brandProfile.contentGoals || "Increase engagement and awareness"}
 Content themes: ${(brandProfile.contentThemes || []).join(", ") || "Tips, updates, stories"}
-Preferred platforms: ${(brandProfile.preferredPlatforms || []).join(", ") || "Instagram, LinkedIn"}`;
+Preferred platforms: ${(brandProfile.preferredPlatforms || []).join(", ") || "Instagram, LinkedIn"}${brainContext ? `\n\n--- VANTABRAIN CONTEXT ---\n${brainContext}` : ""}`;
 
     const response = await fetch(
       "https://ai.gateway.lovable.dev/v1/chat/completions",

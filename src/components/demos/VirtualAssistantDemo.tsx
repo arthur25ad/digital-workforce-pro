@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
+import { useVantaBrainActions } from "@/hooks/useVantaBrain";
 import { useVirtualAssistantData } from "@/hooks/useVirtualAssistantData";
 import { useAuth } from "@/hooks/useAuth";
 import ConnectPlatformModal from "@/components/ConnectPlatformModal";
@@ -25,6 +26,7 @@ const toolPlatforms = [
 
 const VirtualAssistantDemo = () => {
   const { session } = useAuth();
+  const { getContext, recordInteraction } = useVantaBrainActions();
   const {
     profile, tasks, requests, drafts, connections, activities, loading,
     updateProfile, addRequest, updateRequestStatus,
@@ -57,7 +59,8 @@ const VirtualAssistantDemo = () => {
     if (!session?.access_token) return;
     setGenerating(request.id);
     try {
-      const { data, error } = await supabase.functions.invoke("generate-assistant-draft", { body: { request, profile } });
+      const brainContext = await getContext("virtual-assistant");
+      const { data, error } = await supabase.functions.invoke("generate-assistant-draft", { body: { request, profile, brainContext } });
       if (error) throw error;
       if (data?.draft) {
         const d = data.draft;

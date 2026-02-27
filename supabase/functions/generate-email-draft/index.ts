@@ -36,7 +36,7 @@ serve(async (req) => {
       });
     }
 
-    const { brandProfile, campaign, count } = await req.json();
+    const { brandProfile, campaign, count, brainContext } = await req.json();
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
@@ -81,7 +81,7 @@ Campaign Type: ${campaign?.campaign_type || "promotional"}
 Target Audience: ${campaign?.target_audience || "General subscribers"}
 Objective: ${campaign?.objective || "Drive engagement"}
 
-Generate ${numDrafts} distinct email draft(s) for this campaign.`;
+Generate ${numDrafts} distinct email draft(s) for this campaign.${brainContext ? `\n\n--- VANTABRAIN CONTEXT ---\n${brainContext}` : ""}`;
 
     const response = await fetch(
       "https://ai.gateway.lovable.dev/v1/chat/completions",

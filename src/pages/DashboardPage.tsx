@@ -6,9 +6,10 @@ import { useWorkspaceData } from "@/hooks/useWorkspaceData";
 import { useCustomerSupportData } from "@/hooks/useCustomerSupportData";
 import { useEmailMarketingData } from "@/hooks/useEmailMarketingData";
 import { useVirtualAssistantData } from "@/hooks/useVirtualAssistantData";
+import { useVantaBrainStats } from "@/hooks/useVantaBrain";
 import {
   Share2, Headphones, Mail, CalendarCheck, Lock,
-  ArrowRight, Sparkles, CheckCircle2,
+  ArrowRight, Sparkles, CheckCircle2, Brain,
 } from "lucide-react";
 
 const roleConfig = [
@@ -87,6 +88,7 @@ const DashboardPage = () => {
   const summaries = useRoleSummary();
   const nextActions = useNextActions(unlockedRoles);
   const recentActivity = useMergedActivity();
+  const { stats: brainStats } = useVantaBrainStats();
 
   const packageLabel = profile?.active_package
     ? profile.active_package.charAt(0).toUpperCase() + profile.active_package.slice(1)
@@ -163,6 +165,35 @@ const DashboardPage = () => {
               );
             })}
           </div>
+
+          {/* ── VantaBrain card ── */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="mb-12"
+          >
+            <Link
+              to="/vantabrain"
+              className="group flex items-center gap-4 rounded-2xl border border-primary/20 bg-gradient-to-r from-primary/5 to-transparent p-5 transition-all duration-300 hover:border-primary/40"
+            >
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <Brain size={20} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <h3 className="font-display text-sm font-semibold text-foreground">VantaBrain</h3>
+                  <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary">Intelligence</span>
+                </div>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {brainStats.totalMemories > 0
+                    ? `${brainStats.totalMemories} memories · ${brainStats.totalPatterns} patterns · ${brainStats.totalInteractions} interactions tracked`
+                    : "Your AI is learning — memories and patterns will appear as you use the platform"}
+                </p>
+              </div>
+              <ArrowRight size={16} className="shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
+            </Link>
+          </motion.div>
 
           {/* ── Next actions ── */}
           {nextActions.length > 0 && (

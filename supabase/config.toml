@@ -11,3 +11,6 @@ verify_jwt = false
 
 [functions.generate-assistant-draft]
 verify_jwt = false
+
+[functions.vantabrain]
+verify_jwt = false

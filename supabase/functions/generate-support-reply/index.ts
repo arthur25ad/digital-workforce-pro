@@ -36,7 +36,7 @@ serve(async (req) => {
       });
     }
 
-    const { ticket, knowledgeBase, knowledgeItems } = await req.json();
+    const { ticket, knowledgeBase, knowledgeItems, brainContext } = await req.json();
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
@@ -85,7 +85,7 @@ Customer: ${ticket.customerName || "Customer"}
 Channel: ${ticket.channel || "email"}
 Urgency: ${ticket.urgency || "medium"}
 Issue Type: ${ticket.issueType || "General inquiry"}
-Message: ${ticket.customerMessage}`;
+Message: ${ticket.customerMessage}${brainContext ? `\n\n--- VANTABRAIN CONTEXT ---\n${brainContext}` : ""}`;
 
     const response = await fetch(
       "https://ai.gateway.lovable.dev/v1/chat/completions",
