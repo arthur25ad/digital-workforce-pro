@@ -20,7 +20,7 @@ const ai = [
 const ComparisonSection = () => {
   return (
     <section className="section-padding">
-      <div className="mx-auto max-w-5xl">
+      <div className="mx-auto max-w-[1200px]">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}

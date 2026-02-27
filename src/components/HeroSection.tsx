@@ -23,13 +23,13 @@ const HeroSection = () => {
 
   return (
     <section className="blue-ambient relative min-h-screen overflow-hidden pt-24 md:pt-32">
-      <div className="mx-auto max-w-7xl px-4 md:px-8">
-        <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+      <div className="mx-auto max-w-[1600px] px-6 md:px-12 lg:px-16">
+        <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-20 xl:gap-28">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
-            <h1 className="hero-flowing-text font-display text-4xl font-bold leading-tight tracking-tight md:text-5xl lg:text-6xl">
+            <h1 className="hero-flowing-text font-display text-4xl font-bold leading-tight tracking-tight md:text-5xl lg:text-6xl xl:text-7xl">
               AI Employees That Work While You Sleep
             </h1>
-            <p className="mt-6 max-w-lg text-lg leading-relaxed text-muted-foreground">
+            <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground xl:text-xl">
               Hire AI employees to handle social media, customer support, email marketing, and admin tasks 24/7 — without hiring more staff.
             </p>
             <div className="mt-8 flex flex-wrap gap-4">

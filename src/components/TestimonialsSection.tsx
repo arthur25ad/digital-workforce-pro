@@ -31,7 +31,7 @@ const quoteColors = [
 const TestimonialsSection = () => {
   return (
     <section className="section-padding violet-ambient-bottom">
-      <div className="mx-auto max-w-7xl">
+      <div className="mx-auto max-w-[1600px]">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
