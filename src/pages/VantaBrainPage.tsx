@@ -7,10 +7,8 @@ import {
   Brain, Sparkles, Trash2, Eye, EyeOff, TrendingUp,
   Lightbulb, Clock, Shield, Zap, Database,
   Activity, Network, BarChart3, Layers, ArrowRight,
-  CheckCircle2, Globe, Lock, Cpu, Workflow,
-  RefreshCw, Target, Mail, MessageSquare, Calendar,
-  Users, Plug, Settings, ToggleLeft, ToggleRight,
-  History, Star, AlertCircle,
+  Globe, Lock, Cpu, Mail, MessageSquare,
+  Users, Plug, Settings, History, AlertCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
