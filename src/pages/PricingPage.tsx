@@ -118,7 +118,14 @@ const PricingPage = () => {
                   <h3 className="font-display text-lg font-semibold text-foreground">{plan.name}</h3>
                   <p className="mt-1 text-sm text-muted-foreground">{plan.description}</p>
                   <div className="mt-6">
-                    <span className="font-display text-4xl font-bold text-foreground">{plan.price}</span>
+                    {hasDiscount ? (
+                      <>
+                        <span className="font-display text-2xl font-bold text-muted-foreground line-through mr-2">{plan.price}</span>
+                        <span className="font-display text-4xl font-bold text-foreground">${discountedPrice.toFixed(2)}</span>
+                      </>
+                    ) : (
+                      <span className="font-display text-4xl font-bold text-foreground">{plan.price}</span>
+                    )}
                     <span className="text-sm text-muted-foreground">{plan.period}</span>
 
                     {/* Billing journey timeline */}
