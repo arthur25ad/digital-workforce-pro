@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
-import { Users, Sliders, Zap } from "lucide-react";
+import { Users, Sliders, Zap, ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const steps = [
   {
@@ -64,6 +65,22 @@ const HowItWorks = () => {
             </motion.div>
           ))}
         </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.4 }}
+          className="mt-10 text-center"
+        >
+          <Link
+            to="/how-it-works"
+            className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-5 py-2.5 text-sm font-medium text-primary transition-all hover:bg-primary/10 hover:gap-3"
+          >
+            Learn More
+            <ArrowRight size={15} />
+          </Link>
+        </motion.div>
       </div>
     </section>
   );
