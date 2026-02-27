@@ -27,8 +27,8 @@ const HeroSection = () => {
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
             <h1 className="font-display text-4xl font-bold leading-tight tracking-tight md:text-5xl lg:text-6xl">
-              <span className="gradient-text">AI Employees</span>{" "}
-              <span className="text-foreground">That Work While You Sleep</span>
+              <span style={{ color: "hsl(217 60% 75%)" }}>AI Employees</span>{" "}
+              <span className="text-white">That Work While You Sleep</span>
             </h1>
             <p className="mt-6 max-w-lg text-lg leading-relaxed text-muted-foreground">
               Hire AI employees to handle social media, customer support, email marketing, and admin tasks 24/7 — without hiring more staff.
