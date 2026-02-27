@@ -1,33 +1,30 @@
 import { motion } from "framer-motion";
-import { UserPlus, SlidersHorizontal, Repeat } from "lucide-react";
+import { Users, Sliders, Zap } from "lucide-react";
 
 const steps = [
   {
-    icon: UserPlus,
-    number: "01",
-    title: "Choose Your AI Roles",
-    desc: "Pick the digital workers your business needs — like support, social media, or email.",
-    iconColor: "text-blue-400",
-    iconBg: "bg-blue-500/10",
-    numColor: "text-blue-400/60",
+    icon: Users,
+    number: "1",
+    title: "Pick Your Team",
+    desc: "Choose the AI employees your business needs.",
+    color: "text-blue-400",
+    bg: "bg-blue-500/10",
   },
   {
-    icon: SlidersHorizontal,
-    number: "02",
-    title: "Set Their Tasks",
-    desc: "Tell them what to do, how to sound, and what your business rules are.",
-    iconColor: "text-emerald-400",
-    iconBg: "bg-emerald-500/10",
-    numColor: "text-emerald-400/60",
+    icon: Sliders,
+    number: "2",
+    title: "Tell Them About You",
+    desc: "Share your tone, goals, and preferences.",
+    color: "text-emerald-400",
+    bg: "bg-emerald-500/10",
   },
   {
-    icon: Repeat,
-    number: "03",
-    title: "They Work Around the Clock",
-    desc: "Your AI team handles the busy work — day and night — so you don't have to.",
-    iconColor: "text-violet-400",
-    iconBg: "bg-violet-500/10",
-    numColor: "text-violet-400/60",
+    icon: Zap,
+    number: "3",
+    title: "They Start Working",
+    desc: "Your AI team runs 24/7 so you don't have to.",
+    color: "text-violet-400",
+    bg: "bg-violet-500/10",
   },
 ];
 
@@ -42,7 +39,7 @@ const HowItWorks = () => {
           className="mb-14 text-center"
         >
           <h2 className="font-display text-3xl font-bold text-foreground md:text-4xl">
-            Set Up Your AI Team in Minutes
+            3 Simple Steps to Get Started
           </h2>
         </motion.div>
 
@@ -58,10 +55,10 @@ const HowItWorks = () => {
               transition={{ duration: 0.5, delay: i * 0.15 }}
               className="relative text-center"
             >
-              <div className={`relative z-10 mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl ${step.iconBg} ${step.iconColor}`}>
+              <div className={`relative z-10 mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl ${step.bg} ${step.color}`}>
                 <step.icon size={28} />
               </div>
-              <span className={`font-display text-xs font-semibold tracking-widest ${step.numColor}`}>STEP {step.number}</span>
+              <span className={`font-display text-5xl font-bold ${step.color}/20`}>{step.number}</span>
               <h3 className="mt-2 font-display text-lg font-semibold text-foreground">{step.title}</h3>
               <p className="mt-2 text-sm text-muted-foreground">{step.desc}</p>
             </motion.div>
