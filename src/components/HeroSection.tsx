@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Shield, Users, Zap, Clock } from "lucide-react";
+import { Shield, Users, Zap, Clock, CheckCircle2, Clock4, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import BookDemoModal from "./BookDemoModal";
 
-const statusCards = [
-  { role: "Social Media Manager", status: "Active now", statusColor: "bg-green-500", tasks: "12 posts scheduled", agent: "Content Agent" },
-  { role: "Customer Support", status: "Running", statusColor: "bg-primary", tasks: "3 tickets resolved", agent: "Support Agent" },
-  { role: "Email Marketer", status: "Responded", statusColor: "bg-blue-400", tasks: "Campaign sent", agent: "Campaign Agent" },
-  { role: "Virtual Assistant", status: "Completed", statusColor: "bg-emerald-400", tasks: "8 tasks done", agent: "Admin Agent" },
+const summaryItems = [
+  { icon: CheckCircle2, text: "3 customer replies sent", color: "text-[hsl(174,60%,50%)]" },
+  { icon: CheckCircle2, text: "1 email campaign drafted", color: "text-[hsl(174,60%,50%)]" },
+  { icon: Clock4, text: "1 social post needs approval", color: "text-[hsl(38,80%,55%)]" },
+  { icon: ArrowRight, text: "2 follow-ups scheduled today", color: "text-[hsl(262,60%,58%)]" },
 ];
 
 const trustItems = [
@@ -31,7 +31,7 @@ const HeroSection = () => {
               <span className="text-foreground">That Never Sleep</span>
             </h1>
             <p className="mt-6 max-w-lg text-lg leading-relaxed text-muted-foreground">
-              Hire AI employees to handle social media, customer support, email marketing, admin tasks, lead response, and day-to-day business operations 24/7 — without hiring more staff.
+              Hire AI employees to handle social media, customer support, email marketing, and admin tasks 24/7 — without hiring more staff.
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
               <Link to="/get-started" className="btn-glow text-base">Hire Your AI Team</Link>
@@ -40,32 +40,25 @@ const HeroSection = () => {
           </motion.div>
 
           <motion.div initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, delay: 0.2 }} className="relative">
-            <div className="card-glass rounded-2xl p-5">
-              <div className="mb-4 flex items-center justify-between">
-                <span className="font-display text-sm font-semibold text-foreground">AI Team Dashboard</span>
+            <div className="card-glass rounded-2xl p-6">
+              <div className="mb-5 flex items-center justify-between">
+                <span className="font-display text-base font-semibold text-foreground">Today's AI Summary</span>
                 <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
                   <span className="inline-block h-2 w-2 animate-pulse-glow rounded-full bg-green-500" />
-                  All systems active
+                  Active now
                 </span>
               </div>
-              <div className="grid gap-3 sm:grid-cols-2">
-                {statusCards.map((card, i) => (
+              <div className="space-y-4">
+                {summaryItems.map((item, i) => (
                   <motion.div
-                    key={card.role}
-                    initial={{ opacity: 0, y: 15 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.4 + i * 0.1 }}
-                    className="glow-border rounded-xl bg-secondary p-4"
+                    key={item.text}
+                    initial={{ opacity: 0, x: 15 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.4, delay: 0.4 + i * 0.12 }}
+                    className="flex items-center gap-3 rounded-lg bg-secondary px-4 py-3"
                   >
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-medium text-muted-foreground">{card.agent}</span>
-                      <span className="flex items-center gap-1.5">
-                        <span className={`inline-block h-1.5 w-1.5 rounded-full ${card.statusColor}`} />
-                        <span className="text-[11px] text-muted-foreground">{card.status}</span>
-                      </span>
-                    </div>
-                    <p className="mt-2 font-display text-sm font-semibold text-foreground">{card.role}</p>
-                    <p className="mt-1 text-xs text-muted-foreground">{card.tasks}</p>
+                    <item.icon size={18} className={`shrink-0 ${item.color}`} />
+                    <span className="text-sm text-foreground">{item.text}</span>
                   </motion.div>
                 ))}
               </div>

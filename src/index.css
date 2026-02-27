@@ -122,4 +122,16 @@
   .blue-ambient-bottom {
     background: radial-gradient(ellipse 80% 50% at 50% 120%, hsl(217 91% 60% / 0.08), transparent);
   }
+
+  .violet-ambient {
+    background: radial-gradient(ellipse 80% 50% at 50% -20%, hsl(262 60% 58% / 0.08), transparent);
+  }
+
+  .violet-ambient-bottom {
+    background: radial-gradient(ellipse 80% 50% at 50% 120%, hsl(262 60% 58% / 0.06), transparent);
+  }
+
+  .teal-ambient-bottom {
+    background: radial-gradient(ellipse 80% 50% at 50% 120%, hsl(174 60% 50% / 0.06), transparent);
+  }
 }

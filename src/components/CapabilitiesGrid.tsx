@@ -5,21 +5,28 @@ import {
 } from "lucide-react";
 
 const capabilities = [
-  { icon: PenLine, title: "Draft Social Posts", desc: "Create ready-to-publish content for all platforms." },
-  { icon: MessageSquare, title: "Answer Customer Questions", desc: "Respond to common inquiries quickly and accurately." },
-  { icon: Inbox, title: "Organize Inboxes", desc: "Sort, tag, and prioritize incoming messages." },
-  { icon: Mail, title: "Write Email Campaigns", desc: "Build newsletters, promos, and drip sequences." },
-  { icon: UserCheck, title: "Follow Up with Leads", desc: "Automate timely follow-ups to close more deals." },
-  { icon: FileText, title: "Summarize Conversations", desc: "Get clear digests of calls, chats, and threads." },
-  { icon: CalendarClock, title: "Handle Scheduling", desc: "Manage calendars, reminders, and appointments." },
-  { icon: ClipboardList, title: "Day-to-Day Admin", desc: "Take routine admin work off your plate." },
-  { icon: ListChecks, title: "Organize Tasks", desc: "Track to-dos and keep projects moving forward." },
-  { icon: Settings2, title: "Support Operations", desc: "Keep business systems running smoothly." },
+  { icon: PenLine, title: "Draft Social Posts", desc: "Create ready-to-publish content for all platforms.", accent: "teal" },
+  { icon: MessageSquare, title: "Answer Customer Questions", desc: "Respond to common inquiries quickly and accurately.", accent: "blue" },
+  { icon: Inbox, title: "Organize Inboxes", desc: "Sort, tag, and prioritize incoming messages.", accent: "violet" },
+  { icon: Mail, title: "Write Email Campaigns", desc: "Build newsletters, promos, and drip sequences.", accent: "amber" },
+  { icon: UserCheck, title: "Follow Up with Leads", desc: "Automate timely follow-ups to close more deals.", accent: "teal" },
+  { icon: FileText, title: "Summarize Conversations", desc: "Get clear digests of calls, chats, and threads.", accent: "violet" },
+  { icon: CalendarClock, title: "Handle Scheduling", desc: "Manage calendars, reminders, and appointments.", accent: "amber" },
+  { icon: ClipboardList, title: "Day-to-Day Admin", desc: "Take routine admin work off your plate.", accent: "blue" },
+  { icon: ListChecks, title: "Organize Tasks", desc: "Track to-dos and keep projects moving forward.", accent: "teal" },
+  { icon: Settings2, title: "Support Operations", desc: "Keep business systems running smoothly.", accent: "violet" },
 ];
+
+const accentMap: Record<string, { icon: string; border: string }> = {
+  blue: { icon: "text-primary", border: "hover:border-primary/40" },
+  teal: { icon: "text-[hsl(174,60%,50%)]", border: "hover:border-[hsl(174,60%,50%)]/40" },
+  violet: { icon: "text-[hsl(262,60%,58%)]", border: "hover:border-[hsl(262,60%,58%)]/40" },
+  amber: { icon: "text-[hsl(38,80%,55%)]", border: "hover:border-[hsl(38,80%,55%)]/40" },
+};
 
 const CapabilitiesGrid = () => {
   return (
-    <section id="features" className="section-padding blue-ambient-bottom">
+    <section id="features" className="section-padding teal-ambient-bottom">
       <div className="mx-auto max-w-7xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -33,20 +40,23 @@ const CapabilitiesGrid = () => {
         </motion.div>
 
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
-          {capabilities.map((item, i) => (
-            <motion.div
-              key={item.title}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: i * 0.05 }}
-              className="glow-border rounded-xl bg-card p-5"
-            >
-              <item.icon size={20} className="mb-3 text-primary" />
-              <h3 className="font-display text-sm font-semibold text-foreground">{item.title}</h3>
-              <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{item.desc}</p>
-            </motion.div>
-          ))}
+          {capabilities.map((item, i) => {
+            const a = accentMap[item.accent];
+            return (
+              <motion.div
+                key={item.title}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: i * 0.05 }}
+                className={`glow-border rounded-xl bg-card p-5 ${a.border}`}
+              >
+                <item.icon size={20} className={`mb-3 ${a.icon}`} />
+                <h3 className="font-display text-sm font-semibold text-foreground">{item.title}</h3>
+                <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{item.desc}</p>
+              </motion.div>
+            );
+          })}
         </div>
       </div>
     </section>
