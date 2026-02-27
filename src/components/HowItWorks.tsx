@@ -30,7 +30,7 @@ const steps = [
 
 const HowItWorks = () => {
   return (
-    <section id="how-it-works" className="section-padding violet-ambient">
+    <section id="how-it-works" className="px-6 py-10 md:px-12 md:py-14 lg:px-16 violet-ambient">
       <div className="mx-auto max-w-[1600px] px-6 md:px-12 lg:px-16">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
