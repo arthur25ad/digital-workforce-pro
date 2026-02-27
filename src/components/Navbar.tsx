@@ -6,11 +6,11 @@ import { useAuth } from "@/hooks/useAuth";
 
 const navLinks = [
   { label: "VANTABRAIN", href: "/vantabrain", isBrain: true },
-  { label: "Features", href: "/features" },
-  { label: "AI Employees", href: "/ai-employees" },
-  { label: "How It Works", href: "/how-it-works" },
-  { label: "Industries", href: "/industries" },
-  { label: "Pricing", href: "/pricing" },
+  { label: "FEATURES", href: "/features" },
+  { label: "AI EMPLOYEES", href: "/ai-employees" },
+  { label: "HOW IT WORKS", href: "/how-it-works" },
+  { label: "INDUSTRIES", href: "/industries" },
+  { label: "PRICING", href: "/pricing" },
   { label: "FAQ", href: "/faq" },
 ];
 
