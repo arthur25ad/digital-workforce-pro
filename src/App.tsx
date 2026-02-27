@@ -66,7 +66,6 @@ const App = () => (
               <Route path="/get-started" element={<ProtectedRoute><GetStartedPage /></ProtectedRoute>} />
               <Route path="/choose-roles" element={<ProtectedRoute><ChooseRolesPage /></ProtectedRoute>} />
               <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
-              <Route path="/veyra" element={<VantaBrainPage />} />
               <Route path="/vantabrain" element={<VantaBrainPage />} />
               <Route path="/privacy" element={<PrivacyPage />} />
               <Route path="/terms" element={<TermsPage />} />

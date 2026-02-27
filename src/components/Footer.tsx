@@ -28,14 +28,14 @@ const Footer = () => {
         <div className="md:col-span-2">
           <Link to="/" className="font-display text-xl font-bold tracking-tight">
             <span style={{
-              backgroundImage: "linear-gradient(135deg, hsl(280 70% 80%), hsl(280 70% 60%), hsl(0 0% 100% / 0.85), hsl(280 60% 55%))",
+              backgroundImage: "linear-gradient(135deg, hsl(0 0% 100%), hsl(225 60% 82%), hsl(0 0% 100%), hsl(225 50% 78%))",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               backgroundClip: "text",
-            }}>VANTABRAIN</span>
+            }}>VANTORY</span>
           </Link>
           <p className="mt-3 max-w-sm text-sm text-white">
-            AI Employees powered by Veyra intelligence — built for small businesses that need real help.
+            AI Employees that work while you sleep. Built for small businesses that need real help.
           </p>
         </div>
         {footerLinks.map((group) => (
@@ -61,7 +61,7 @@ const Footer = () => {
       </div>
       <div className="mx-auto mt-10 max-w-[1600px] border-t border-border/30 pt-6">
         <p className="text-center text-xs text-muted-foreground">
-          © {new Date().getFullYear()} VANTABRAIN. All rights reserved.
+          © {new Date().getFullYear()} VANTORY. All rights reserved.
         </p>
       </div>
     </footer>

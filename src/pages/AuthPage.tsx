@@ -98,11 +98,11 @@ const AuthPage = () => {
         <div className="text-center mb-8">
           <h1 className="font-display text-3xl font-bold">
             <span style={{
-              backgroundImage: "linear-gradient(135deg, hsl(280 70% 80%), hsl(280 70% 60%), hsl(0 0% 100% / 0.85), hsl(280 60% 55%))",
+              backgroundImage: "linear-gradient(135deg, hsl(0 0% 100%), hsl(225 60% 82%), hsl(0 0% 100%), hsl(225 50% 78%))",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               backgroundClip: "text",
-            }}>VANTABRAIN</span>
+            }}>VANTORY</span>
           </h1>
           <p className="mt-2 text-muted-foreground">
             {mode === "login" ? "Welcome back to your workspace" : mode === "signup" ? "Create your AI workforce account" : "Reset your password"}

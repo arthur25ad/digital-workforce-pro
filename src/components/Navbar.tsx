@@ -5,7 +5,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 
 const navLinks = [
-  { label: "VEYRA", href: "/veyra", isEngine: true },
+  { label: "VANTABRAIN", href: "/vantabrain", isBrain: true },
   { label: "FEATURES", href: "/features" },
   { label: "AI EMPLOYEES", href: "/ai-employees" },
   { label: "HOW IT WORKS", href: "/how-it-works" },
@@ -30,11 +30,11 @@ const Navbar = () => {
       <div className="mx-auto flex max-w-[1600px] items-center justify-between px-6 py-4 md:px-12 lg:px-16">
         <Link to="/" className="font-display text-2xl font-bold tracking-tight">
           <span style={{
-            backgroundImage: "linear-gradient(135deg, hsl(280 70% 80%), hsl(280 70% 60%), hsl(0 0% 100% / 0.85), hsl(280 60% 55%))",
+            backgroundImage: "linear-gradient(135deg, hsl(0 0% 100%), hsl(225 60% 82%), hsl(0 0% 100%), hsl(225 50% 78%))",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
             backgroundClip: "text",
-          }}>VANTABRAIN</span>
+          }}>VANTORY</span>
         </Link>
 
         <div className="hidden items-center gap-8 lg:flex">
@@ -43,7 +43,7 @@ const Navbar = () => {
               key={link.href}
               to={link.href}
               className={
-                link.isEngine
+                link.isBrain
                   ? `flex items-center gap-1.5 text-base font-bold tracking-widest transition-colors duration-200 hover:text-foreground ${
                       location.pathname === link.href ? "text-foreground" : ""
                     }`
@@ -51,9 +51,9 @@ const Navbar = () => {
                       location.pathname === link.href ? "text-foreground" : "text-muted-foreground"
                     }`
               }
-              style={link.isEngine ? { color: location.pathname === link.href ? undefined : "hsl(217 91% 60%)" } : undefined}
+              style={link.isBrain ? { color: location.pathname === link.href ? undefined : "hsl(280 70% 65%)" } : undefined}
             >
-              {link.isEngine && <Brain size={18} className="shrink-0" />}
+              {link.isBrain && <Brain size={18} className="shrink-0" />}
               {link.label}
             </Link>
           ))}
@@ -87,11 +87,11 @@ const Navbar = () => {
                   key={link.href}
                   to={link.href}
                   className={
-                    link.isEngine
+                    link.isBrain
                       ? "text-sm font-bold tracking-widest transition-colors hover:text-foreground"
                       : "text-sm text-muted-foreground transition-colors hover:text-foreground"
                   }
-                  style={link.isEngine ? { color: "hsl(217 91% 60%)" } : undefined}
+                  style={link.isBrain ? { color: "hsl(280 70% 65%)" } : undefined}
                   onClick={() => setOpen(false)}
                 >
                   {link.label}
