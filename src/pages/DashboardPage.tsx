@@ -3,20 +3,41 @@ import { Link } from "react-router-dom";
 import PageLayout from "@/components/PageLayout";
 import { useAuth } from "@/hooks/useAuth";
 import { useWorkspaceData } from "@/hooks/useWorkspaceData";
+import { useCustomerSupportData } from "@/hooks/useCustomerSupportData";
 import {
   Share2, Headphones, Mail, CalendarCheck, Check, Clock, AlertCircle,
   FileText, MessageSquare, PenLine, Eye, ThumbsUp, Bell, Send, Calendar,
+  AlertTriangle,
 } from "lucide-react";
 
 const DashboardPage = () => {
   const { profile, workspace } = useAuth();
   const { drafts, connections, activities } = useWorkspaceData();
+  const {
+    tickets: supportTickets, drafts: supportDrafts, connections: supportConnections,
+    activities: supportActivities,
+  } = useCustomerSupportData();
 
   const approved = drafts.filter(d => d.status === "approved").length;
   const pending = drafts.filter(d => d.status === "pending" || d.status === "draft").length;
   const scheduled = drafts.filter(d => d.status === "scheduled").length;
   const connectedPlatforms = connections.filter(c => c.connected);
   const nextScheduled = drafts.find(d => d.status === "scheduled" && d.scheduled_date);
+
+  const hasSocial = profile?.unlocked_roles.includes("social-media-manager");
+  const hasSupport = profile?.unlocked_roles.includes("customer-support");
+
+  // Support stats
+  const openTickets = supportTickets.filter(t => t.status === "new" || t.status === "drafting").length;
+  const pendingDrafts = supportDrafts.filter(d => d.status === "draft" || d.status === "edited").length;
+  const escalatedTickets = supportTickets.filter(t => t.status === "escalated").length;
+  const resolvedTickets = supportTickets.filter(t => t.status === "resolved").length;
+  const connectedChannels = supportConnections.filter((c: any) => c.connected);
+
+  // Merge activities from both roles
+  const allActivities = [...activities, ...supportActivities]
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    .slice(0, 10);
 
   return (
     <PageLayout>
@@ -29,44 +50,79 @@ const DashboardPage = () => {
                   {workspace?.business_name ? `${workspace.business_name} Dashboard` : "Your Dashboard"}
                 </h1>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  {profile?.active_package ? `${profile.active_package} plan` : ""} · {connectedPlatforms.length} platforms connected
+                  {profile?.active_package ? `${profile.active_package} plan` : ""} · {connectedPlatforms.length + connectedChannels.length} connections
                 </p>
               </div>
-              <Link to="/ai-employees/social-media-manager" className="btn-outline-glow text-sm">Open Social Manager</Link>
+              <div className="flex gap-3">
+                {hasSocial && <Link to="/ai-employees/social-media-manager" className="btn-outline-glow text-sm">Open Social Manager</Link>}
+                {hasSupport && <Link to="/ai-employees/customer-support" className="btn-outline-glow text-sm">Open Support Manager</Link>}
+              </div>
             </div>
           </motion.div>
 
           {/* Social Media Manager Stats */}
-          <div className="mb-8">
-            <div className="flex items-center gap-2 mb-4">
-              <Share2 size={18} className="text-primary" />
-              <h2 className="font-display text-lg font-semibold text-foreground">Social Media Manager</h2>
-              {profile?.unlocked_roles.includes("social-media-manager") && (
+          {hasSocial && (
+            <div className="mb-8">
+              <div className="flex items-center gap-2 mb-4">
+                <Share2 size={18} className="text-primary" />
+                <h2 className="font-display text-lg font-semibold text-foreground">Social Media Manager</h2>
                 <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] text-emerald-400 font-medium">Active</span>
-              )}
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+                {[
+                  { label: "Total Drafts", value: String(drafts.length), icon: PenLine, color: "text-primary" },
+                  { label: "Pending Review", value: String(pending), icon: Eye, color: "text-yellow-400" },
+                  { label: "Approved", value: String(approved), icon: ThumbsUp, color: "text-emerald-400" },
+                  { label: "Scheduled", value: String(scheduled), icon: Calendar, color: "text-primary" },
+                  { label: "Platforms", value: String(connectedPlatforms.length), icon: Share2, color: "text-primary" },
+                ].map((s) => (
+                  <div key={s.label} className="rounded-xl border border-border/50 bg-card p-4">
+                    <div className="flex items-center justify-between"><s.icon size={16} className={s.color} /><span className="font-display text-2xl font-bold text-foreground">{s.value}</span></div>
+                    <p className="mt-1 text-xs text-muted-foreground">{s.label}</p>
+                  </div>
+                ))}
+              </div>
             </div>
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-              {[
-                { label: "Total Drafts", value: String(drafts.length), icon: PenLine, color: "text-primary" },
-                { label: "Pending Review", value: String(pending), icon: Eye, color: "text-yellow-400" },
-                { label: "Approved", value: String(approved), icon: ThumbsUp, color: "text-emerald-400" },
-                { label: "Scheduled", value: String(scheduled), icon: Calendar, color: "text-primary" },
-                { label: "Platforms", value: String(connectedPlatforms.length), icon: Share2, color: "text-primary" },
-              ].map((s) => (
-                <div key={s.label} className="rounded-xl border border-border/50 bg-card p-4">
-                  <div className="flex items-center justify-between"><s.icon size={16} className={s.color} /><span className="font-display text-2xl font-bold text-foreground">{s.value}</span></div>
-                  <p className="mt-1 text-xs text-muted-foreground">{s.label}</p>
-                </div>
-              ))}
+          )}
+
+          {/* Customer Support Stats */}
+          {hasSupport && (
+            <div className="mb-8">
+              <div className="flex items-center gap-2 mb-4">
+                <Headphones size={18} className="text-primary" />
+                <h2 className="font-display text-lg font-semibold text-foreground">Customer Support</h2>
+                <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] text-emerald-400 font-medium">Active</span>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+                {[
+                  { label: "Open Tickets", value: String(openTickets), icon: MessageSquare, color: "text-primary" },
+                  { label: "Drafts Pending", value: String(pendingDrafts), icon: PenLine, color: "text-yellow-400" },
+                  { label: "Escalated", value: String(escalatedTickets), icon: AlertTriangle, color: "text-orange-400" },
+                  { label: "Resolved", value: String(resolvedTickets), icon: Check, color: "text-emerald-400" },
+                  { label: "Channels", value: String(connectedChannels.length), icon: Headphones, color: "text-primary" },
+                ].map((s) => (
+                  <div key={s.label} className="rounded-xl border border-border/50 bg-card p-4">
+                    <div className="flex items-center justify-between"><s.icon size={16} className={s.color} /><span className="font-display text-2xl font-bold text-foreground">{s.value}</span></div>
+                    <p className="mt-1 text-xs text-muted-foreground">{s.label}</p>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Connected Platforms */}
-          {connectedPlatforms.length > 0 && (
+          {(connectedPlatforms.length > 0 || connectedChannels.length > 0) && (
             <div className="mb-8 rounded-xl border border-border/50 bg-card p-5">
-              <h3 className="mb-3 font-display text-sm font-semibold text-foreground">Connected Platforms</h3>
+              <h3 className="mb-3 font-display text-sm font-semibold text-foreground">Connected Platforms & Channels</h3>
               <div className="flex flex-wrap gap-3">
                 {connectedPlatforms.map((c) => (
+                  <div key={c.id} className="flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1.5">
+                    <div className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                    <span className="text-xs font-medium text-primary">{c.platform}</span>
+                    <span className="text-xs text-muted-foreground">{c.account_name}</span>
+                  </div>
+                ))}
+                {connectedChannels.map((c: any) => (
                   <div key={c.id} className="flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1.5">
                     <div className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
                     <span className="text-xs font-medium text-primary">{c.platform}</span>
@@ -89,7 +145,7 @@ const DashboardPage = () => {
           {/* Recent Drafts */}
           {drafts.length > 0 && (
             <div className="mb-8 rounded-xl border border-border/50 bg-card p-5">
-              <h3 className="mb-3 font-display text-sm font-semibold text-foreground">Recent Drafts</h3>
+              <h3 className="mb-3 font-display text-sm font-semibold text-foreground">Recent Social Drafts</h3>
               <div className="space-y-2">
                 {drafts.slice(0, 5).map((d) => (
                   <div key={d.id} className="flex items-center justify-between rounded-lg bg-secondary p-3">
@@ -109,12 +165,34 @@ const DashboardPage = () => {
             </div>
           )}
 
+          {/* Recent Support Tickets */}
+          {supportTickets.length > 0 && hasSupport && (
+            <div className="mb-8 rounded-xl border border-border/50 bg-card p-5">
+              <h3 className="mb-3 font-display text-sm font-semibold text-foreground">Recent Support Tickets</h3>
+              <div className="space-y-2">
+                {supportTickets.slice(0, 5).map((t) => (
+                  <div key={t.id} className="flex items-center justify-between rounded-lg bg-secondary p-3">
+                    <div>
+                      <p className="text-sm font-medium text-foreground truncate max-w-[300px]">{t.customer_name}</p>
+                      <p className="text-xs text-muted-foreground">{t.channel} · {t.issue_type || "General"}</p>
+                    </div>
+                    <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${
+                      t.status === "resolved" ? "bg-emerald-500/10 text-emerald-400" :
+                      t.status === "escalated" ? "bg-orange-500/10 text-orange-400" :
+                      "bg-primary/10 text-primary"
+                    }`}>{t.status}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Recent Activity */}
-          {activities.length > 0 && (
+          {allActivities.length > 0 && (
             <div className="rounded-xl border border-border/50 bg-card p-5">
               <h3 className="mb-3 font-display text-sm font-semibold text-foreground">Recent Activity</h3>
               <div className="space-y-2">
-                {activities.slice(0, 8).map((a) => (
+                {allActivities.map((a) => (
                   <div key={a.id} className="flex items-center gap-3 rounded-lg bg-secondary p-3">
                     <div className="h-1.5 w-1.5 rounded-full bg-primary shrink-0" />
                     <div className="flex-1 min-w-0">
@@ -130,19 +208,19 @@ const DashboardPage = () => {
           {/* Other roles locked preview */}
           <div className="mt-12">
             <h2 className="font-display text-lg font-semibold text-foreground mb-4">Other AI Employees</h2>
-            <div className="grid gap-4 sm:grid-cols-3">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {[
+                { icon: Share2, label: "Social Media Manager", slug: "social-media-manager" },
                 { icon: Headphones, label: "Customer Support", slug: "customer-support" },
                 { icon: Mail, label: "Email Marketer", slug: "email-marketer" },
                 { icon: CalendarCheck, label: "Virtual Assistant", slug: "virtual-assistant" },
-              ].map((r) => {
-                const unlocked = profile?.unlocked_roles.includes(r.slug);
+              ].filter((r) => !profile?.unlocked_roles.includes(r.slug)).map((r) => {
                 return (
                   <Link key={r.slug} to={`/ai-employees/${r.slug}`}
-                    className={`rounded-xl border p-5 transition-all hover:border-primary/30 ${unlocked ? "border-primary/20 bg-primary/5" : "border-border/50 bg-card"}`}>
-                    <r.icon size={20} className={unlocked ? "text-primary mb-2" : "text-muted-foreground mb-2"} />
+                    className="rounded-xl border border-border/50 bg-card p-5 transition-all hover:border-primary/30">
+                    <r.icon size={20} className="text-muted-foreground mb-2" />
                     <p className="text-sm font-medium text-foreground">{r.label}</p>
-                    <p className="text-xs text-muted-foreground mt-1">{unlocked ? "Active" : "Locked — upgrade to access"}</p>
+                    <p className="text-xs text-muted-foreground mt-1">Locked — upgrade to access</p>
                   </Link>
                 );
               })}
