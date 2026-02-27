@@ -51,7 +51,7 @@ function AnimatedCounter({ target, duration = 2 }: { target: number; duration?: 
 
 const DashboardPreview = () => {
   return (
-    <section className="relative overflow-hidden py-24 md:py-32">
+    <section className="relative overflow-hidden pb-24 pt-10 md:pb-32 md:pt-14">
       {/* Ambient background effects */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute left-1/4 top-0 h-[600px] w-[600px] rounded-full opacity-20 blur-[120px]" style={{ background: "radial-gradient(circle, hsl(217 91% 60% / 0.3), transparent 70%)" }} />
