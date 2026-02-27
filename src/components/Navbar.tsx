@@ -30,7 +30,7 @@ const Navbar = () => {
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 md:px-8">
         <Link to="/" className="font-display text-xl font-bold tracking-tight">
           <span style={{
-            backgroundImage: "linear-gradient(135deg, hsl(217 91% 70%), hsl(217 91% 55%), hsl(0 0% 100% / 0.9), hsl(217 80% 50%))",
+            backgroundImage: "linear-gradient(135deg, hsl(0 0% 100%), hsl(225 60% 82%), hsl(0 0% 100%), hsl(225 50% 78%))",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
             backgroundClip: "text",
