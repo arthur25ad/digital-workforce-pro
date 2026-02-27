@@ -278,7 +278,7 @@ const DashboardPage = () => {
                   <span className="mb-1.5 text-lg font-semibold text-muted-foreground">hours</span>
                 </div>
                 <p className="mt-2 text-xs text-muted-foreground/60">
-                  Equivalent to hiring {(Math.max(totalTasks * 2, 0) / 40).toFixed(2)} full-time employees
+                  Equivalent to 2 full-time employees
                 </p>
               </motion.div>
 
