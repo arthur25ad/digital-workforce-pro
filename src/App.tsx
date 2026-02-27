@@ -17,6 +17,8 @@ import PricingPage from "./pages/PricingPage";
 import FAQPage from "./pages/FAQPage";
 import GetStartedPage from "./pages/GetStartedPage";
 import DashboardPage from "./pages/DashboardPage";
+import PrivacyPage from "./pages/PrivacyPage";
+import TermsPage from "./pages/TermsPage";
 
 const queryClient = new QueryClient();
 
@@ -45,6 +47,8 @@ const App = () => (
             <Route path="/faq" element={<FAQPage />} />
             <Route path="/get-started" element={<GetStartedPage />} />
             <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/privacy" element={<PrivacyPage />} />
+            <Route path="/terms" element={<TermsPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

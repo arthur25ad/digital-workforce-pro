@@ -15,8 +15,8 @@ const footerLinks = [
     links: [
       { label: "How It Works", href: "/how-it-works" },
       { label: "Industries", href: "/industries" },
-      { label: "Privacy Policy", href: "#" },
-      { label: "Terms", href: "#" },
+      { label: "Privacy Policy", href: "/privacy" },
+      { label: "Terms", href: "/terms" },
     ],
   },
 ];

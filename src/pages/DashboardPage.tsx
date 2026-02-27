@@ -4,8 +4,7 @@ import PageLayout from "@/components/PageLayout";
 import { useAppState } from "@/context/AppContext";
 import {
   Share2, Headphones, Mail, CalendarCheck, Check, Clock, AlertCircle,
-  FileText, MessageSquare, BarChart3, Calendar, Bell, Users, Inbox,
-  Send, PenLine, Eye, ThumbsUp, ArrowRight,
+  FileText, MessageSquare, PenLine, Eye, ThumbsUp, Bell, Send,
 } from "lucide-react";
 
 const roleLabels: Record<string, string> = {
@@ -24,209 +23,162 @@ const roleIcons: Record<string, any> = {
 
 const SocialPanel = () => {
   const { state } = useAppState();
-  const socialConnections = state.connections.filter((c) =>
-    ["Instagram", "Facebook", "LinkedIn", "X / Twitter", "TikTok"].includes(c.platform)
-  );
+  const drafts = state.socialDrafts;
+  const approved = drafts.filter(d => d.status === "approved").length;
+  const pending = drafts.filter(d => d.status === "pending" || d.status === "draft").length;
 
   return (
-    <div className="space-y-6">
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="space-y-4">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {[
-          { label: "Scheduled Posts", value: "12", icon: Calendar, color: "text-primary" },
-          { label: "Drafts", value: "4", icon: PenLine, color: "text-yellow-400" },
-          { label: "Approval Needed", value: "2", icon: Eye, color: "text-orange-400" },
-          { label: "Published", value: "28", icon: ThumbsUp, color: "text-emerald-400" },
-        ].map((stat) => (
-          <div key={stat.label} className="rounded-xl border border-border/50 bg-card p-4">
-            <div className="flex items-center justify-between">
-              <stat.icon size={18} className={stat.color} />
-              <span className="font-display text-2xl font-bold text-foreground">{stat.value}</span>
-            </div>
-            <p className="mt-2 text-xs text-muted-foreground">{stat.label}</p>
+          { label: "Total Drafts", value: String(drafts.length), icon: PenLine, color: "text-primary" },
+          { label: "Pending Review", value: String(pending), icon: Eye, color: "text-yellow-400" },
+          { label: "Approved", value: String(approved), icon: ThumbsUp, color: "text-emerald-400" },
+          { label: "Ideas Generated", value: String(state.postIdeas.length), icon: Share2, color: "text-primary" },
+        ].map((s) => (
+          <div key={s.label} className="rounded-xl border border-border/50 bg-card p-4">
+            <div className="flex items-center justify-between"><s.icon size={16} className={s.color} /><span className="font-display text-2xl font-bold text-foreground">{s.value}</span></div>
+            <p className="mt-1 text-xs text-muted-foreground">{s.label}</p>
           </div>
         ))}
       </div>
-
-      <div className="grid gap-6 lg:grid-cols-2">
-        <div className="rounded-xl border border-border/50 bg-card p-5">
-          <h3 className="mb-4 font-display text-sm font-semibold text-foreground">Content Queue</h3>
-          <div className="space-y-3">
-            {[
-              { title: "Weekly tip carousel", platform: "Instagram", time: "Today 2PM", status: "Scheduled" },
-              { title: "Product announcement", platform: "LinkedIn", time: "Tomorrow 10AM", status: "Pending Approval" },
-              { title: "Customer spotlight", platform: "Facebook", time: "Wed 9AM", status: "Draft" },
-            ].map((item) => (
-              <div key={item.title} className="flex items-center justify-between rounded-lg bg-secondary p-3">
-                <div>
-                  <p className="text-sm font-medium text-foreground">{item.title}</p>
-                  <p className="text-xs text-muted-foreground">{item.platform} · {item.time}</p>
-                </div>
-                <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-medium ${
-                  item.status === "Scheduled" ? "bg-primary/10 text-primary" :
-                  item.status === "Draft" ? "bg-secondary text-muted-foreground border border-border" :
-                  "bg-orange-500/10 text-orange-400"
-                }`}>{item.status}</span>
+      {drafts.length > 0 && (
+        <div className="rounded-xl border border-border/50 bg-card p-4">
+          <h3 className="mb-3 font-display text-sm font-semibold text-foreground">Recent Drafts</h3>
+          <div className="space-y-2">
+            {drafts.slice(0, 3).map((d) => (
+              <div key={d.id} className="flex items-center justify-between rounded-lg bg-secondary p-3">
+                <div><p className="text-sm font-medium text-foreground truncate max-w-[280px]">{d.content.slice(0, 60)}...</p><p className="text-xs text-muted-foreground">{d.platform} · {d.scheduledDate}</p></div>
+                <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${d.status === "approved" ? "bg-emerald-500/10 text-emerald-400" : d.status === "pending" ? "bg-yellow-500/10 text-yellow-400" : "bg-secondary text-muted-foreground border border-border"}`}>{d.status}</span>
               </div>
             ))}
           </div>
         </div>
-
-        <div className="rounded-xl border border-border/50 bg-card p-5">
-          <h3 className="mb-4 font-display text-sm font-semibold text-foreground">Connected Platforms</h3>
-          {socialConnections.length > 0 ? (
-            <div className="space-y-2">
-              {socialConnections.map((c) => (
-                <div key={c.platform} className="flex items-center justify-between rounded-lg bg-secondary p-3">
-                  <div className="flex items-center gap-2">
-                    <div className="h-2 w-2 rounded-full bg-emerald-400" />
-                    <span className="text-sm text-foreground">{c.platform}</span>
-                  </div>
-                  <span className="text-xs text-muted-foreground">{c.accountName}</span>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="flex flex-col items-center py-8 text-center">
-              <Share2 size={24} className="mb-2 text-muted-foreground/40" />
-              <p className="text-sm text-muted-foreground">No platforms connected yet</p>
-              <Link to="/ai-employees/social-media-manager" className="mt-2 text-xs text-primary hover:underline">Connect now →</Link>
-            </div>
-          )}
-        </div>
-      </div>
+      )}
     </div>
   );
 };
 
-const SupportPanel = () => (
-  <div className="space-y-6">
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      {[
-        { label: "Open Tickets", value: "7", icon: Inbox, color: "text-primary" },
-        { label: "Suggested Replies", value: "5", icon: MessageSquare, color: "text-yellow-400" },
-        { label: "Resolved Today", value: "12", icon: Check, color: "text-emerald-400" },
-        { label: "Escalations", value: "1", icon: AlertCircle, color: "text-red-400" },
-      ].map((stat) => (
-        <div key={stat.label} className="rounded-xl border border-border/50 bg-card p-4">
-          <div className="flex items-center justify-between">
-            <stat.icon size={18} className={stat.color} />
-            <span className="font-display text-2xl font-bold text-foreground">{stat.value}</span>
-          </div>
-          <p className="mt-2 text-xs text-muted-foreground">{stat.label}</p>
-        </div>
-      ))}
-    </div>
-    <div className="rounded-xl border border-border/50 bg-card p-5">
-      <h3 className="mb-4 font-display text-sm font-semibold text-foreground">Support Queue</h3>
-      <div className="space-y-3">
+const SupportPanel = () => {
+  const { state } = useAppState();
+  const tickets = state.supportTickets;
+  const open = tickets.filter(t => t.status === "open").length;
+  const replied = tickets.filter(t => t.status === "replied").length;
+
+  return (
+    <div className="space-y-4">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {[
-          { customer: "Sarah M.", subject: "Booking confirmation issue", time: "5 min ago", priority: "High" },
-          { customer: "David K.", subject: "Pricing question", time: "12 min ago", priority: "Medium" },
-          { customer: "Lisa T.", subject: "Service area inquiry", time: "28 min ago", priority: "Low" },
-          { customer: "Mark R.", subject: "Rescheduling request", time: "1 hr ago", priority: "Medium" },
-        ].map((ticket) => (
-          <div key={ticket.customer} className="flex items-center justify-between rounded-lg bg-secondary p-3">
-            <div>
-              <p className="text-sm font-medium text-foreground">{ticket.subject}</p>
-              <p className="text-xs text-muted-foreground">{ticket.customer} · {ticket.time}</p>
-            </div>
-            <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-medium ${
-              ticket.priority === "High" ? "bg-red-500/10 text-red-400" :
-              ticket.priority === "Medium" ? "bg-yellow-500/10 text-yellow-400" :
-              "bg-secondary text-muted-foreground border border-border"
-            }`}>{ticket.priority}</span>
+          { label: "Open Tickets", value: String(open), icon: MessageSquare, color: "text-primary" },
+          { label: "Replied", value: String(replied), icon: Check, color: "text-emerald-400" },
+          { label: "Escalated", value: String(tickets.filter(t => t.status === "escalated").length), icon: AlertCircle, color: "text-orange-400" },
+          { label: "Knowledge Items", value: String(state.supportKnowledge.length), icon: FileText, color: "text-primary" },
+        ].map((s) => (
+          <div key={s.label} className="rounded-xl border border-border/50 bg-card p-4">
+            <div className="flex items-center justify-between"><s.icon size={16} className={s.color} /><span className="font-display text-2xl font-bold text-foreground">{s.value}</span></div>
+            <p className="mt-1 text-xs text-muted-foreground">{s.label}</p>
           </div>
         ))}
       </div>
-    </div>
-  </div>
-);
-
-const EmailPanel = () => (
-  <div className="space-y-6">
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      {[
-        { label: "Campaign Drafts", value: "3", icon: FileText, color: "text-primary" },
-        { label: "Scheduled", value: "5", icon: Send, color: "text-emerald-400" },
-        { label: "Open Rate", value: "24%", icon: BarChart3, color: "text-yellow-400" },
-        { label: "Follow-Up Queue", value: "8", icon: Clock, color: "text-orange-400" },
-      ].map((stat) => (
-        <div key={stat.label} className="rounded-xl border border-border/50 bg-card p-4">
-          <div className="flex items-center justify-between">
-            <stat.icon size={18} className={stat.color} />
-            <span className="font-display text-2xl font-bold text-foreground">{stat.value}</span>
+      {tickets.length > 0 && (
+        <div className="rounded-xl border border-border/50 bg-card p-4">
+          <h3 className="mb-3 font-display text-sm font-semibold text-foreground">Recent Tickets</h3>
+          <div className="space-y-2">
+            {tickets.slice(0, 3).map((t) => (
+              <div key={t.id} className="flex items-center justify-between rounded-lg bg-secondary p-3">
+                <div><p className="text-sm font-medium text-foreground">{t.subject}</p><p className="text-xs text-muted-foreground">{t.customer} · {t.time}</p></div>
+                <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${t.status === "replied" ? "bg-emerald-500/10 text-emerald-400" : t.status === "escalated" ? "bg-orange-500/10 text-orange-400" : t.priority === "High" ? "bg-red-500/10 text-red-400" : "bg-yellow-500/10 text-yellow-400"}`}>{t.status === "open" ? t.priority : t.status}</span>
+              </div>
+            ))}
           </div>
-          <p className="mt-2 text-xs text-muted-foreground">{stat.label}</p>
         </div>
-      ))}
+      )}
     </div>
-    <div className="rounded-xl border border-border/50 bg-card p-5">
-      <h3 className="mb-4 font-display text-sm font-semibold text-foreground">Campaign Drafts</h3>
-      <div className="space-y-3">
+  );
+};
+
+const EmailPanel = () => {
+  const { state } = useAppState();
+  const campaigns = state.emailCampaigns;
+  const drafts = campaigns.filter(c => c.status === "draft").length;
+  const scheduled = campaigns.filter(c => c.status === "scheduled" || c.status === "approved").length;
+
+  return (
+    <div className="space-y-4">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {[
-          { name: "Welcome Series — Email 1", recipients: "New subscribers", status: "Ready" },
-          { name: "Monthly Newsletter — March", recipients: "All contacts", status: "Draft" },
-          { name: "Re-engagement Campaign", recipients: "Inactive 30d+", status: "In Review" },
-        ].map((c) => (
-          <div key={c.name} className="flex items-center justify-between rounded-lg bg-secondary p-3">
-            <div>
-              <p className="text-sm font-medium text-foreground">{c.name}</p>
-              <p className="text-xs text-muted-foreground">{c.recipients}</p>
-            </div>
-            <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-medium ${
-              c.status === "Ready" ? "bg-emerald-500/10 text-emerald-400" :
-              c.status === "Draft" ? "bg-secondary text-muted-foreground border border-border" :
-              "bg-primary/10 text-primary"
-            }`}>{c.status}</span>
+          { label: "Total Campaigns", value: String(campaigns.length), icon: Mail, color: "text-primary" },
+          { label: "Drafts", value: String(drafts), icon: PenLine, color: "text-yellow-400" },
+          { label: "Scheduled / Approved", value: String(scheduled), icon: Send, color: "text-emerald-400" },
+          { label: "Open Rate", value: "24%", icon: Eye, color: "text-primary" },
+        ].map((s) => (
+          <div key={s.label} className="rounded-xl border border-border/50 bg-card p-4">
+            <div className="flex items-center justify-between"><s.icon size={16} className={s.color} /><span className="font-display text-2xl font-bold text-foreground">{s.value}</span></div>
+            <p className="mt-1 text-xs text-muted-foreground">{s.label}</p>
           </div>
         ))}
       </div>
-    </div>
-  </div>
-);
-
-const AssistantPanel = () => (
-  <div className="space-y-6">
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      {[
-        { label: "Tasks Today", value: "9", icon: FileText, color: "text-primary" },
-        { label: "Reminders", value: "4", icon: Bell, color: "text-yellow-400" },
-        { label: "Meetings", value: "3", icon: Users, color: "text-emerald-400" },
-        { label: "Completed", value: "14", icon: Check, color: "text-muted-foreground" },
-      ].map((stat) => (
-        <div key={stat.label} className="rounded-xl border border-border/50 bg-card p-4">
-          <div className="flex items-center justify-between">
-            <stat.icon size={18} className={stat.color} />
-            <span className="font-display text-2xl font-bold text-foreground">{stat.value}</span>
+      {campaigns.length > 0 && (
+        <div className="rounded-xl border border-border/50 bg-card p-4">
+          <h3 className="mb-3 font-display text-sm font-semibold text-foreground">Recent Campaigns</h3>
+          <div className="space-y-2">
+            {campaigns.slice(0, 3).map((c) => (
+              <div key={c.id} className="flex items-center justify-between rounded-lg bg-secondary p-3">
+                <div><p className="text-sm font-medium text-foreground">{c.name}</p><p className="text-xs text-muted-foreground">{c.recipients}</p></div>
+                <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${c.status === "approved" || c.status === "scheduled" ? "bg-emerald-500/10 text-emerald-400" : c.status === "draft" ? "bg-secondary text-muted-foreground border border-border" : "bg-yellow-500/10 text-yellow-400"}`}>{c.status}</span>
+              </div>
+            ))}
           </div>
-          <p className="mt-2 text-xs text-muted-foreground">{stat.label}</p>
         </div>
-      ))}
+      )}
     </div>
-    <div className="grid gap-6 lg:grid-cols-2">
-      <div className="rounded-xl border border-border/50 bg-card p-5">
-        <h3 className="mb-4 font-display text-sm font-semibold text-foreground">Today's Tasks</h3>
-        <div className="space-y-2">
-          {["Follow up with vendor", "Prepare meeting agenda", "Update project timeline", "Send weekly report"].map((t) => (
-            <div key={t} className="flex items-center gap-3 rounded-lg bg-secondary p-3">
-              <div className="h-4 w-4 rounded border border-border" />
-              <span className="text-sm text-foreground">{t}</span>
-            </div>
-          ))}
-        </div>
+  );
+};
+
+const AssistantPanel = () => {
+  const { state } = useAppState();
+  const tasks = state.tasks;
+  const pending = tasks.filter(t => t.status === "pending").length;
+  const completed = tasks.filter(t => t.status === "completed").length;
+  const needsReview = tasks.filter(t => t.needsReview && t.status !== "completed").length;
+
+  return (
+    <div className="space-y-4">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {[
+          { label: "Tasks Pending", value: String(pending), icon: FileText, color: "text-primary" },
+          { label: "In Progress", value: String(tasks.filter(t => t.status === "in-progress").length), icon: Clock, color: "text-yellow-400" },
+          { label: "Completed", value: String(completed), icon: Check, color: "text-emerald-400" },
+          { label: "Needs Review", value: String(needsReview), icon: Bell, color: "text-orange-400" },
+        ].map((s) => (
+          <div key={s.label} className="rounded-xl border border-border/50 bg-card p-4">
+            <div className="flex items-center justify-between"><s.icon size={16} className={s.color} /><span className="font-display text-2xl font-bold text-foreground">{s.value}</span></div>
+            <p className="mt-1 text-xs text-muted-foreground">{s.label}</p>
+          </div>
+        ))}
       </div>
-      <div className="rounded-xl border border-border/50 bg-card p-5">
-        <h3 className="mb-4 font-display text-sm font-semibold text-foreground">Daily Summary</h3>
-        <div className="space-y-3 text-sm text-muted-foreground">
-          <p>• 3 meetings scheduled for today</p>
-          <p>• 2 follow-ups pending from yesterday</p>
-          <p>• Weekly report due by 5 PM</p>
-          <p>• New client onboarding at 2 PM</p>
+      {state.dailySummary && (
+        <div className="rounded-xl border border-border/50 bg-card p-4">
+          <h3 className="mb-3 font-display text-sm font-semibold text-foreground">Daily Summary</h3>
+          <div className="text-sm text-muted-foreground whitespace-pre-line">{state.dailySummary}</div>
         </div>
-      </div>
+      )}
+      {tasks.length > 0 && (
+        <div className="rounded-xl border border-border/50 bg-card p-4">
+          <h3 className="mb-3 font-display text-sm font-semibold text-foreground">Recent Tasks</h3>
+          <div className="space-y-2">
+            {tasks.filter(t => t.status !== "completed").slice(0, 4).map((t) => (
+              <div key={t.id} className="flex items-center justify-between rounded-lg bg-secondary p-3">
+                <div><p className="text-sm font-medium text-foreground">{t.title}</p><p className="text-xs text-muted-foreground">Due: {t.dueDate}</p></div>
+                <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${t.status === "in-progress" ? "bg-primary/10 text-primary" : t.status === "on-hold" ? "bg-yellow-500/10 text-yellow-400" : "bg-secondary text-muted-foreground border border-border"}`}>{t.status}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
-  </div>
-);
+  );
+};
 
 const panelMap: Record<string, React.FC> = {
   social: SocialPanel,
@@ -257,7 +209,6 @@ const DashboardPage = () => {
             </div>
           </motion.div>
 
-          {/* Active roles tabs */}
           <div className="mb-8 flex flex-wrap gap-3">
             {roles.map((r) => {
               const Icon = roleIcons[r] || Share2;
@@ -271,18 +222,12 @@ const DashboardPage = () => {
             })}
           </div>
 
-          {/* Panels */}
           <div className="space-y-12">
             {roles.map((r) => {
               const Panel = panelMap[r];
               if (!Panel) return null;
               return (
-                <motion.div
-                  key={r}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                >
+                <motion.div key={r} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
                   <div className="mb-4 flex items-center gap-2">
                     {(() => { const Icon = roleIcons[r] || Share2; return <Icon size={18} className="text-primary" />; })()}
                     <h2 className="font-display text-lg font-semibold text-foreground">{roleLabels[r]}</h2>
