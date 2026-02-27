@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Menu, X, LogOut } from "lucide-react";
+import { Menu, X, LogOut, Brain } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -44,7 +44,7 @@ const Navbar = () => {
               to={link.href}
               className={
                 link.isBrain
-                  ? `text-sm font-bold tracking-widest transition-colors duration-200 hover:text-foreground ${
+                  ? `flex items-center gap-1.5 text-base font-bold tracking-widest transition-colors duration-200 hover:text-foreground ${
                       location.pathname === link.href ? "text-foreground" : ""
                     }`
                   : `text-sm transition-colors duration-200 hover:text-foreground ${
@@ -53,6 +53,7 @@ const Navbar = () => {
               }
               style={link.isBrain ? { color: location.pathname === link.href ? undefined : "hsl(280 70% 65%)" } : undefined}
             >
+              {link.isBrain && <Brain size={18} className="shrink-0" />}
               {link.label}
             </Link>
           ))}
