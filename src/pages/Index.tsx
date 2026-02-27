@@ -1,5 +1,4 @@
 import Navbar from "@/components/Navbar";
-import PromoBanner from "@/components/PromoBanner";
 import HeroSection from "@/components/HeroSection";
 import AITeamSection from "@/components/AITeamSection";
 import CapabilitiesGrid from "@/components/CapabilitiesGrid";
@@ -18,7 +17,6 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <PromoBanner />
       <HeroSection />
       <BrandDivider />
       <DashboardPreview />
