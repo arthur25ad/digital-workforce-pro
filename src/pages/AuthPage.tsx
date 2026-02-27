@@ -96,8 +96,13 @@ const AuthPage = () => {
           </Link>
         </div>
         <div className="text-center mb-8">
-          <h1 className="font-display text-3xl font-bold text-foreground">
-            <span className="text-primary">VAN</span>TORY
+          <h1 className="font-display text-3xl font-bold">
+            <span style={{
+              backgroundImage: "linear-gradient(135deg, hsl(0 0% 100%), hsl(225 60% 82%), hsl(0 0% 100%), hsl(225 50% 78%))",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+            }}>VANTORY</span>
           </h1>
           <p className="mt-2 text-muted-foreground">
             {mode === "login" ? "Welcome back to your workspace" : mode === "signup" ? "Create your AI workforce account" : "Reset your password"}
