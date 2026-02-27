@@ -39,7 +39,7 @@ const roles = [
 
 const AITeamSection = () => (
   <section id="team" className="section-padding">
-    <div className="mx-auto max-w-7xl">
+    <div className="mx-auto max-w-[1600px] px-6 md:px-12 lg:px-16">
       <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} className="mb-14 text-center">
         <h2 className="font-display text-3xl font-bold text-foreground md:text-4xl">Specialized AI Roles for Real Business Work</h2>
         <p className="mx-auto mt-4 max-w-2xl text-muted-foreground">Deploy a focused digital team built to handle the repetitive work that slows small businesses down.</p>

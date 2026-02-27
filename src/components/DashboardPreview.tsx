@@ -50,7 +50,7 @@ const columns = [
 const DashboardPreview = () => {
   return (
     <section className="section-padding blue-ambient">
-      <div className="mx-auto max-w-5xl">
+      <div className="mx-auto max-w-[1400px]">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}

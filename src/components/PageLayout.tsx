@@ -12,8 +12,8 @@ const PageLayout = ({ children }: { children: React.ReactNode }) => {
       <Navbar />
       <main className="pt-20 relative">
         {!isHome && (
-          <div className="absolute top-24 left-0 z-10 mx-auto w-full px-4 md:px-8">
-            <div className="mx-auto max-w-7xl">
+          <div className="absolute top-24 left-0 z-10 mx-auto w-full px-6 md:px-12 lg:px-16">
+            <div className="mx-auto max-w-[1600px]">
               <Link
                 to="/"
                 className="group inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.15em] text-white/50 transition-all duration-300 hover:text-white/80 hover:gap-2"

@@ -8,7 +8,7 @@ const CTASection = () => {
 
   return (
     <section id="cta" className="section-padding blue-ambient">
-      <div className="mx-auto max-w-3xl text-center">
+      <div className="mx-auto max-w-4xl text-center">
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
           <h2 className="font-display text-3xl font-bold text-foreground md:text-5xl">
             Build Your AI Team Today

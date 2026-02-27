@@ -27,8 +27,8 @@ const Navbar = () => {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 md:px-8">
-        <Link to="/" className="font-display text-xl font-bold tracking-tight">
+      <div className="mx-auto flex max-w-[1600px] items-center justify-between px-6 py-4 md:px-12 lg:px-16">
+        <Link to="/" className="font-display text-2xl font-bold tracking-tight">
           <span style={{
             backgroundImage: "linear-gradient(135deg, hsl(0 0% 100%), hsl(225 60% 82%), hsl(0 0% 100%), hsl(225 50% 78%))",
             WebkitBackgroundClip: "text",
@@ -44,10 +44,10 @@ const Navbar = () => {
               to={link.href}
               className={
                 link.isBrain
-                  ? `text-xs font-bold tracking-widest transition-colors duration-200 hover:text-foreground ${
+                  ? `text-sm font-bold tracking-widest transition-colors duration-200 hover:text-foreground ${
                       location.pathname === link.href ? "text-foreground" : ""
                     }`
-                  : `text-xs transition-colors duration-200 hover:text-foreground ${
+                  : `text-sm transition-colors duration-200 hover:text-foreground ${
                       location.pathname === link.href ? "text-foreground" : "text-muted-foreground"
                     }`
               }

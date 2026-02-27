@@ -8,7 +8,7 @@ const PricingSection = () => {
 
   return (
     <section id="pricing" className="section-padding">
-      <div className="mx-auto max-w-7xl">
+      <div className="mx-auto max-w-[1600px] px-6 md:px-12 lg:px-16">
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-14 text-center">
           <h2 className="font-display text-3xl font-bold text-foreground md:text-4xl">Simple Pricing for Your First AI Team</h2>
         </motion.div>
