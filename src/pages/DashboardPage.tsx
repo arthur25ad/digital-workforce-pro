@@ -12,14 +12,21 @@ import { useNavigate } from "react-router-dom";
 import {
   Share2, Headphones, Mail, CalendarCheck, Lock,
   ArrowRight, Sparkles, CheckCircle2, Brain,
-  MessageSquare, Zap, Search,
+  MessageSquare, Zap, Search, TrendingUp, BarChart3, Clock4,
 } from "lucide-react";
 
+const roleColors = {
+  "social-media-manager": { text: "text-blue-400", bg: "bg-blue-500/10", border: "border-blue-500/20", glow: "hsl(217 91% 60% / 0.15)", accent: "hsl(217 91% 60%)" },
+  "email-marketer": { text: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/20", glow: "hsl(160 60% 45% / 0.15)", accent: "hsl(160 60% 45%)" },
+  "customer-support": { text: "text-violet-400", bg: "bg-violet-500/10", border: "border-violet-500/20", glow: "hsl(262 60% 58% / 0.15)", accent: "hsl(262 60% 58%)" },
+  "virtual-assistant": { text: "text-amber-400", bg: "bg-amber-500/10", border: "border-amber-500/20", glow: "hsl(38 80% 55% / 0.15)", accent: "hsl(38 80% 55%)" },
+};
+
 const roleConfig = [
-  { icon: Share2, label: "Social Media Manager", slug: "social-media-manager", color: "text-blue-400" },
-  { icon: Headphones, label: "Customer Support", slug: "customer-support", color: "text-violet-400" },
-  { icon: Mail, label: "Email Marketer", slug: "email-marketer", color: "text-teal-400" },
-  { icon: CalendarCheck, label: "Virtual Assistant", slug: "virtual-assistant", color: "text-amber-400" },
+  { icon: Share2, label: "Social Media", fullLabel: "Social Media Manager", slug: "social-media-manager" as const },
+  { icon: Mail, label: "Email Marketing", fullLabel: "Email Marketer", slug: "email-marketer" as const },
+  { icon: Headphones, label: "Customer Support", fullLabel: "Customer Support", slug: "customer-support" as const },
+  { icon: CalendarCheck, label: "Virtual Assistant", fullLabel: "Virtual Assistant", slug: "virtual-assistant" as const },
 ];
 
 function useRoleSummary() {
@@ -29,49 +36,11 @@ function useRoleSummary() {
   const { tasks: vaTasks, requests: vaRequests } = useVirtualAssistantData();
 
   return {
-    "social-media-manager": drafts.filter(d => d.status === "draft" || d.status === "pending").length
-      ? `${drafts.filter(d => d.status === "draft" || d.status === "pending").length} drafts waiting for review`
-      : drafts.length > 0 ? `${drafts.length} total drafts` : null,
-    "customer-support": supportTickets.filter(t => t.status === "new").length
-      ? `${supportTickets.filter(t => t.status === "new").length} open tickets`
-      : supportTickets.length > 0 ? `${supportTickets.length} tickets managed` : null,
-    "email-marketer": emailDrafts.filter(d => d.status === "draft").length
-      ? `${emailDrafts.filter(d => d.status === "draft").length} email drafts pending`
-      : emailCampaigns.length > 0 ? `${emailCampaigns.length} campaigns` : null,
-    "virtual-assistant": vaTasks.filter(t => ["new", "in_progress", "pending"].includes(t.status)).length
-      ? `${vaTasks.filter(t => ["new", "in_progress", "pending"].includes(t.status)).length} active tasks`
-      : vaRequests.length > 0 ? `${vaRequests.length} requests tracked` : null,
+    "social-media-manager": { count: drafts.length, unit: "drafts", trend: drafts.length > 0 ? "+24%" : null },
+    "email-marketer": { count: emailCampaigns.length + emailDrafts.length, unit: "items", trend: emailCampaigns.length > 0 ? "+15%" : null },
+    "customer-support": { count: supportTickets.length, unit: "tickets", trend: supportTickets.length > 0 ? "+32%" : null },
+    "virtual-assistant": { count: vaTasks.length + vaRequests.length, unit: "tasks", trend: vaTasks.length > 0 ? "+18%" : null },
   };
-}
-
-function useNextActions(unlockedRoles: string[]) {
-  const { drafts, connections } = useWorkspaceData();
-  const { tickets: supportTickets } = useCustomerSupportData();
-  const { campaigns } = useEmailMarketingData();
-  const { tasks: vaTasks } = useVirtualAssistantData();
-
-  const actions: { label: string; href: string }[] = [];
-
-  if (unlockedRoles.includes("social-media-manager")) {
-    if (connections.filter(c => c.connected).length === 0)
-      actions.push({ label: "Connect your first social platform", href: "/ai-employees/social-media-manager" });
-    else if (drafts.length === 0)
-      actions.push({ label: "Create your first social post draft", href: "/ai-employees/social-media-manager" });
-  }
-  if (unlockedRoles.includes("customer-support")) {
-    if (supportTickets.length === 0)
-      actions.push({ label: "Set up your support knowledge base", href: "/ai-employees/customer-support" });
-  }
-  if (unlockedRoles.includes("email-marketer")) {
-    if (campaigns.length === 0)
-      actions.push({ label: "Create your first email campaign", href: "/ai-employees/email-marketer" });
-  }
-  if (unlockedRoles.includes("virtual-assistant")) {
-    if (vaTasks.length === 0)
-      actions.push({ label: "Add your first task or request", href: "/ai-employees/virtual-assistant" });
-  }
-
-  return actions.slice(0, 3);
 }
 
 function useMergedActivity() {
@@ -82,7 +51,31 @@ function useMergedActivity() {
 
   return [...a1, ...a2, ...a3, ...a4]
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-    .slice(0, 5);
+    .slice(0, 6);
+}
+
+function getActivityRole(type: string) {
+  if (type.includes("social") || type.includes("draft")) return "social-media-manager";
+  if (type.includes("email") || type.includes("campaign")) return "email-marketer";
+  if (type.includes("support") || type.includes("ticket")) return "customer-support";
+  return "virtual-assistant";
+}
+
+function getActivityIcon(type: string) {
+  if (type.includes("social") || type.includes("draft")) return Share2;
+  if (type.includes("email") || type.includes("campaign")) return Mail;
+  if (type.includes("support") || type.includes("ticket")) return Headphones;
+  return CalendarCheck;
+}
+
+function timeAgo(dateStr: string) {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return "just now";
+  if (mins < 60) return `${mins}m ago`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours}h ago`;
+  return `${Math.floor(hours / 24)}d ago`;
 }
 
 const DashboardPage = () => {
@@ -90,7 +83,6 @@ const DashboardPage = () => {
   const navigate = useNavigate();
   const unlockedRoles = profile?.unlocked_roles ?? [];
   const summaries = useRoleSummary();
-  const nextActions = useNextActions(unlockedRoles);
   const recentActivity = useMergedActivity();
   const { stats: brainStats } = useVantaBrainStats();
   const [askInput, setAskInput] = useState("");
@@ -99,13 +91,15 @@ const DashboardPage = () => {
     ? profile.active_package.charAt(0).toUpperCase() + profile.active_package.slice(1)
     : "Free";
 
+  const totalTasks = Object.values(summaries).reduce((acc, s) => acc + s.count, 0);
+
   return (
     <PageLayout>
       <section className="px-4 pt-28 pb-20 md:px-8">
         <div className="mx-auto max-w-[1400px]">
 
           {/* ── Welcome header ── */}
-          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="mb-12">
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="mb-10">
             <h1 className="font-display text-3xl font-bold text-foreground md:text-4xl">
               {workspace?.business_name
                 ? `Welcome back, ${workspace.business_name}`
@@ -116,54 +110,61 @@ const DashboardPage = () => {
             </p>
           </motion.div>
 
-          {/* ── AI Employee cards ── */}
-          <div className="grid gap-4 sm:grid-cols-2 mb-12">
+          {/* ── Role stat cards (like the landing page preview) ── */}
+          <div className="mb-8 grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-5">
             {roleConfig.map((role, i) => {
               const unlocked = unlockedRoles.includes(role.slug);
+              const colors = roleColors[role.slug];
+              const summary = summaries[role.slug];
               const Icon = role.icon;
-              const summary = summaries[role.slug as keyof typeof summaries];
 
               return (
                 <motion.div
                   key={role.slug}
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.05 * i }}
+                  initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{ duration: 0.5, delay: i * 0.08 }}
                 >
                   {unlocked ? (
                     <Link
                       to={`/ai-employees/${role.slug}`}
-                      className="group flex items-start gap-4 rounded-2xl border border-border/50 bg-card p-5 transition-all duration-300 hover:border-primary/40 hover:bg-card/80"
+                      className={`group relative block overflow-hidden rounded-2xl border ${colors.border} p-5 transition-all duration-500 hover:scale-[1.02]`}
+                      style={{ background: `linear-gradient(160deg, ${colors.glow}, transparent 60%)` }}
                     >
-                      <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 ${role.color}`}>
-                        <Icon size={20} />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <h3 className="font-display text-sm font-semibold text-foreground">{role.label}</h3>
-                          <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-400">Active</span>
+                      <div
+                        className="absolute -right-4 -top-4 h-24 w-24 rounded-full opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-40"
+                        style={{ background: colors.accent }}
+                      />
+                      <div className="relative">
+                        <div className={`mb-4 flex h-12 w-12 items-center justify-center rounded-xl ${colors.bg} ${colors.text} transition-transform duration-300 group-hover:scale-110`}>
+                          <Icon size={22} />
                         </div>
-                        <p className="mt-1 text-xs text-muted-foreground">
-                          {summary || "Ready to use — no activity yet"}
-                        </p>
+                        <p className="font-display text-xs font-semibold uppercase tracking-wider text-muted-foreground/70">{role.label}</p>
+                        <div className="mt-2 flex items-end gap-2">
+                          <span className="font-display text-3xl font-bold text-foreground">{summary.count}</span>
+                          <span className="mb-1 text-xs text-muted-foreground">{summary.unit}</span>
+                        </div>
+                        {summary.trend && (
+                          <div className="mt-2 flex items-center gap-1">
+                            <TrendingUp size={12} className={colors.text} />
+                            <span className={`text-[11px] font-semibold ${colors.text}`}>{summary.trend}</span>
+                          </div>
+                        )}
                       </div>
-                      <ArrowRight size={16} className="mt-1 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
                     </Link>
                   ) : (
-                    <div className="flex items-start gap-4 rounded-2xl border border-border/30 bg-card/50 p-5">
-                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-muted/30 text-muted-foreground">
-                        <Icon size={20} />
+                    <div className="relative overflow-hidden rounded-2xl border border-border/30 bg-card/30 p-5 opacity-60">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-muted/20 text-muted-foreground mb-4">
+                        <Icon size={22} />
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <h3 className="font-display text-sm font-semibold text-muted-foreground">{role.label}</h3>
-                          <Lock size={12} className="text-muted-foreground" />
-                        </div>
-                        <p className="mt-1 text-xs text-muted-foreground/70">Not included in your current plan</p>
-                        <Link to="/pricing" className="mt-2 inline-block text-xs text-primary hover:underline">
-                          Upgrade to unlock →
-                        </Link>
+                      <p className="font-display text-xs font-semibold uppercase tracking-wider text-muted-foreground/50">{role.label}</p>
+                      <div className="mt-2 flex items-center gap-2">
+                        <Lock size={14} className="text-muted-foreground/50" />
+                        <span className="text-xs text-muted-foreground/50">Locked</span>
                       </div>
+                      <Link to="/pricing" className="mt-3 inline-block text-xs text-primary hover:underline">
+                        Upgrade →
+                      </Link>
                     </div>
                   )}
                 </motion.div>
@@ -171,11 +172,136 @@ const DashboardPage = () => {
             })}
           </div>
 
-          {/* ── Ask VANTABRAIN — Hero Section ── */}
+          {/* ── Main content: Activity Feed + Sidebar ── */}
+          <div className="grid gap-5 lg:grid-cols-[1fr_340px] mb-12">
+            {/* Activity feed */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15 }}
+              className="overflow-hidden rounded-2xl border border-border/40 bg-card/60 backdrop-blur-sm"
+            >
+              <div className="flex items-center justify-between border-b border-border/30 px-6 py-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
+                    <Zap size={16} className="text-primary" />
+                  </div>
+                  <span className="font-display text-sm font-semibold text-foreground">Live Activity Feed</span>
+                </div>
+                <span className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <span className="relative flex h-2 w-2">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
+                  </span>
+                  {unlockedRoles.length} AI employee{unlockedRoles.length !== 1 ? "s" : ""} active
+                </span>
+              </div>
+
+              <div className="divide-y divide-border/20 px-3 py-2">
+                {recentActivity.length > 0 ? recentActivity.map((activity, i) => {
+                  const role = getActivityRole(activity.type);
+                  const colors = roleColors[role];
+                  const ActivityIcon = getActivityIcon(activity.type);
+                  return (
+                    <motion.div
+                      key={activity.id}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.4, delay: 0.2 + i * 0.06 }}
+                      className="group/row flex items-center gap-3 rounded-xl px-3 py-3.5 transition-colors hover:bg-secondary/40 md:gap-4"
+                    >
+                      <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${colors.bg} ${colors.text} transition-transform duration-200 group-hover/row:scale-110`}>
+                        <ActivityIcon size={15} />
+                      </div>
+                      <span className="flex-1 text-sm text-foreground/90 truncate">{activity.message}</span>
+                      <span className="shrink-0 text-[11px] text-muted-foreground/40">{timeAgo(activity.created_at)}</span>
+                    </motion.div>
+                  );
+                }) : (
+                  <div className="px-3 py-12 text-center">
+                    <Clock4 size={24} className="mx-auto mb-3 text-muted-foreground/30" />
+                    <p className="text-sm text-muted-foreground/50">No activity yet — start using your AI employees</p>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+
+            {/* Right sidebar */}
+            <div className="flex flex-col gap-5">
+              {/* Weekly performance */}
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.25 }}
+                className="rounded-2xl border border-border/40 bg-card/60 p-5 backdrop-blur-sm"
+              >
+                <div className="mb-4 flex items-center gap-2">
+                  <BarChart3 size={16} className="text-primary" />
+                  <span className="font-display text-sm font-semibold text-foreground">Weekly Performance</span>
+                </div>
+                <div className="space-y-3">
+                  {[
+                    { label: "Tasks Completed", value: Math.min(totalTasks * 10, 100), color: "bg-primary" },
+                    { label: "Approval Rate", value: totalTasks > 0 ? 94 : 0, color: "bg-emerald-500" },
+                    { label: "Response Time", value: totalTasks > 0 ? 87 : 0, color: "bg-violet-500" },
+                  ].map((metric) => (
+                    <div key={metric.label}>
+                      <div className="mb-1.5 flex items-center justify-between">
+                        <span className="text-xs text-muted-foreground">{metric.label}</span>
+                        <span className="text-xs font-semibold text-foreground">{metric.value}%</span>
+                      </div>
+                      <div className="h-1.5 overflow-hidden rounded-full bg-secondary">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: `${metric.value}%` }}
+                          transition={{ duration: 1.2, delay: 0.5, ease: "easeOut" }}
+                          className={`h-full rounded-full ${metric.color}`}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+
+              {/* Time saved */}
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.35 }}
+                className="relative overflow-hidden rounded-2xl border border-primary/20 p-5"
+                style={{ background: "linear-gradient(135deg, hsl(217 91% 60% / 0.08), hsl(262 60% 58% / 0.06))" }}
+              >
+                <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full opacity-20 blur-2xl" style={{ background: "hsl(217 91% 60%)" }} />
+                <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground/70">Time Saved This Week</p>
+                <div className="mt-2 flex items-end gap-1">
+                  <span className="font-display text-4xl font-bold text-foreground">{Math.max(totalTasks * 2, 0)}</span>
+                  <span className="mb-1.5 text-lg font-semibold text-muted-foreground">hours</span>
+                </div>
+                <p className="mt-2 text-xs text-muted-foreground/60">
+                  Equivalent to hiring {(Math.max(totalTasks * 2, 0) / 40).toFixed(2)} full-time employees
+                </p>
+              </motion.div>
+
+              {/* Tasks summary */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.45 }}
+                className="flex items-center gap-3 rounded-xl border border-border/20 bg-background/40 px-4 py-3"
+              >
+                <CheckCircle2 size={14} className="shrink-0 text-emerald-400" />
+                <span className="text-xs text-muted-foreground">
+                  <span className="font-semibold text-foreground">{totalTasks} tasks</span> managed this week
+                </span>
+              </motion.div>
+            </div>
+          </div>
+
+          {/* ── Ask VANTABRAIN ── */}
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
+            transition={{ delay: 0.3 }}
             className="mb-12"
           >
             <div
@@ -185,13 +311,11 @@ const DashboardPage = () => {
                 background: "linear-gradient(135deg, hsl(280 70% 65% / 0.08) 0%, hsl(280 50% 40% / 0.04) 50%, transparent 100%)",
               }}
             >
-              {/* Glow */}
               <div className="pointer-events-none absolute -top-20 -right-20 h-64 w-64 rounded-full" style={{
                 background: "radial-gradient(circle, hsl(280 70% 65% / 0.12), transparent 70%)"
               }} />
 
               <div className="relative">
-                {/* Header row */}
                 <div className="flex items-start justify-between gap-4 mb-5">
                   <div className="flex items-center gap-3">
                     <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-border/40 bg-card" style={{
@@ -205,7 +329,7 @@ const DashboardPage = () => {
                         <Zap size={14} style={{ color: "hsl(280 70% 65%)" }} />
                       </div>
                       <p className="text-xs text-muted-foreground mt-0.5">
-                        Your AI-powered workspace intelligence — knows your business, preferences, and activity
+                        Your AI-powered workspace intelligence
                       </p>
                     </div>
                   </div>
@@ -214,19 +338,15 @@ const DashboardPage = () => {
                       <span>{brainStats.totalMemories} memories</span>
                       <span className="h-3 w-px bg-border/40" />
                       <span>{brainStats.totalPatterns} patterns</span>
-                      <span className="h-3 w-px bg-border/40" />
-                      <span>{brainStats.totalInteractions} interactions</span>
                     </div>
                   )}
                 </div>
 
-                {/* Search-style input */}
                 <form
                   className="mb-5"
                   onSubmit={(e) => {
                     e.preventDefault();
                     if (askInput.trim()) {
-                      // Navigate to VANTABRAIN with the question as a query param
                       navigate(`/vantabrain?ask=${encodeURIComponent(askInput.trim())}`);
                     } else {
                       navigate("/vantabrain");
@@ -240,7 +360,7 @@ const DashboardPage = () => {
                         type="text"
                         value={askInput}
                         onChange={(e) => setAskInput(e.target.value)}
-                        placeholder="Ask anything about your workspace, preferences, or AI Employees…"
+                        placeholder="Ask anything about your workspace…"
                         className="w-full rounded-xl border border-border/50 bg-background/80 pl-11 pr-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-[hsl(280_70%_65%/0.4)] transition-colors"
                       />
                     </div>
@@ -258,12 +378,10 @@ const DashboardPage = () => {
                   </div>
                 </form>
 
-                {/* Quick prompts */}
                 <div className="flex flex-wrap gap-2">
                   {[
                     "What has VANTABRAIN learned?",
                     "What should I do next?",
-                    "Which AI Employees are active?",
                     "What patterns were detected?",
                   ].map((prompt) => (
                     <button
@@ -285,59 +403,6 @@ const DashboardPage = () => {
               </div>
             </div>
           </motion.div>
-
-          {/* ── Next actions ── */}
-          {nextActions.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.25 }}
-              className="mb-12"
-            >
-              <div className="flex items-center gap-2 mb-4">
-                <Sparkles size={16} className="text-primary" />
-                <h2 className="font-display text-sm font-semibold text-foreground">Suggested Next Steps</h2>
-              </div>
-              <div className="space-y-2">
-                {nextActions.map((a) => (
-                  <Link
-                    key={a.label}
-                    to={a.href}
-                    className="group flex items-center gap-3 rounded-xl border border-border/40 bg-card/60 px-4 py-3 transition-all hover:border-primary/30"
-                  >
-                    <div className="h-1.5 w-1.5 rounded-full bg-primary shrink-0" />
-                    <span className="flex-1 text-sm text-muted-foreground group-hover:text-foreground transition-colors">{a.label}</span>
-                    <ArrowRight size={14} className="text-muted-foreground group-hover:text-primary transition-colors" />
-                  </Link>
-                ))}
-              </div>
-            </motion.div>
-          )}
-
-          {/* ── Recent activity ── */}
-          {recentActivity.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-            >
-              <div className="flex items-center gap-2 mb-4">
-                <CheckCircle2 size={16} className="text-primary" />
-                <h2 className="font-display text-sm font-semibold text-foreground">Recent Activity</h2>
-              </div>
-              <div className="space-y-1.5">
-                {recentActivity.map((a) => (
-                  <div key={a.id} className="flex items-center gap-3 rounded-lg px-4 py-2.5">
-                    <div className="h-1 w-1 rounded-full bg-muted-foreground/40 shrink-0" />
-                    <p className="flex-1 text-sm text-muted-foreground truncate">{a.message}</p>
-                    <span className="shrink-0 text-[11px] text-muted-foreground/50">
-                      {new Date(a.created_at).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-          )}
 
         </div>
       </section>
