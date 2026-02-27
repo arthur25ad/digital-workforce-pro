@@ -147,19 +147,19 @@
       hsl(0 0% 100%) 62%,
       hsl(0 0% 100%) 100%
     );
-    background-size: 300% 100%;
+    background-size: 400% 100%;
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation: flow-sweep 6s linear infinite;
+    animation: flow-sweep 8s linear infinite;
   }
 }
 
 @keyframes flow-sweep {
   0% {
-    background-position: 100% 0;
+    background-position: 200% 0;
   }
   100% {
-    background-position: -100% 0;
+    background-position: -200% 0;
   }
 }
