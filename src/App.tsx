@@ -24,6 +24,7 @@ import ResetPasswordPage from "./pages/ResetPasswordPage";
 import ChooseRolesPage from "./pages/ChooseRolesPage";
 import VantaBrainPage from "./pages/VantaBrainPage";
 import StaffPortalPage from "./pages/StaffPortalPage";
+import SupportPage from "./pages/SupportPage";
 
 const queryClient = new QueryClient();
 
@@ -69,6 +70,7 @@ const App = () => (
               <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
               <Route path="/vantabrain" element={<VantaBrainPage />} />
               <Route path="/staff-portal" element={<ProtectedRoute><StaffPortalPage /></ProtectedRoute>} />
+              <Route path="/support" element={<SupportPage />} />
               <Route path="/privacy" element={<PrivacyPage />} />
               <Route path="/terms" element={<TermsPage />} />
               <Route path="*" element={<NotFound />} />
