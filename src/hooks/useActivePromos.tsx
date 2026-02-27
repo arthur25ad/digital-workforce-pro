@@ -60,8 +60,10 @@ export function getDiscountForPlan(
       : planKey === "team"
       ? promo.team_discount
       : 0;
-  // If plan-specific discount is set, use it; otherwise fall back to global discount_value
+  // Plan-specific override takes priority
   if (planDiscount > 0) return planDiscount;
+  // Only Starter & Growth get the global fallback; Team requires an explicit override
+  if (planKey === "team") return 0;
   return promo.discount_value;
 }
 
