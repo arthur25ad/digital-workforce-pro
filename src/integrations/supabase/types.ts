@@ -253,6 +253,153 @@ export type Database = {
           },
         ]
       }
+      brain_interactions: {
+        Row: {
+          action_taken: string
+          created_at: string
+          edited_content: string | null
+          id: string
+          interaction_type: string
+          metadata: Json | null
+          original_content: string | null
+          role_scope: string
+          workspace_id: string
+        }
+        Insert: {
+          action_taken: string
+          created_at?: string
+          edited_content?: string | null
+          id?: string
+          interaction_type: string
+          metadata?: Json | null
+          original_content?: string | null
+          role_scope: string
+          workspace_id: string
+        }
+        Update: {
+          action_taken?: string
+          created_at?: string
+          edited_content?: string | null
+          id?: string
+          interaction_type?: string
+          metadata?: Json | null
+          original_content?: string | null
+          role_scope?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brain_interactions_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      brain_memories: {
+        Row: {
+          category: string
+          confidence: number
+          created_at: string
+          id: string
+          last_used_at: string | null
+          memory_key: string
+          memory_value: string
+          scope: string
+          source: string
+          times_reinforced: number
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          category?: string
+          confidence?: number
+          created_at?: string
+          id?: string
+          last_used_at?: string | null
+          memory_key: string
+          memory_value: string
+          scope?: string
+          source?: string
+          times_reinforced?: number
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          category?: string
+          confidence?: number
+          created_at?: string
+          id?: string
+          last_used_at?: string | null
+          memory_key?: string
+          memory_value?: string
+          scope?: string
+          source?: string
+          times_reinforced?: number
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brain_memories_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      brain_patterns: {
+        Row: {
+          confidence: number
+          created_at: string
+          description: string
+          evidence: Json | null
+          evidence_count: number
+          id: string
+          is_active: boolean
+          pattern_type: string
+          role_scope: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          confidence?: number
+          created_at?: string
+          description: string
+          evidence?: Json | null
+          evidence_count?: number
+          id?: string
+          is_active?: boolean
+          pattern_type: string
+          role_scope?: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          confidence?: number
+          created_at?: string
+          description?: string
+          evidence?: Json | null
+          evidence_count?: number
+          id?: string
+          is_active?: boolean
+          pattern_type?: string
+          role_scope?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brain_patterns_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       brand_profiles: {
         Row: {
           approval_required: boolean

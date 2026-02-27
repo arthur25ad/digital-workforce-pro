@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
+import { useVantaBrainActions } from "@/hooks/useVantaBrain";
 import { useAuth } from "@/hooks/useAuth";
 import { useWorkspaceData, SocialDraft } from "@/hooks/useWorkspaceData";
 import ConnectPlatformModal from "@/components/ConnectPlatformModal";
@@ -28,6 +29,7 @@ const SocialMediaDemo = () => {
   const { workspace, brandProfile, updateBrandProfile, updateWorkspace } = useAuth();
   const { drafts, isConnected, getConnection, connectPlatform, disconnectPlatform, addDraft, updateDraftStatus, updateDraftSchedule, logActivity, activities } = useWorkspaceData();
   const [connectModal, setConnectModal] = useState<string | null>(null);
+  const { getContext, recordInteraction } = useVantaBrainActions();
   const [activeTab, setActiveTab] = useState(0);
   const [generating, setGenerating] = useState(false);
   const [ideas, setIdeas] = useState<GeneratedIdea[]>([]);
@@ -71,12 +73,18 @@ const SocialMediaDemo = () => {
   const handleGenerateIdeas = async () => {
     setGenerating(true);
     try {
+      const brainContext = await getContext("social-media-manager");
       const { data, error } = await supabase.functions.invoke("generate-social-ideas", {
-        body: { brandProfile: { businessName: brain.businessName || workspace?.business_name, offerType: brain.offerType || brandProfile?.offer_type, targetAudience: brain.targetAudience || brandProfile?.target_audience, brandVoice: brain.brandVoice || brandProfile?.brand_voice, contentGoals: brain.contentGoals || brandProfile?.content_goals, contentThemes: brain.contentThemes.split(",").map(s => s.trim()).filter(Boolean), preferredPlatforms: brain.preferredPlatforms } },
+        body: { brainContext, brandProfile: { businessName: brain.businessName || workspace?.business_name, offerType: brain.offerType || brandProfile?.offer_type, targetAudience: brain.targetAudience || brandProfile?.target_audience, brandVoice: brain.brandVoice || brandProfile?.brand_voice, contentGoals: brain.contentGoals || brandProfile?.content_goals, contentThemes: brain.contentThemes.split(",").map(s => s.trim()).filter(Boolean), preferredPlatforms: brain.preferredPlatforms } },
       });
       if (error) throw error;
       if (data?.error) { toast({ title: "AI Error", description: data.error, variant: "destructive" }); }
-      else { setIdeas(data.ideas || []); toast({ title: "Ideas generated", description: "3 new post ideas ready to review." }); await logActivity("ideas_generated", "Generated 3 post ideas"); }
+      else {
+        setIdeas(data.ideas || []);
+        toast({ title: "Ideas generated", description: "3 new post ideas ready to review." });
+        await logActivity("ideas_generated", "Generated 3 post ideas");
+        await recordInteraction({ roleScope: "social-media-manager", interactionType: "generation", actionTaken: "Generated 3 social post ideas" });
+      }
     } catch (err: any) { toast({ title: "Generation failed", description: err.message || "Please try again.", variant: "destructive" }); }
     finally { setGenerating(false); }
   };

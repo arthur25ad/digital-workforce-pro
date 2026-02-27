@@ -36,7 +36,7 @@ serve(async (req) => {
       });
     }
 
-    const { request, profile } = await req.json();
+    const { request, profile, brainContext } = await req.json();
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
@@ -71,7 +71,7 @@ Guidelines:
       profile?.important_notes ? `Important Notes: ${profile.important_notes}` : "",
     ].filter(Boolean).join("\n");
 
-    const userPrompt = `${contextParts ? `Business Context:\n${contextParts}\n\n` : ""}--- INCOMING REQUEST ---
+    const userPrompt = `${contextParts ? `Business Context:\n${contextParts}\n\n` : ""}${brainContext ? `--- VANTABRAIN CONTEXT ---\n${brainContext}\n\n` : ""}--- INCOMING REQUEST ---
 Source: ${request.source || "manual"}
 Requester: ${request.requesterName || "Not specified"}
 Urgency: ${request.urgency || "medium"}
