@@ -11,7 +11,7 @@ const PricingSection = () => {
   const { pricingPromos } = useActivePromos();
   const topPromo = pricingPromos[0] || null;
   const [appliedPromo, setAppliedPromo] = useState<PromoCode | null>(null);
-  const activePromo = appliedPromo || topPromo;
+  const activePromo = appliedPromo;
 
   return (
     <section id="pricing" className="section-padding">
