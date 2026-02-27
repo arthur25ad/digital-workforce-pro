@@ -4,7 +4,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { LifeBuoy, Send, CheckCircle } from "lucide-react";
 import Navbar from "@/components/Navbar";
@@ -14,15 +13,13 @@ import { z } from "zod";
 const ticketSchema = z.object({
   subject: z.string().trim().min(3, "Subject must be at least 3 characters").max(200, "Subject must be under 200 characters"),
   message: z.string().trim().min(10, "Please provide more detail (at least 10 characters)").max(2000, "Message must be under 2000 characters"),
-  priority: z.enum(["low", "medium", "high"]),
 });
 
 const SupportPage = () => {
-  const { user, profile } = useAuth();
+  const { user } = useAuth();
   const { toast } = useToast();
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
-  const [priority, setPriority] = useState("medium");
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -31,7 +28,7 @@ const SupportPage = () => {
     e.preventDefault();
     setErrors({});
 
-    const parsed = ticketSchema.safeParse({ subject, message, priority });
+    const parsed = ticketSchema.safeParse({ subject, message });
     if (!parsed.success) {
       const fieldErrors: Record<string, string> = {};
       parsed.error.errors.forEach((err) => {
@@ -48,15 +45,11 @@ const SupportPage = () => {
 
     setSubmitting(true);
     try {
-      const { error } = await supabase.from("public_support_tickets").insert({
-        user_id: user.id,
-        user_email: profile?.email || user.email || "",
-        user_name: profile?.full_name || "",
-        subject: parsed.data.subject,
-        message: parsed.data.message,
-        priority: parsed.data.priority,
+      const { data, error } = await supabase.functions.invoke("classify-ticket", {
+        body: { subject: parsed.data.subject, message: parsed.data.message },
       });
       if (error) throw error;
+      if (data?.error) throw new Error(data.error);
       setSubmitted(true);
     } catch {
       toast({ title: "Failed to submit ticket. Please try again.", variant: "destructive" });
@@ -75,7 +68,7 @@ const SupportPage = () => {
               <CheckCircle size={48} className="mx-auto text-primary" />
               <h1 className="font-display text-2xl font-bold">Ticket Submitted</h1>
               <p className="text-muted-foreground text-sm">We've received your request and will get back to you as soon as possible.</p>
-              <Button variant="outline" onClick={() => { setSubmitted(false); setSubject(""); setMessage(""); setPriority("medium"); }}>
+              <Button variant="outline" onClick={() => { setSubmitted(false); setSubject(""); setMessage(""); }}>
                 Submit Another
               </Button>
             </div>
@@ -106,18 +99,6 @@ const SupportPage = () => {
                     disabled={!user}
                   />
                   {errors.subject && <p className="text-xs text-destructive mt-1">{errors.subject}</p>}
-                </div>
-
-                <div>
-                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Priority</label>
-                  <Select value={priority} onValueChange={setPriority} disabled={!user}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="low">Low</SelectItem>
-                      <SelectItem value="medium">Medium</SelectItem>
-                      <SelectItem value="high">High</SelectItem>
-                    </SelectContent>
-                  </Select>
                 </div>
 
                 <div>
