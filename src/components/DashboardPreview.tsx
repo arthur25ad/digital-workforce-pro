@@ -1,5 +1,5 @@
-import { motion, useInView } from "framer-motion";
-import { Share2, Mail, Headphones, CalendarCheck, CheckCircle2, Clock4, ArrowRight, Zap, TrendingUp, BarChart3, Sparkles } from "lucide-react";
+import { motion, useInView, AnimatePresence } from "framer-motion";
+import { Share2, Mail, Headphones, CalendarCheck, CheckCircle2, Clock4, ArrowRight, Zap, TrendingUp, BarChart3, Sparkles, RotateCcw } from "lucide-react";
 import { useRef, useState, useEffect } from "react";
 
 const roleColors = {
@@ -19,10 +19,10 @@ const activityRows = [
 ];
 
 const roleStats = [
-  { icon: Share2, label: "Social Media", ...roleColors.social, stat: "12", unit: "posts this week", trend: "+24%" },
-  { icon: Mail, label: "Email Marketing", ...roleColors.email, stat: "8", unit: "campaigns active", trend: "+15%" },
-  { icon: Headphones, label: "Customer Support", ...roleColors.support, stat: "47", unit: "replies drafted", trend: "+32%" },
-  { icon: CalendarCheck, label: "Calendar Assistant", ...roleColors.assistant, stat: "23", unit: "appointments managed", trend: "+18%" },
+  { icon: Share2, label: "Social Media", ...roleColors.social, stat: "12", unit: "posts this week", trend: "+24%", summary: "Creates, schedules & publishes content across all your social platforms — so you stay visible without lifting a finger." },
+  { icon: Mail, label: "Email Marketing", ...roleColors.email, stat: "8", unit: "campaigns active", trend: "+15%", summary: "Writes newsletters, promos & follow-ups that sound like you — then sends them at the perfect time." },
+  { icon: Headphones, label: "Customer Support", ...roleColors.support, stat: "47", unit: "replies drafted", trend: "+32%", summary: "Reads every ticket, drafts thoughtful replies using your policies & tone — and flags anything urgent." },
+  { icon: CalendarCheck, label: "Calendar Assistant", ...roleColors.assistant, stat: "23", unit: "appointments managed", trend: "+18%", summary: "Manages bookings, sends reminders & reschedules — keeping your calendar organized automatically." },
 ];
 
 function AnimatedCounter({ target, duration = 2 }: { target: number; duration?: number }) {
@@ -50,6 +50,17 @@ function AnimatedCounter({ target, duration = 2 }: { target: number; duration?: 
 }
 
 const DashboardPreview = () => {
+  const [flippedCards, setFlippedCards] = useState<Set<number>>(new Set());
+
+  const toggleFlip = (index: number) => {
+    setFlippedCards(prev => {
+      const next = new Set(prev);
+      if (next.has(index)) next.delete(index);
+      else next.add(index);
+      return next;
+    });
+  };
+
   return (
     <section className="relative overflow-hidden pb-24 pt-4 md:pb-32 md:pt-8">
       {/* Ambient background effects */}
@@ -90,39 +101,74 @@ const DashboardPreview = () => {
 
         {/* Big stat cards with animated counters */}
         <div className="mb-8 grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-5">
-          {roleStats.map((role, i) => (
-            <motion.div
-              key={role.label}
-              initial={{ opacity: 0, y: 30, scale: 0.95 }}
-              whileInView={{ opacity: 1, y: 0, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: i * 0.1 }}
-              className={`group relative overflow-hidden rounded-2xl border ${role.border} p-5 transition-all duration-500 hover:scale-[1.02]`}
-              style={{ background: `linear-gradient(160deg, ${role.glow}, transparent 60%)` }}
-            >
-              {/* Subtle animated glow on hover */}
-              <div
-                className="absolute -right-4 -top-4 h-24 w-24 rounded-full opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-40"
-                style={{ background: role.accent }}
-              />
-              <div className="relative">
-                <div className={`mb-4 flex h-12 w-12 items-center justify-center rounded-xl ${role.bg} ${role.text} transition-transform duration-300 group-hover:scale-110`}>
-                  <role.icon size={22} />
-                </div>
-                <p className="font-display text-xs font-semibold uppercase tracking-wider text-muted-foreground/70">{role.label}</p>
-                <div className="mt-2 flex items-end gap-2">
-                  <span className="font-display text-3xl font-bold text-foreground">
-                    <AnimatedCounter target={parseInt(role.stat)} />
-                  </span>
-                  <span className="mb-1 text-xs text-muted-foreground">{role.unit}</span>
-                </div>
-                <div className="mt-2 flex items-center gap-1">
-                  <TrendingUp size={12} className={role.text} />
-                  <span className={`text-[11px] font-semibold ${role.text}`}>{role.trend}</span>
-                </div>
-              </div>
-            </motion.div>
-          ))}
+          {roleStats.map((role, i) => {
+            const isFlipped = flippedCards.has(i);
+            return (
+              <motion.div
+                key={role.label}
+                initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
+                className="cursor-pointer [perspective:1000px]"
+                onClick={() => toggleFlip(i)}
+              >
+                <motion.div
+                  className="relative w-full h-full"
+                  style={{ transformStyle: "preserve-3d" }}
+                  animate={{ rotateY: isFlipped ? 180 : 0 }}
+                  transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
+                >
+                  {/* Front */}
+                  <div
+                    className={`relative overflow-hidden rounded-2xl border ${role.border} p-5 transition-all duration-500 hover:scale-[1.02] [backface-visibility:hidden]`}
+                    style={{ background: `linear-gradient(160deg, ${role.glow}, transparent 60%)` }}
+                  >
+                    <div
+                      className="absolute -right-4 -top-4 h-24 w-24 rounded-full opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-40"
+                      style={{ background: role.accent }}
+                    />
+                    <div className="relative">
+                      <div className={`mb-4 flex h-12 w-12 items-center justify-center rounded-xl ${role.bg} ${role.text} transition-transform duration-300`}>
+                        <role.icon size={22} />
+                      </div>
+                      <p className="font-display text-xs font-semibold uppercase tracking-wider text-muted-foreground/70">{role.label}</p>
+                      <div className="mt-2 flex items-end gap-2">
+                        <span className="font-display text-3xl font-bold text-foreground">
+                          <AnimatedCounter target={parseInt(role.stat)} />
+                        </span>
+                        <span className="mb-1 text-xs text-muted-foreground">{role.unit}</span>
+                      </div>
+                      <div className="mt-2 flex items-center gap-1">
+                        <TrendingUp size={12} className={role.text} />
+                        <span className={`text-[11px] font-semibold ${role.text}`}>{role.trend}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Back */}
+                  <div
+                    className={`absolute inset-0 overflow-hidden rounded-2xl border ${role.border} p-5 [backface-visibility:hidden] [transform:rotateY(180deg)]`}
+                    style={{ background: `linear-gradient(160deg, ${role.glow}, hsl(0 0% 8% / 0.95) 60%)` }}
+                  >
+                    <div className="flex h-full flex-col justify-between relative">
+                      <div>
+                        <div className={`mb-3 flex h-10 w-10 items-center justify-center rounded-xl ${role.bg} ${role.text}`}>
+                          <role.icon size={18} />
+                        </div>
+                        <h3 className="font-display text-sm font-bold text-foreground mb-2">{role.label}</h3>
+                        <p className="text-xs text-muted-foreground leading-relaxed">{role.summary}</p>
+                      </div>
+                      <div className="mt-3 flex items-center gap-1.5 text-muted-foreground/50">
+                        <RotateCcw size={10} />
+                        <span className="text-[10px]">Tap to flip back</span>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              </motion.div>
+            );
+          })}
         </div>
 
         {/* Main content area — two columns on desktop */}
