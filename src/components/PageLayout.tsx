@@ -10,16 +10,18 @@ const PageLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <main className="pt-20">
+      <main className="pt-20 relative">
         {!isHome && (
-          <div className="mx-auto max-w-7xl px-4 pt-4 md:px-8">
-            <Link
-              to="/"
-              className="group inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-[0.15em] text-foreground/40 transition-all duration-300 hover:text-foreground/70 hover:gap-1.5"
-            >
-              <ChevronLeft size={12} className="transition-transform duration-300 group-hover:-translate-x-0.5" />
-              HOME
-            </Link>
+          <div className="absolute top-24 left-0 z-10 mx-auto w-full px-4 md:px-8">
+            <div className="mx-auto max-w-7xl">
+              <Link
+                to="/"
+                className="group inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.15em] text-white/50 transition-all duration-300 hover:text-white/80 hover:gap-2"
+              >
+                <ChevronLeft size={14} className="transition-transform duration-300 group-hover:-translate-x-0.5" />
+                HOME
+              </Link>
+            </div>
           </div>
         )}
         {children}
