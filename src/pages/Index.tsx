@@ -20,9 +20,9 @@ const Index = () => {
       <HeroSection />
       <BrandDivider />
       <DashboardPreview />
+      <HowItWorks />
       <CapabilitiesGrid />
       <AITeamSection />
-      <HowItWorks />
       <IndustriesSection />
       <ComparisonSection />
       <TestimonialsSection />
