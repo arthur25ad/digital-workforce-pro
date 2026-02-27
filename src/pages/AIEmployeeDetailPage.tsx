@@ -5,12 +5,14 @@ import SocialMediaDemo from "@/components/demos/SocialMediaDemo";
 import CustomerSupportDemo from "@/components/demos/CustomerSupportDemo";
 import EmailMarketerDemo from "@/components/demos/EmailMarketerDemo";
 import VirtualAssistantDemo from "@/components/demos/VirtualAssistantDemo";
-import { Share2, Headphones, Mail, CalendarCheck, Check } from "lucide-react";
+import { Share2, Headphones, Mail, CalendarCheck, Check, Lock } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 interface RoleConfig {
   icon: any;
   title: string;
   roleKey: string;
+  slug: string;
   summary: string;
   valuePoints: string[];
   capabilities: string[];
@@ -19,7 +21,7 @@ interface RoleConfig {
 
 const roles: Record<string, RoleConfig> = {
   "social-media-manager": {
-    icon: Share2, title: "Your AI Social Media Manager", roleKey: "social",
+    icon: Share2, title: "Your AI Social Media Manager", roleKey: "social", slug: "social-media-manager",
     summary: "From planning to publishing, this AI role helps keep your brand active with a structured workflow built around strategy, approvals, and ongoing performance.",
     valuePoints: [
       "Understands your audience and brand context",
@@ -31,7 +33,7 @@ const roles: Record<string, RoleConfig> = {
     Demo: SocialMediaDemo,
   },
   "customer-support": {
-    icon: Headphones, title: "Your AI Customer Support Manager", roleKey: "support",
+    icon: Headphones, title: "Your AI Customer Support Manager", roleKey: "support", slug: "customer-support",
     summary: "From first contact to resolution, this AI role helps your business respond faster, stay organized, and keep support quality consistent.",
     valuePoints: [
       "Understands your business, audience, and policies",
@@ -43,7 +45,7 @@ const roles: Record<string, RoleConfig> = {
     Demo: CustomerSupportDemo,
   },
   "email-marketer": {
-    icon: Mail, title: "Your AI Email Marketer", roleKey: "email",
+    icon: Mail, title: "Your AI Email Marketer", roleKey: "email", slug: "email-marketer",
     summary: "From drafts to delivery, this AI role helps keep campaigns moving with structured planning, approval, and repeatable email execution.",
     valuePoints: [
       "Understands your business, audience, and intent",
@@ -55,7 +57,7 @@ const roles: Record<string, RoleConfig> = {
     Demo: EmailMarketerDemo,
   },
   "virtual-assistant": {
-    icon: CalendarCheck, title: "Your AI Virtual Assistant", roleKey: "assistant",
+    icon: CalendarCheck, title: "Your AI Virtual Assistant", roleKey: "assistant", slug: "virtual-assistant",
     summary: "From scheduling to coordination, this AI role helps turn scattered requests into organized execution without constant follow-up.",
     valuePoints: [
       "Understands your habits, priorities, and work context",
@@ -68,15 +70,38 @@ const roles: Record<string, RoleConfig> = {
   },
 };
 
+const LockedRoleView = ({ role }: { role: RoleConfig }) => {
+  const Icon = role.icon;
+  return (
+    <section className="section-padding">
+      <div className="mx-auto max-w-2xl text-center">
+        <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-muted/50">
+          <Lock size={32} className="text-muted-foreground" />
+        </div>
+        <h2 className="font-display text-2xl font-bold text-foreground">This AI Employee is Locked</h2>
+        <p className="mt-3 text-muted-foreground">
+          {role.title} is not included in your current package. Upgrade to unlock this role.
+        </p>
+        <div className="mt-8 flex flex-wrap justify-center gap-4">
+          <Link to="/pricing" className="btn-glow text-base">View Plans</Link>
+          <Link to="/dashboard" className="btn-outline-glow text-base">Back to Dashboard</Link>
+        </div>
+      </div>
+    </section>
+  );
+};
+
 const AIEmployeeDetailPage = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
+  const { user, userHasAccessToRole } = useAuth();
   const role = roles[slug || ""];
 
   if (!role) return (
     <PageLayout><div className="section-padding text-center"><h1 className="font-display text-2xl font-bold text-foreground">Role not found</h1><Link to="/ai-employees" className="mt-4 inline-block text-primary">← Back to AI Employees</Link></div></PageLayout>
   );
 
+  const hasAccess = !user || userHasAccessToRole(role.slug);
   const Icon = role.icon;
   const Demo = role.Demo;
 
@@ -95,20 +120,33 @@ const AIEmployeeDetailPage = () => {
                 </span>
               ))}
             </div>
-            <div className="mt-8 flex flex-wrap justify-center gap-4">
-              <button onClick={() => navigate(`/get-started?role=${role.roleKey}`)} className="btn-glow text-base">Activate This AI Employee</button>
-              <Link to="/get-started" className="btn-outline-glow text-base">Build My Team</Link>
-            </div>
+            {!user && (
+              <div className="mt-8 flex flex-wrap justify-center gap-4">
+                <Link to="/auth" className="btn-glow text-base">Sign Up to Use</Link>
+                <Link to="/pricing" className="btn-outline-glow text-base">View Pricing</Link>
+              </div>
+            )}
           </motion.div>
         </div>
       </section>
 
-      <section className="section-padding">
-        <div className="mx-auto max-w-4xl">
-          <h2 className="font-display text-2xl font-bold text-foreground md:text-3xl mb-8">Interactive Setup & Demo</h2>
-          <Demo />
-        </div>
-      </section>
+      {user && !hasAccess ? (
+        <LockedRoleView role={role} />
+      ) : user && hasAccess ? (
+        <section className="section-padding">
+          <div className="mx-auto max-w-4xl">
+            <h2 className="font-display text-2xl font-bold text-foreground md:text-3xl mb-8">Your Workspace</h2>
+            <Demo />
+          </div>
+        </section>
+      ) : (
+        <section className="section-padding">
+          <div className="mx-auto max-w-4xl">
+            <h2 className="font-display text-2xl font-bold text-foreground md:text-3xl mb-8">Interactive Preview</h2>
+            <p className="text-muted-foreground mb-6">Sign up to save your work and access the full AI workflow.</p>
+          </div>
+        </section>
+      )}
 
       <section className="section-padding blue-ambient-bottom">
         <div className="mx-auto max-w-4xl">
@@ -120,17 +158,6 @@ const AIEmployeeDetailPage = () => {
                 <span className="text-sm text-foreground">{cap}</span>
               </div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="section-padding blue-ambient text-center">
-        <div className="mx-auto max-w-3xl">
-          <h2 className="font-display text-3xl font-bold text-foreground md:text-4xl">Ready to Deploy?</h2>
-          <p className="mt-4 text-muted-foreground">Add this AI employee to your team and start getting structured, approval-driven work done 24/7.</p>
-          <div className="mt-8 flex flex-wrap justify-center gap-4">
-            <button onClick={() => navigate("/get-started")} className="btn-glow text-base">Activate This Role</button>
-            <Link to="/pricing" className="btn-outline-glow text-base">View Pricing</Link>
           </div>
         </div>
       </section>

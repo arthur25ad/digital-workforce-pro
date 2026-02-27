@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, LogOut } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Link, useLocation } from "react-router-dom";
-import { useAppState } from "@/context/AppContext";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 
 const navLinks = [
   { label: "Features", href: "/features" },
@@ -16,7 +16,13 @@ const navLinks = [
 const Navbar = () => {
   const [open, setOpen] = useState(false);
   const location = useLocation();
-  const { state } = useAppState();
+  const navigate = useNavigate();
+  const { user, profile, signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/");
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
@@ -32,10 +38,18 @@ const Navbar = () => {
                 location.pathname === link.href ? "text-foreground" : "text-muted-foreground"
               }`}>{link.label}</Link>
           ))}
-          {state.onboardingComplete ? (
-            <Link to="/dashboard" className="btn-glow inline-block text-sm">Dashboard</Link>
+          {user ? (
+            <div className="flex items-center gap-3">
+              <Link to="/dashboard" className="btn-glow inline-block text-sm">Dashboard</Link>
+              <button onClick={handleSignOut} className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors" title="Sign out">
+                <LogOut size={14} />
+              </button>
+            </div>
           ) : (
-            <Link to="/get-started" className="btn-glow inline-block text-sm">Get Started</Link>
+            <div className="flex items-center gap-3">
+              <Link to="/auth" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Log In</Link>
+              <Link to="/auth" className="btn-glow inline-block text-sm">Get Started</Link>
+            </div>
           )}
         </div>
 
@@ -54,10 +68,13 @@ const Navbar = () => {
                   {link.label}
                 </Link>
               ))}
-              {state.onboardingComplete ? (
-                <Link to="/dashboard" className="btn-glow mt-2 inline-block text-center text-sm" onClick={() => setOpen(false)}>Dashboard</Link>
+              {user ? (
+                <>
+                  <Link to="/dashboard" className="btn-glow mt-2 inline-block text-center text-sm" onClick={() => setOpen(false)}>Dashboard</Link>
+                  <button onClick={() => { handleSignOut(); setOpen(false); }} className="text-sm text-muted-foreground hover:text-foreground">Sign Out</button>
+                </>
               ) : (
-                <Link to="/get-started" className="btn-glow mt-2 inline-block text-center text-sm" onClick={() => setOpen(false)}>Get Started</Link>
+                <Link to="/auth" className="btn-glow mt-2 inline-block text-center text-sm" onClick={() => setOpen(false)}>Get Started</Link>
               )}
             </div>
           </motion.div>

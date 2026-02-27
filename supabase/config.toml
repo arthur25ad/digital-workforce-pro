@@ -1,1 +1,4 @@
 project_id = "gxdadgxpeclmobnddqgf"
+
+[functions.generate-social-ideas]
+verify_jwt = false
