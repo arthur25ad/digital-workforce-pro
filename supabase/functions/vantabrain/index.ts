@@ -104,6 +104,19 @@ serve(async (req) => {
     if (action === "get-suggestions") {
       const { workspaceId, roleScope } = body;
 
+      // Respect brain_settings — if learning is paused, skip suggestions
+      const { data: brainSettings } = await supabase
+        .from("brain_settings")
+        .select("learning_paused")
+        .eq("workspace_id", workspaceId)
+        .maybeSingle();
+
+      if (brainSettings?.learning_paused) {
+        return new Response(JSON.stringify({ suggestions: [], reason: "Learning is paused" }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
       // Require minimum confidence & evidence for suggestions
       const MIN_CONFIDENCE = 0.55;
       const MIN_EVIDENCE = 2;
@@ -308,6 +321,19 @@ RULES:
     // ── LEARN: Analyze recent interactions and update memories/patterns ──
     if (action === "learn") {
       const { workspaceId, roleScope } = body;
+
+      // Respect brain_settings
+      const { data: brainSettings } = await supabase
+        .from("brain_settings")
+        .select("learning_paused, learn_from_approvals, learn_from_edits")
+        .eq("workspace_id", workspaceId)
+        .maybeSingle();
+
+      if (brainSettings?.learning_paused) {
+        return new Response(JSON.stringify({ learned: false, reason: "Learning is paused" }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
 
       const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
       if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");

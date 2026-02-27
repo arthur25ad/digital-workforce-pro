@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import PageLayout from "@/components/PageLayout";
 import { useAuth } from "@/hooks/useAuth";
 import { useVantaBrainMemories, useVantaBrainStats, useVantaBrainActions } from "@/hooks/useVantaBrain";
+import { useBrainSettings } from "@/hooks/useBrainSettings";
 import {
   Brain, Sparkles, Trash2, Eye, EyeOff, TrendingUp,
   Lightbulb, Clock, Shield, Zap, Database,
@@ -223,16 +224,9 @@ const AuthenticatedView = () => {
   const { stats, loading: statsLoading } = useVantaBrainStats();
   const { memories, patterns, loading, refresh } = useVantaBrainMemories();
   const { deleteMemory, deletePattern } = useVantaBrainActions();
+  const { settings, update: updateSettings, clearRoleMemory, clearAllMemory, refresh: refreshSettings } = useBrainSettings();
   const [showPatterns, setShowPatterns] = useState(true);
   const [activeRoleTab, setActiveRoleTab] = useState<string | null>(null);
-
-  // Learning controls (local state — could be persisted later)
-  const [controls, setControls] = useState({
-    learnFromApprovals: true,
-    learnFromEdits: true,
-    learnTimingSuggestions: true,
-    requireApproval: true,
-  });
 
   const handleDeleteMemory = async (id: string) => {
     await deleteMemory(id);
@@ -508,12 +502,25 @@ const AuthenticatedView = () => {
                   <Settings size={14} style={{ color: PURPLE }} />
                   <h2 className="font-display text-sm font-semibold text-foreground">Learning Controls</h2>
                 </div>
+
+                {/* Pause Learning — prominent toggle */}
+                <div className="flex items-center justify-between gap-3 rounded-xl border border-border/30 bg-background/50 p-3 mb-4">
+                  <div className="flex-1">
+                    <p className="text-xs font-medium text-foreground">Pause All Learning</p>
+                    <p className="text-[10px] text-muted-foreground">Temporarily stop VANTABRAIN from learning new preferences</p>
+                  </div>
+                  <Switch
+                    checked={settings.learning_paused}
+                    onCheckedChange={(v) => updateSettings({ learning_paused: v })}
+                  />
+                </div>
+
                 <div className="space-y-4">
                   {[
-                    { key: "learnFromApprovals" as const, label: "Learn from approvals", desc: "Track what you approve to learn preferences" },
-                    { key: "learnFromEdits" as const, label: "Learn from edits", desc: "Use your edits to refine future outputs" },
-                    { key: "learnTimingSuggestions" as const, label: "Timing suggestions", desc: "Suggest posting and send times" },
-                    { key: "requireApproval" as const, label: "Require approval", desc: "Always ask before applying learned preferences" },
+                    { key: "learn_from_approvals" as const, label: "Learn from approvals", desc: "Track what you approve to learn preferences" },
+                    { key: "learn_from_edits" as const, label: "Learn from edits", desc: "Use your edits to refine future outputs" },
+                    { key: "learn_timing_suggestions" as const, label: "Timing suggestions", desc: "Suggest posting and send times" },
+                    { key: "require_approval" as const, label: "Require approval", desc: "Always ask before applying learned preferences" },
                   ].map((c) => (
                     <div key={c.key} className="flex items-center justify-between gap-3">
                       <div className="flex-1">
@@ -521,24 +528,40 @@ const AuthenticatedView = () => {
                         <p className="text-[10px] text-muted-foreground">{c.desc}</p>
                       </div>
                       <Switch
-                        checked={controls[c.key]}
-                        onCheckedChange={(v) => setControls(prev => ({ ...prev, [c.key]: v }))}
+                        checked={settings[c.key]}
+                        onCheckedChange={(v) => updateSettings({ [c.key]: v })}
                       />
                     </div>
                   ))}
                 </div>
-                <div className="mt-5 pt-4 border-t border-border/30">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="text-xs w-full text-muted-foreground hover:text-destructive"
-                    onClick={() => {
-                      toast.info("To clear role-specific memory, select a role above and remove individual memories.");
-                    }}
-                  >
-                    <AlertCircle size={12} className="mr-1.5" />
-                    Reset Learned Preferences
-                  </Button>
+                <div className="mt-5 pt-4 border-t border-border/30 space-y-2">
+                  {activeRoleTab ? (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-xs w-full text-muted-foreground hover:text-destructive"
+                      onClick={async () => {
+                        await clearRoleMemory(activeRoleTab);
+                        refresh();
+                      }}
+                    >
+                      <AlertCircle size={12} className="mr-1.5" />
+                      Clear {ROLES.find(r => r.key === activeRoleTab)?.label} Memory
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-xs w-full text-muted-foreground hover:text-destructive"
+                      onClick={async () => {
+                        await clearAllMemory();
+                        refresh();
+                      }}
+                    >
+                      <AlertCircle size={12} className="mr-1.5" />
+                      Reset All Learned Preferences
+                    </Button>
+                  )}
                 </div>
               </div>
             </motion.div>
