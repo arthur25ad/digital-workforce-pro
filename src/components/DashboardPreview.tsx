@@ -1,5 +1,5 @@
 import { motion, useInView, AnimatePresence } from "framer-motion";
-import { Share2, Mail, Headphones, CalendarCheck, CheckCircle2, Clock4, ArrowRight, Zap, TrendingUp, BarChart3, Sparkles, RotateCcw } from "lucide-react";
+import { Share2, Mail, Headphones, CalendarCheck, CheckCircle2, Clock4, ArrowRight, Zap, TrendingUp, BarChart3, Sparkles, X, MessageSquare, PenTool, Send, Clock, BarChart2, Users, Calendar, Bell, RefreshCw, FileText, Target, Megaphone } from "lucide-react";
 import { useRef, useState, useEffect } from "react";
 
 const roleColors = {
@@ -18,11 +18,51 @@ const activityRows = [
   { icon: ArrowRight, role: "social", roleIcon: Share2, text: "5-star review response posted to Google Business", status: "Done", statusColor: "text-emerald-400", statusBg: "bg-emerald-500/10", time: "1h ago" },
 ];
 
-const roleStats = [
-  { icon: Share2, label: "Social Media", ...roleColors.social, stat: "12", unit: "posts this week", trend: "+24%", summary: "Creates, schedules & publishes content across all your social platforms — so you stay visible without lifting a finger." },
-  { icon: Mail, label: "Email Marketing", ...roleColors.email, stat: "8", unit: "campaigns active", trend: "+15%", summary: "Writes newsletters, promos & follow-ups that sound like you — then sends them at the perfect time." },
-  { icon: Headphones, label: "Customer Support", ...roleColors.support, stat: "47", unit: "replies drafted", trend: "+32%", summary: "Reads every ticket, drafts thoughtful replies using your policies & tone — and flags anything urgent." },
-  { icon: CalendarCheck, label: "Calendar Assistant", ...roleColors.assistant, stat: "23", unit: "appointments managed", trend: "+18%", summary: "Manages bookings, sends reminders & reschedules — keeping your calendar organized automatically." },
+const roleDetails = [
+  {
+    icon: Share2, label: "Social Media", ...roleColors.social, stat: "12", unit: "posts this week", trend: "+24%",
+    tagline: "Your always-on content creator",
+    summary: "Creates, schedules & publishes content across all your social platforms — so you stay visible without lifting a finger.",
+    features: [
+      { icon: PenTool, text: "Writes captions in your brand voice" },
+      { icon: Calendar, text: "Schedules posts at peak engagement times" },
+      { icon: BarChart2, text: "Tracks performance & suggests improvements" },
+      { icon: Target, text: "Generates content ideas from your niche" },
+    ],
+  },
+  {
+    icon: Mail, label: "Email Marketing", ...roleColors.email, stat: "8", unit: "campaigns active", trend: "+15%",
+    tagline: "Campaigns that convert, on autopilot",
+    summary: "Writes newsletters, promos & follow-ups that sound like you — then sends them at the perfect time.",
+    features: [
+      { icon: FileText, text: "Drafts subject lines & body copy" },
+      { icon: Users, text: "Segments your audience automatically" },
+      { icon: Send, text: "Sends at optimal open-rate times" },
+      { icon: Megaphone, text: "Creates promo & nurture sequences" },
+    ],
+  },
+  {
+    icon: Headphones, label: "Customer Support", ...roleColors.support, stat: "47", unit: "replies drafted", trend: "+32%",
+    tagline: "Instant, thoughtful customer care",
+    summary: "Reads every ticket, drafts thoughtful replies using your policies & tone — and flags anything urgent.",
+    features: [
+      { icon: MessageSquare, text: "Drafts replies matching your tone" },
+      { icon: Clock, text: "Prioritizes tickets by urgency" },
+      { icon: FileText, text: "References your policies & FAQs" },
+      { icon: Bell, text: "Escalates critical issues to you" },
+    ],
+  },
+  {
+    icon: CalendarCheck, label: "Calendar Assistant", ...roleColors.assistant, stat: "23", unit: "appointments managed", trend: "+18%",
+    tagline: "Your schedule, perfectly managed",
+    summary: "Manages bookings, sends reminders & reschedules — keeping your calendar organized automatically.",
+    features: [
+      { icon: Calendar, text: "Books & confirms appointments" },
+      { icon: Bell, text: "Sends smart reminders to clients" },
+      { icon: RefreshCw, text: "Handles reschedules & cancellations" },
+      { icon: Clock, text: "Detects scheduling conflicts" },
+    ],
+  },
 ];
 
 function AnimatedCounter({ target, duration = 2 }: { target: number; duration?: number }) {
@@ -50,16 +90,7 @@ function AnimatedCounter({ target, duration = 2 }: { target: number; duration?: 
 }
 
 const DashboardPreview = () => {
-  const [flippedCards, setFlippedCards] = useState<Set<number>>(new Set());
-
-  const toggleFlip = (index: number) => {
-    setFlippedCards(prev => {
-      const next = new Set(prev);
-      if (next.has(index)) next.delete(index);
-      else next.add(index);
-      return next;
-    });
-  };
+  const [expandedCard, setExpandedCard] = useState<number | null>(null);
 
   return (
     <section className="relative overflow-hidden pb-24 pt-4 md:pb-32 md:pt-8">
@@ -100,76 +131,136 @@ const DashboardPreview = () => {
         </motion.div>
 
         {/* Big stat cards with animated counters */}
-        <div className="mb-8 grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-5">
-          {roleStats.map((role, i) => {
-            const isFlipped = flippedCards.has(i);
-            return (
-              <motion.div
-                key={role.label}
-                initial={{ opacity: 0, y: 30, scale: 0.95 }}
-                whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
-                className="cursor-pointer [perspective:1000px]"
-                onClick={() => toggleFlip(i)}
+        <div className="relative mb-8 grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-5">
+          {roleDetails.map((role, i) => (
+            <motion.div
+              key={role.label}
+              initial={{ opacity: 0, y: 30, scale: 0.95 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: i * 0.1 }}
+              className="group relative cursor-pointer"
+              onClick={() => setExpandedCard(expandedCard === i ? null : i)}
+            >
+              <div
+                className={`relative overflow-hidden rounded-2xl border ${role.border} p-5 transition-all duration-500 hover:scale-[1.02]`}
+                style={{ background: `linear-gradient(160deg, ${role.glow}, transparent 60%)` }}
               >
-                <motion.div
-                  className="relative w-full h-full"
-                  style={{ transformStyle: "preserve-3d" }}
-                  animate={{ rotateY: isFlipped ? 180 : 0 }}
-                  transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
-                >
-                  {/* Front */}
-                  <div
-                    className={`relative overflow-hidden rounded-2xl border ${role.border} p-5 transition-all duration-500 hover:scale-[1.02] [backface-visibility:hidden]`}
-                    style={{ background: `linear-gradient(160deg, ${role.glow}, transparent 60%)` }}
-                  >
-                    <div
-                      className="absolute -right-4 -top-4 h-24 w-24 rounded-full opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-40"
-                      style={{ background: role.accent }}
-                    />
-                    <div className="relative">
-                      <div className={`mb-4 flex h-12 w-12 items-center justify-center rounded-xl ${role.bg} ${role.text} transition-transform duration-300`}>
-                        <role.icon size={22} />
-                      </div>
-                      <p className="font-display text-xs font-semibold uppercase tracking-wider text-muted-foreground/70">{role.label}</p>
-                      <div className="mt-2 flex items-end gap-2">
-                        <span className="font-display text-3xl font-bold text-foreground">
-                          <AnimatedCounter target={parseInt(role.stat)} />
-                        </span>
-                        <span className="mb-1 text-xs text-muted-foreground">{role.unit}</span>
-                      </div>
-                      <div className="mt-2 flex items-center gap-1">
-                        <TrendingUp size={12} className={role.text} />
-                        <span className={`text-[11px] font-semibold ${role.text}`}>{role.trend}</span>
-                      </div>
-                    </div>
+                <div
+                  className="absolute -right-4 -top-4 h-24 w-24 rounded-full opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-40"
+                  style={{ background: role.accent }}
+                />
+                <div className="relative">
+                  <div className={`mb-4 flex h-12 w-12 items-center justify-center rounded-xl ${role.bg} ${role.text} transition-transform duration-300 group-hover:scale-110`}>
+                    <role.icon size={22} />
                   </div>
-
-                  {/* Back */}
-                  <div
-                    className={`absolute inset-0 overflow-hidden rounded-2xl border ${role.border} p-5 [backface-visibility:hidden] [transform:rotateY(180deg)]`}
-                    style={{ background: `linear-gradient(160deg, ${role.glow}, hsl(0 0% 8% / 0.95) 60%)` }}
-                  >
-                    <div className="flex h-full flex-col justify-between relative">
-                      <div>
-                        <div className={`mb-3 flex h-10 w-10 items-center justify-center rounded-xl ${role.bg} ${role.text}`}>
-                          <role.icon size={18} />
-                        </div>
-                        <h3 className="font-display text-sm font-bold text-foreground mb-2">{role.label}</h3>
-                        <p className="text-xs text-muted-foreground leading-relaxed">{role.summary}</p>
-                      </div>
-                      <div className="mt-3 flex items-center gap-1.5 text-muted-foreground/50">
-                        <RotateCcw size={10} />
-                        <span className="text-[10px]">Tap to flip back</span>
-                      </div>
-                    </div>
+                  <p className="font-display text-xs font-semibold uppercase tracking-wider text-muted-foreground/70">{role.label}</p>
+                  <div className="mt-2 flex items-end gap-2">
+                    <span className="font-display text-3xl font-bold text-foreground">
+                      <AnimatedCounter target={parseInt(role.stat)} />
+                    </span>
+                    <span className="mb-1 text-xs text-muted-foreground">{role.unit}</span>
                   </div>
-                </motion.div>
-              </motion.div>
-            );
-          })}
+                  <div className="mt-2 flex items-center gap-1">
+                    <TrendingUp size={12} className={role.text} />
+                    <span className={`text-[11px] font-semibold ${role.text}`}>{role.trend}</span>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          ))}
         </div>
+
+        {/* Expanded card overlay */}
+        <AnimatePresence>
+          {expandedCard !== null && (
+            <>
+              {/* Backdrop */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm"
+                onClick={() => setExpandedCard(null)}
+              />
+              {/* Card */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.85, y: 40 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.85, y: 40 }}
+                transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
+                className="fixed inset-x-4 top-[15%] z-50 mx-auto max-w-lg md:inset-x-0"
+              >
+                {(() => {
+                  const role = roleDetails[expandedCard];
+                  return (
+                    <div
+                      className={`relative overflow-hidden rounded-3xl border ${role.border} p-6 md:p-8`}
+                      style={{ background: `linear-gradient(160deg, ${role.glow}, hsl(0 0% 6% / 0.97) 50%)` }}
+                    >
+                      {/* Glow effects */}
+                      <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full opacity-30 blur-3xl" style={{ background: role.accent }} />
+                      <div className="absolute -left-10 -bottom-10 h-32 w-32 rounded-full opacity-15 blur-3xl" style={{ background: role.accent }} />
+
+                      {/* Close button */}
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setExpandedCard(null); }}
+                        className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full border border-border/40 bg-background/50 text-muted-foreground transition-colors hover:text-foreground"
+                      >
+                        <X size={14} />
+                      </button>
+
+                      {/* Header */}
+                      <div className="relative mb-6">
+                        <div className={`mb-4 flex h-14 w-14 items-center justify-center rounded-2xl ${role.bg} ${role.text}`}>
+                          <role.icon size={28} />
+                        </div>
+                        <h3 className="font-display text-xl font-bold text-foreground md:text-2xl">{role.label}</h3>
+                        <p className="mt-1 text-sm font-medium" style={{ color: role.accent }}>{role.tagline}</p>
+                      </div>
+
+                      {/* Summary */}
+                      <p className="relative mb-6 text-sm leading-relaxed text-muted-foreground md:text-base">
+                        {role.summary}
+                      </p>
+
+                      {/* Feature grid */}
+                      <div className="relative grid grid-cols-2 gap-3">
+                        {role.features.map((feat, fi) => (
+                          <motion.div
+                            key={fi}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.1 + fi * 0.08 }}
+                            className={`flex items-start gap-3 rounded-xl border ${role.border} bg-background/30 p-3`}
+                          >
+                            <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${role.bg} ${role.text}`}>
+                              <feat.icon size={14} />
+                            </div>
+                            <span className="text-xs leading-snug text-foreground/80 pt-1">{feat.text}</span>
+                          </motion.div>
+                        ))}
+                      </div>
+
+                      {/* Stats bar */}
+                      <div className="relative mt-6 flex items-center justify-between rounded-xl border border-border/20 bg-background/20 px-4 py-3">
+                        <div className="flex items-end gap-2">
+                          <span className="font-display text-2xl font-bold text-foreground">{role.stat}</span>
+                          <span className="mb-0.5 text-xs text-muted-foreground">{role.unit}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <TrendingUp size={12} className={role.text} />
+                          <span className={`text-xs font-semibold ${role.text}`}>{role.trend}</span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
 
         {/* Main content area — two columns on desktop */}
         <div className="grid gap-5 lg:grid-cols-[1fr_340px]">
