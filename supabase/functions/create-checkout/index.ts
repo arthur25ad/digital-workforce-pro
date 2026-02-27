@@ -24,6 +24,14 @@ serve(async (req) => {
     const user = data.user;
     if (!user?.email) throw new Error("User not authenticated or email not available");
 
+    // Owner/developer bypass — never charge this account
+    if (user.email === "arthur25.ad@gmail.com") {
+      return new Response(JSON.stringify({ error: "Owner account has free access. No checkout needed." }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
+    }
+
     const { priceId } = await req.json();
     if (!priceId) throw new Error("priceId is required");
 

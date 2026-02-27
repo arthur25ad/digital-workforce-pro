@@ -19,6 +19,11 @@ export function useSubscriptionSync() {
         return { packageKey: null, subscribed: false };
       }
 
+      // Owner bypass — always gets team package
+      if (data.price_id === "owner_bypass") {
+        return { packageKey: "team", subscribed: true };
+      }
+
       const pkg = getPackageByPriceId(data.price_id);
       if (!pkg) {
         console.warn("Unknown Stripe price_id:", data.price_id);
