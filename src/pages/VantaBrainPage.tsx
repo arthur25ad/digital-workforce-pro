@@ -50,7 +50,7 @@ const PublicView = () => (
         {/* Title — massive, at the very top */}
         <motion.h1
           {...fadeUp}
-          className="font-display text-6xl font-black tracking-tight md:text-8xl lg:text-9xl leading-[0.9]"
+          className="font-display text-5xl font-black tracking-tighter sm:text-6xl md:text-8xl lg:text-9xl leading-[0.9]"
           style={{
             backgroundImage: "linear-gradient(135deg, hsl(280 70% 80%), hsl(280 70% 55%), hsl(0 0% 100% / 0.85), hsl(280 60% 50%))",
             WebkitBackgroundClip: "text",
