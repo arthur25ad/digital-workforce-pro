@@ -29,6 +29,7 @@ const roleDetails = [
       { icon: BarChart2, text: "Tracks performance & suggests improvements" },
       { icon: Target, text: "Generates content ideas from your niche" },
     ],
+    bottomNote: "Works 24/7 so your brand never goes quiet — even when you're off the clock.",
   },
   {
     icon: Mail, label: "Email Marketing", ...roleColors.email, stat: "8", unit: "campaigns active", trend: "+15%",
@@ -40,6 +41,7 @@ const roleDetails = [
       { icon: Send, text: "Sends at optimal open-rate times" },
       { icon: Megaphone, text: "Creates promo & nurture sequences" },
     ],
+    bottomNote: "Turns your email list into a revenue engine — without you writing a single word.",
   },
   {
     icon: Headphones, label: "Customer Support", ...roleColors.support, stat: "47", unit: "replies drafted", trend: "+32%",
@@ -51,6 +53,7 @@ const roleDetails = [
       { icon: FileText, text: "References your policies & FAQs" },
       { icon: Bell, text: "Escalates critical issues to you" },
     ],
+    bottomNote: "Every customer feels heard — instantly — while you focus on growing your business.",
   },
   {
     icon: CalendarCheck, label: "Calendar Assistant", ...roleColors.assistant, stat: "23", unit: "appointments managed", trend: "+18%",
@@ -62,6 +65,7 @@ const roleDetails = [
       { icon: RefreshCw, text: "Handles reschedules & cancellations" },
       { icon: Clock, text: "Detects scheduling conflicts" },
     ],
+    bottomNote: "No more double-bookings or missed appointments — your calendar runs itself.",
   },
 ];
 
@@ -243,16 +247,11 @@ const DashboardPreview = () => {
                         ))}
                       </div>
 
-                      {/* Stats bar */}
-                      <div className="relative mt-6 flex items-center justify-between rounded-xl border border-border/20 bg-background/20 px-4 py-3">
-                        <div className="flex items-end gap-2">
-                          <span className="font-display text-2xl font-bold text-foreground">{role.stat}</span>
-                          <span className="mb-0.5 text-xs text-muted-foreground">{role.unit}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <TrendingUp size={12} className={role.text} />
-                          <span className={`text-xs font-semibold ${role.text}`}>{role.trend}</span>
-                        </div>
+                      {/* Bottom note */}
+                      <div className="relative mt-6 rounded-xl border border-border/20 bg-background/20 px-4 py-3">
+                        <p className="text-xs text-muted-foreground italic leading-relaxed text-center">
+                          "{role.bottomNote}"
+                        </p>
                       </div>
                     </div>
                   );
