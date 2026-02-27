@@ -11,12 +11,14 @@ import PricingSection from "@/components/PricingSection";
 import FAQSection from "@/components/FAQSection";
 import CTASection from "@/components/CTASection";
 import Footer from "@/components/Footer";
+import BrandDivider from "@/components/BrandDivider";
 
 const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
       <HeroSection />
+      <BrandDivider />
       <DashboardPreview />
       <CapabilitiesGrid />
       <AITeamSection />
