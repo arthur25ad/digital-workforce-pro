@@ -27,9 +27,20 @@ const HeroSection = () => {
       <div className="mx-auto max-w-[1600px] px-6 md:px-12 lg:px-16">
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-20 xl:gap-28">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }} className="text-center lg:text-left">
-            <h1 className="hero-flowing-text font-display text-4xl font-bold leading-tight tracking-tight md:text-5xl lg:text-6xl xl:text-7xl">
-              AI Employees That Work While You Sleep
+            {/* Brand hierarchy */}
+            <h1 className="font-display text-4xl font-bold leading-tight tracking-tight md:text-5xl lg:text-6xl xl:text-7xl">
+              <span className="hero-flowing-text block">AI Employees That Work While You Sleep</span>
             </h1>
+            <div className="mt-4 flex items-center gap-3 justify-center lg:justify-start">
+              <span className="font-display text-2xl font-black tracking-tight md:text-3xl" style={{
+                backgroundImage: "linear-gradient(135deg, hsl(280 70% 80%), hsl(280 70% 55%), hsl(0 0% 100% / 0.85), hsl(280 60% 50%))",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+              }}>VANTABRAIN</span>
+              <span className="text-muted-foreground text-sm font-medium">Powered by</span>
+              <span className="veyra-gradient-text font-display text-xl font-bold tracking-tight md:text-2xl">Veyra</span>
+            </div>
             <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground xl:text-xl lg:mx-0">
               Hire AI employees to handle social media, customer support, email marketing, and admin tasks 24/7 — without hiring more staff.
             </p>
