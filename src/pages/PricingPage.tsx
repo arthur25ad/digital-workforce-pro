@@ -118,24 +118,41 @@ const PricingPage = () => {
                   <h3 className="font-display text-lg font-semibold text-foreground">{plan.name}</h3>
                   <p className="mt-1 text-sm text-muted-foreground">{plan.description}</p>
                   <div className="mt-6">
-                    {hasDiscount ? (
-                      <>
-                        <span className="font-display text-2xl font-bold text-muted-foreground line-through mr-2">{plan.price}</span>
-                        <span className="font-display text-4xl font-bold text-foreground">${Math.round(discountedPrice)}</span>
-                      </>
-                    ) : (
-                      <span className="font-display text-4xl font-bold text-foreground">{plan.price}</span>
-                    )}
+                    <span className="font-display text-4xl font-bold text-foreground">{plan.price}</span>
                     <span className="text-sm text-muted-foreground">{plan.period}</span>
-                    {hasDiscount && activePromo?.first_billing_cycle_only && (
-                      <p className="mt-1 text-xs text-emerald-400/70">First month only · then {plan.price}/mo</p>
-                    )}
-                    {plan.trialDays && (
-                      <p className="mt-3 flex items-center gap-2 text-base font-semibold text-emerald-400">
-                        <Check size={20} className="text-emerald-400" />
-                        {plan.trialDays}-day free trial
-                      </p>
-                    )}
+
+                    {/* Billing journey timeline */}
+                    <div className="mt-4 space-y-2 rounded-lg border border-border/40 bg-muted/30 px-4 py-3">
+                      {plan.trialDays && (
+                        <div className="flex items-start gap-2 text-sm">
+                          <span className="mt-0.5 h-2 w-2 shrink-0 rounded-full bg-emerald-400" />
+                          <span className="text-emerald-400 font-medium">Free for {plan.trialDays} days</span>
+                        </div>
+                      )}
+                      {hasDiscount && (
+                        <div className="flex items-start gap-2 text-sm">
+                          <span className="mt-0.5 h-2 w-2 shrink-0 rounded-full bg-primary" />
+                          <span className="text-foreground">
+                            {activePromo?.first_billing_cycle_only
+                              ? <>Then <span className="font-semibold">${discountedPrice.toFixed(2)}</span> for the first {plan.trialDays ? "paid " : ""}month</>
+                              : <>Then <span className="font-semibold">${discountedPrice.toFixed(2)}/mo</span> ongoing</>
+                            }
+                          </span>
+                        </div>
+                      )}
+                      {hasDiscount && activePromo?.first_billing_cycle_only && (
+                        <div className="flex items-start gap-2 text-sm">
+                          <span className="mt-0.5 h-2 w-2 shrink-0 rounded-full bg-muted-foreground/50" />
+                          <span className="text-muted-foreground">Then renews at {plan.price}/mo</span>
+                        </div>
+                      )}
+                      {!hasDiscount && plan.trialDays && (
+                        <div className="flex items-start gap-2 text-sm">
+                          <span className="mt-0.5 h-2 w-2 shrink-0 rounded-full bg-muted-foreground/50" />
+                          <span className="text-muted-foreground">Then {plan.price}/mo after trial</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
                   <ul className="mt-8 space-y-3">
                     {plan.features.map((f) => (
