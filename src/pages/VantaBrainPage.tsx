@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import PageLayout from "@/components/PageLayout";
 import { useAuth } from "@/hooks/useAuth";
 import { useVantaBrainMemories, useVantaBrainStats, useVantaBrainActions } from "@/hooks/useVantaBrain";
@@ -221,7 +221,7 @@ const RECENT_ACTIVITY_PLACEHOLDER = [
   { text: "Added task prioritization pattern", role: "virtual_assistant", time: "" },
 ];
 
-const AuthenticatedView = () => {
+const AuthenticatedView = ({ initialQuestion }: { initialQuestion?: string }) => {
   const { stats, loading: statsLoading } = useVantaBrainStats();
   const { memories, patterns, loading, refresh } = useVantaBrainMemories();
   const { deleteMemory, deletePattern } = useVantaBrainActions();
@@ -469,7 +469,7 @@ const AuthenticatedView = () => {
 
           {/* ── VANTABRAIN AI Assistant ── */}
           <motion.div {...fadeUp} transition={{ delay: 0.2 }} className="mb-6">
-            <VantaBrainAssistant />
+            <VantaBrainAssistant initialQuestion={initialQuestion} />
           </motion.div>
 
           {/* ── Bottom row: Connected Context + Learning Controls + Recent Activity ── */}
@@ -619,10 +619,12 @@ const AuthenticatedView = () => {
    ═══════════════════════════════════════════════ */
 const VantaBrainPage = () => {
   const { user } = useAuth();
+  const [searchParams] = useSearchParams();
+  const askParam = searchParams.get("ask") || undefined;
 
   return (
     <PageLayout>
-      {user ? <AuthenticatedView /> : <PublicView />}
+      {user ? <AuthenticatedView initialQuestion={askParam} /> : <PublicView />}
     </PageLayout>
   );
 };

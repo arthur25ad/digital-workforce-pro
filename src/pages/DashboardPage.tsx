@@ -7,9 +7,12 @@ import { useCustomerSupportData } from "@/hooks/useCustomerSupportData";
 import { useEmailMarketingData } from "@/hooks/useEmailMarketingData";
 import { useVirtualAssistantData } from "@/hooks/useVirtualAssistantData";
 import { useVantaBrainStats } from "@/hooks/useVantaBrain";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Share2, Headphones, Mail, CalendarCheck, Lock,
   ArrowRight, Sparkles, CheckCircle2, Brain,
+  MessageSquare, Zap, Search,
 } from "lucide-react";
 
 const roleConfig = [
@@ -84,11 +87,13 @@ function useMergedActivity() {
 
 const DashboardPage = () => {
   const { profile, workspace } = useAuth();
+  const navigate = useNavigate();
   const unlockedRoles = profile?.unlocked_roles ?? [];
   const summaries = useRoleSummary();
   const nextActions = useNextActions(unlockedRoles);
   const recentActivity = useMergedActivity();
   const { stats: brainStats } = useVantaBrainStats();
+  const [askInput, setAskInput] = useState("");
 
   const packageLabel = profile?.active_package
     ? profile.active_package.charAt(0).toUpperCase() + profile.active_package.slice(1)
@@ -166,34 +171,119 @@ const DashboardPage = () => {
             })}
           </div>
 
-          {/* ── VantaBrain card ── */}
+          {/* ── Ask VANTABRAIN — Hero Section ── */}
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
             className="mb-12"
           >
-            <Link
-              to="/vantabrain"
-              className="group flex items-center gap-4 rounded-2xl border p-5 transition-all duration-300 hover:border-[hsl(280_70%_65%)/0.4]"
-              style={{ borderColor: "hsl(280 70% 65% / 0.2)", backgroundImage: "linear-gradient(to right, hsl(280 70% 65% / 0.05), transparent)" }}
+            <div
+              className="relative overflow-hidden rounded-2xl border p-6 md:p-8"
+              style={{
+                borderColor: "hsl(280 70% 65% / 0.25)",
+                background: "linear-gradient(135deg, hsl(280 70% 65% / 0.08) 0%, hsl(280 50% 40% / 0.04) 50%, transparent 100%)",
+              }}
             >
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl" style={{ backgroundColor: "hsl(280 70% 65% / 0.1)", color: "hsl(280 70% 65%)" }}>
-                <Brain size={20} />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <h3 className="font-display text-sm font-semibold" style={{ color: "hsl(280 70% 65%)" }}>VANTABRAIN</h3>
-                  <span className="rounded-full px-2 py-0.5 text-[10px] font-medium" style={{ backgroundColor: "hsl(280 70% 65% / 0.1)", color: "hsl(280 70% 65%)" }}>Intelligence</span>
+              {/* Glow */}
+              <div className="pointer-events-none absolute -top-20 -right-20 h-64 w-64 rounded-full" style={{
+                background: "radial-gradient(circle, hsl(280 70% 65% / 0.12), transparent 70%)"
+              }} />
+
+              <div className="relative">
+                {/* Header row */}
+                <div className="flex items-start justify-between gap-4 mb-5">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-border/40 bg-card" style={{
+                      boxShadow: "0 0 30px hsl(280 70% 65% / 0.15)"
+                    }}>
+                      <Brain size={24} style={{ color: "hsl(280 70% 65%)" }} />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h2 className="font-display text-lg font-bold text-foreground">Ask VANTABRAIN</h2>
+                        <Zap size={14} style={{ color: "hsl(280 70% 65%)" }} />
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        Your AI-powered workspace intelligence — knows your business, preferences, and activity
+                      </p>
+                    </div>
+                  </div>
+                  {(brainStats.totalMemories > 0 || brainStats.totalPatterns > 0) && (
+                    <div className="hidden md:flex items-center gap-3 text-[10px] text-muted-foreground/60 shrink-0 mt-1">
+                      <span>{brainStats.totalMemories} memories</span>
+                      <span className="h-3 w-px bg-border/40" />
+                      <span>{brainStats.totalPatterns} patterns</span>
+                      <span className="h-3 w-px bg-border/40" />
+                      <span>{brainStats.totalInteractions} interactions</span>
+                    </div>
+                  )}
                 </div>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  {brainStats.totalMemories > 0
-                    ? `${brainStats.totalMemories} memories · ${brainStats.totalPatterns} patterns · ${brainStats.totalInteractions} interactions tracked`
-                    : "Your AI is learning — memories and patterns will appear as you use the platform"}
-                </p>
+
+                {/* Search-style input */}
+                <form
+                  className="mb-5"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    if (askInput.trim()) {
+                      // Navigate to VANTABRAIN with the question as a query param
+                      navigate(`/vantabrain?ask=${encodeURIComponent(askInput.trim())}`);
+                    } else {
+                      navigate("/vantabrain");
+                    }
+                  }}
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="relative flex-1">
+                      <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/40" />
+                      <input
+                        type="text"
+                        value={askInput}
+                        onChange={(e) => setAskInput(e.target.value)}
+                        placeholder="Ask anything about your workspace, preferences, or AI Employees…"
+                        className="w-full rounded-xl border border-border/50 bg-background/80 pl-11 pr-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-[hsl(280_70%_65%/0.4)] transition-colors"
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      className="shrink-0 rounded-xl px-5 py-3 text-sm font-semibold transition-all duration-300 hover:-translate-y-0.5"
+                      style={{
+                        background: "linear-gradient(135deg, hsl(280 70% 60%), hsl(280 60% 50%))",
+                        color: "white",
+                        boxShadow: "0 0 20px hsl(280 70% 65% / 0.2)",
+                      }}
+                    >
+                      <MessageSquare size={16} />
+                    </button>
+                  </div>
+                </form>
+
+                {/* Quick prompts */}
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    "What has VANTABRAIN learned?",
+                    "What should I do next?",
+                    "Which AI Employees are active?",
+                    "What patterns were detected?",
+                  ].map((prompt) => (
+                    <button
+                      key={prompt}
+                      onClick={() => navigate(`/vantabrain?ask=${encodeURIComponent(prompt)}`)}
+                      className="rounded-lg border border-border/40 bg-background/60 px-3 py-1.5 text-[11px] text-muted-foreground hover:text-foreground hover:border-border/60 transition-all"
+                    >
+                      {prompt}
+                    </button>
+                  ))}
+                  <Link
+                    to="/vantabrain"
+                    className="rounded-lg border border-border/40 bg-background/60 px-3 py-1.5 text-[11px] transition-all inline-flex items-center gap-1"
+                    style={{ color: "hsl(280 70% 65%)" }}
+                  >
+                    Open Intelligence Center <ArrowRight size={10} />
+                  </Link>
+                </div>
               </div>
-              <ArrowRight size={16} className="shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
-            </Link>
+            </div>
           </motion.div>
 
           {/* ── Next actions ── */}
