@@ -91,6 +91,63 @@ export function useVantaBrainMemories(roleScope?: string) {
   return { memories, patterns, loading, refresh };
 }
 
+export interface BrainSuggestion {
+  id: string;
+  message: string;
+  category: "timing" | "style" | "platform" | "workflow" | "tone" | "content" | "priority";
+  confidence: number;
+  source_pattern_type: string;
+  actionable_value: string;
+}
+
+export function useVantaBrainSuggestions(roleScope: string) {
+  const { workspace } = useAuth();
+  const [suggestions, setSuggestions] = useState<BrainSuggestion[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [dismissed, setDismissed] = useState<Set<string>>(new Set());
+
+  const fetchSuggestions = useCallback(async () => {
+    if (!workspace?.id) return;
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("vantabrain", {
+        body: { action: "get-suggestions", workspaceId: workspace.id, roleScope },
+      });
+      if (!error && data?.suggestions) {
+        setSuggestions(data.suggestions);
+      }
+    } catch { /* silent */ }
+    setLoading(false);
+  }, [workspace?.id, roleScope]);
+
+  useEffect(() => { fetchSuggestions(); }, [fetchSuggestions]);
+
+  const sendFeedback = useCallback(async (
+    suggestionId: string,
+    feedback: "accepted" | "rejected" | "edited" | "not_preferred",
+    patternType: string,
+    editedValue?: string,
+  ) => {
+    if (!workspace?.id) return;
+    setDismissed(prev => new Set(prev).add(suggestionId));
+    await supabase.functions.invoke("vantabrain", {
+      body: {
+        action: "suggestion-feedback",
+        workspaceId: workspace.id,
+        roleScope,
+        suggestionId,
+        feedback,
+        patternType,
+        editedValue,
+      },
+    });
+  }, [workspace?.id, roleScope]);
+
+  const visibleSuggestions = suggestions.filter(s => !dismissed.has(s.id));
+
+  return { suggestions: visibleSuggestions, loading, refresh: fetchSuggestions, sendFeedback };
+}
+
 export function useVantaBrainActions() {
   const { workspace } = useAuth();
 

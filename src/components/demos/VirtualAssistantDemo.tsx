@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
-import { useVantaBrainActions } from "@/hooks/useVantaBrain";
+import { useVantaBrainActions, useVantaBrainSuggestions } from "@/hooks/useVantaBrain";
+import SmartSuggestions from "@/components/SmartSuggestions";
 import { useVirtualAssistantData } from "@/hooks/useVirtualAssistantData";
 import { useAuth } from "@/hooks/useAuth";
 import ConnectPlatformModal from "@/components/ConnectPlatformModal";
@@ -27,6 +28,7 @@ const toolPlatforms = [
 const VirtualAssistantDemo = () => {
   const { session } = useAuth();
   const { getContext, recordInteraction } = useVantaBrainActions();
+  const { suggestions: brainSuggestions, loading: suggestionsLoading, sendFeedback } = useVantaBrainSuggestions("virtual-assistant");
   const {
     profile, tasks, requests, drafts, connections, activities, loading,
     updateProfile, addRequest, updateRequestStatus,
@@ -82,6 +84,7 @@ const VirtualAssistantDemo = () => {
   return (
     <>
       <WorkspaceShell tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab}>
+        <SmartSuggestions suggestions={brainSuggestions} loading={suggestionsLoading} onFeedback={sendFeedback} />
         {/* Foundation */}
         {activeTab === 0 && (
           <div className="space-y-5">

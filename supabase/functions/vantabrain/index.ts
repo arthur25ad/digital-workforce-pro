@@ -42,7 +42,6 @@ serve(async (req) => {
     if (action === "get-context") {
       const { workspaceId, roleScope } = body;
 
-      // Fetch shared + role-specific memories
       const { data: memories } = await supabase
         .from("brain_memories")
         .select("*")
@@ -51,7 +50,6 @@ serve(async (req) => {
         .order("times_reinforced", { ascending: false })
         .limit(30);
 
-      // Fetch active patterns
       const { data: patterns } = await supabase
         .from("brain_patterns")
         .select("*")
@@ -61,7 +59,6 @@ serve(async (req) => {
         .order("confidence", { ascending: false })
         .limit(15);
 
-      // Build context string for AI prompts
       const memoryLines = (memories || []).map(
         (m: any) => `[${m.category}] ${m.memory_key}: ${m.memory_value} (confidence: ${m.confidence}, reinforced: ${m.times_reinforced}x)`
       );
@@ -102,6 +99,208 @@ serve(async (req) => {
       });
     }
 
+    // ── GET SUGGESTIONS: Generate adaptive suggestions from patterns ──
+    if (action === "get-suggestions") {
+      const { workspaceId, roleScope } = body;
+
+      // Require minimum confidence & evidence for suggestions
+      const MIN_CONFIDENCE = 0.55;
+      const MIN_EVIDENCE = 2;
+
+      // Fetch qualifying patterns
+      const { data: patterns } = await supabase
+        .from("brain_patterns")
+        .select("*")
+        .eq("workspace_id", workspaceId)
+        .in("role_scope", ["shared", roleScope])
+        .eq("is_active", true)
+        .gte("confidence", MIN_CONFIDENCE)
+        .gte("evidence_count", MIN_EVIDENCE)
+        .order("confidence", { ascending: false })
+        .limit(10);
+
+      // Fetch high-confidence memories
+      const { data: memories } = await supabase
+        .from("brain_memories")
+        .select("*")
+        .eq("workspace_id", workspaceId)
+        .in("scope", ["shared", roleScope])
+        .gte("confidence", MIN_CONFIDENCE)
+        .gte("times_reinforced", MIN_EVIDENCE)
+        .order("confidence", { ascending: false })
+        .limit(10);
+
+      if ((!patterns || patterns.length === 0) && (!memories || memories.length === 0)) {
+        return new Response(JSON.stringify({ suggestions: [], reason: "Not enough learned patterns yet" }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+      if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+
+      const patternSummary = (patterns || []).map(
+        (p: any) => `[${p.pattern_type}] ${p.description} (confidence: ${Math.round(p.confidence * 100)}%, evidence: ${p.evidence_count}x)`
+      ).join("\n");
+
+      const memorySummary = (memories || []).map(
+        (m: any) => `[${m.category}] ${m.memory_key}: ${m.memory_value} (confidence: ${Math.round(m.confidence * 100)}%, reinforced: ${m.times_reinforced}x)`
+      ).join("\n");
+
+      const rolePrompts: Record<string, string> = {
+        "social-media-manager": "posting times, platforms, content types, caption styles, CTA patterns, content themes, approval patterns, scheduling choices",
+        "customer-support": "reply tone, reply structures, resolution patterns, escalation rules, reply length, policy language, issue-response pairings",
+        "email-marketer": "send times, campaign timing, subject line styles, CTA patterns, audience segments, campaign types by season, approval preferences",
+        "virtual-assistant": "task priorities, follow-up cadence, next-step patterns, message style, admin workflows, request handling, approval tendencies",
+      };
+
+      const focusAreas = rolePrompts[roleScope] || "general behavioral preferences";
+
+      const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "google/gemini-3-flash-preview",
+          tools: [{
+            type: "function",
+            function: {
+              name: "return_suggestions",
+              description: "Return 1-5 smart adaptive suggestions based on learned patterns and memories.",
+              parameters: {
+                type: "object",
+                properties: {
+                  suggestions: {
+                    type: "array",
+                    items: {
+                      type: "object",
+                      properties: {
+                        id: { type: "string", description: "Unique short ID for this suggestion (snake_case)" },
+                        message: { type: "string", description: "Natural language suggestion message, phrased as a helpful question. Max 120 chars." },
+                        category: { type: "string", enum: ["timing", "style", "platform", "workflow", "tone", "content", "priority"] },
+                        confidence: { type: "number", description: "How confident this suggestion is (0.5-1.0)" },
+                        source_pattern_type: { type: "string", description: "The pattern type that drives this suggestion" },
+                        actionable_value: { type: "string", description: "The specific value being suggested (e.g. '5:00 PM', 'Instagram', 'concise tone')" },
+                      },
+                      required: ["id", "message", "category", "confidence", "source_pattern_type", "actionable_value"],
+                      additionalProperties: false,
+                    },
+                  },
+                },
+                required: ["suggestions"],
+                additionalProperties: false,
+              },
+            },
+          }],
+          tool_choice: { type: "function", function: { name: "return_suggestions" } },
+          messages: [
+            {
+              role: "system",
+              content: `You analyze learned behavioral patterns and memories for a ${roleScope} AI Employee to generate smart, adaptive suggestions.
+
+RULES:
+- Only suggest things with strong pattern evidence (multiple occurrences)
+- Phrase each suggestion as a friendly, helpful question (e.g. "You usually schedule posts at 5 PM. Want to use that time again?")
+- Focus on: ${focusAreas}
+- Max 5 suggestions, only include genuinely useful ones
+- Each suggestion should feel earned through repeated behavior, not assumed from a single action
+- Confidence should reflect the strength of the underlying pattern`,
+            },
+            {
+              role: "user",
+              content: `Role: ${roleScope}\n\nLEARNED PATTERNS:\n${patternSummary || "None yet"}\n\nMEMORIES:\n${memorySummary || "None yet"}`,
+            },
+          ],
+        }),
+      });
+
+      if (!response.ok) {
+        if (response.status === 429 || response.status === 402) {
+          return new Response(JSON.stringify({ suggestions: [], reason: "Rate limited" }), {
+            status: response.status,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+        throw new Error("AI suggestion generation failed");
+      }
+
+      const data = await response.json();
+      let suggestions: any[] = [];
+      
+      // Parse tool call response
+      const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
+      if (toolCall?.function?.arguments) {
+        try {
+          const parsed = JSON.parse(toolCall.function.arguments);
+          suggestions = parsed.suggestions || [];
+        } catch {
+          // fallback: try content
+          const content = data.choices?.[0]?.message?.content || "{}";
+          try {
+            const jsonMatch = content.match(/\{[\s\S]*\}/);
+            const parsed = JSON.parse(jsonMatch ? jsonMatch[0] : content);
+            suggestions = parsed.suggestions || [];
+          } catch { /* empty */ }
+        }
+      }
+
+      return new Response(JSON.stringify({ suggestions }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // ── SUGGESTION FEEDBACK: Accept/Reject/Edit strengthens or weakens patterns ──
+    if (action === "suggestion-feedback") {
+      const { workspaceId, roleScope, suggestionId, feedback, patternType, editedValue } = body;
+      // feedback: "accepted" | "rejected" | "edited" | "not_preferred"
+
+      // Record the interaction
+      await supabase.from("brain_interactions").insert({
+        workspace_id: workspaceId,
+        role_scope: roleScope,
+        interaction_type: feedback === "accepted" ? "approval" : feedback === "rejected" ? "rejection" : "edit",
+        action_taken: `Suggestion ${feedback}: ${suggestionId}`,
+        original_content: suggestionId,
+        edited_content: editedValue || null,
+        metadata: { suggestion_feedback: true, pattern_type: patternType, feedback },
+      });
+
+      // Find matching patterns and adjust confidence
+      if (patternType) {
+        const { data: matchingPatterns } = await supabase
+          .from("brain_patterns")
+          .select("id, confidence, evidence_count")
+          .eq("workspace_id", workspaceId)
+          .in("role_scope", ["shared", roleScope])
+          .eq("pattern_type", patternType)
+          .eq("is_active", true);
+
+        for (const pat of matchingPatterns || []) {
+          let newConfidence = pat.confidence;
+          if (feedback === "accepted") {
+            newConfidence = Math.min(1, pat.confidence + 0.05);
+          } else if (feedback === "rejected" || feedback === "not_preferred") {
+            newConfidence = Math.max(0.1, pat.confidence - 0.1);
+          } else if (feedback === "edited") {
+            newConfidence = Math.min(1, pat.confidence + 0.02);
+          }
+
+          // Deactivate if confidence drops too low
+          if (newConfidence < 0.3) {
+            await supabase.from("brain_patterns").update({ is_active: false, confidence: newConfidence }).eq("id", pat.id);
+          } else {
+            await supabase.from("brain_patterns").update({ confidence: newConfidence, evidence_count: pat.evidence_count + 1 }).eq("id", pat.id);
+          }
+        }
+      }
+
+      return new Response(JSON.stringify({ success: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     // ── LEARN: Analyze recent interactions and update memories/patterns ──
     if (action === "learn") {
       const { workspaceId, roleScope } = body;
@@ -109,7 +308,6 @@ serve(async (req) => {
       const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
       if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-      // Fetch recent interactions for this role
       const { data: recentInteractions } = await supabase
         .from("brain_interactions")
         .select("*")
@@ -124,7 +322,6 @@ serve(async (req) => {
         });
       }
 
-      // Fetch existing memories to avoid duplicates
       const { data: existingMemories } = await supabase
         .from("brain_memories")
         .select("memory_key, memory_value")
@@ -152,9 +349,9 @@ serve(async (req) => {
               content: `You analyze user interaction patterns to extract useful preferences and behavioral patterns. Return JSON (no markdown):
 {
   "memories": [{"key": "short_key", "value": "what was learned", "category": "preference|style|timing|tone|workflow", "confidence": 0.5-1.0}],
-  "patterns": [{"type": "approval_trend|edit_pattern|timing_preference|rejection_reason|style_preference", "description": "pattern observed", "confidence": 0.5-1.0}]
+  "patterns": [{"type": "approval_trend|edit_pattern|timing_preference|rejection_reason|style_preference|platform_preference|content_preference|priority_preference|follow_up_pattern|escalation_preference", "description": "pattern observed", "confidence": 0.5-1.0}]
 }
-Only include genuinely useful insights. Skip obvious or trivial observations. Existing memory keys to avoid duplicating: ${existingKeys.join(", ") || "none"}`
+Only include genuinely useful insights from REPEATED behaviors. Do not form strong preferences from single actions. A preference should only be learned after multiple consistent signals. Existing memory keys to avoid duplicating: ${existingKeys.join(", ") || "none"}`
             },
             {
               role: "user",
@@ -186,9 +383,7 @@ Only include genuinely useful insights. Skip obvious or trivial observations. Ex
         });
       }
 
-      // Upsert memories
       for (const mem of result.memories || []) {
-        // Check if memory exists to reinforce
         const { data: existing } = await supabase
           .from("brain_memories")
           .select("id, times_reinforced, confidence")
@@ -217,7 +412,6 @@ Only include genuinely useful insights. Skip obvious or trivial observations. Ex
         }
       }
 
-      // Insert patterns
       for (const pat of result.patterns || []) {
         const { data: existingPat } = await supabase
           .from("brain_patterns")

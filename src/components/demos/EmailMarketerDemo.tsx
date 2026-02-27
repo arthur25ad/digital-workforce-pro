@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
-import { useVantaBrainActions } from "@/hooks/useVantaBrain";
+import { useVantaBrainActions, useVantaBrainSuggestions } from "@/hooks/useVantaBrain";
+import SmartSuggestions from "@/components/SmartSuggestions";
 import { useEmailMarketingData } from "@/hooks/useEmailMarketingData";
 import { useAuth } from "@/hooks/useAuth";
 import ConnectPlatformModal from "@/components/ConnectPlatformModal";
@@ -35,6 +36,7 @@ const EmailMarketerDemo = () => {
   } = useEmailMarketingData();
   const { session } = useAuth();
   const { getContext, recordInteraction } = useVantaBrainActions();
+  const { suggestions: brainSuggestions, loading: suggestionsLoading, sendFeedback } = useVantaBrainSuggestions("email-marketer");
 
   const [activeTab, setActiveTab] = useState(0);
   const [connectModal, setConnectModal] = useState<string | null>(null);
@@ -101,6 +103,7 @@ const EmailMarketerDemo = () => {
   return (
     <>
       <WorkspaceShell tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab}>
+        <SmartSuggestions suggestions={brainSuggestions} loading={suggestionsLoading} onFeedback={sendFeedback} />
         {/* Foundation */}
         {activeTab === 0 && (
           <div className="space-y-5">
