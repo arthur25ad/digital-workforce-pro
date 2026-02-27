@@ -181,7 +181,7 @@ const DashboardPreview = () => {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.3 }}
-                className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm"
+                className="fixed inset-0 z-[60] bg-background/80 backdrop-blur-sm"
                 onClick={() => setExpandedCard(null)}
               />
               {/* Card */}
@@ -190,7 +190,7 @@ const DashboardPreview = () => {
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.85, y: 40 }}
                 transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
-                className="fixed inset-x-4 top-[15%] z-50 mx-auto max-w-lg md:inset-x-0"
+                className="fixed inset-x-4 top-[10%] z-[70] mx-auto max-w-lg md:inset-x-0 md:top-[15%] max-h-[80vh] overflow-y-auto"
               >
                 {(() => {
                   const role = roleDetails[expandedCard];
@@ -206,9 +206,9 @@ const DashboardPreview = () => {
                       {/* Close button */}
                       <button
                         onClick={(e) => { e.stopPropagation(); setExpandedCard(null); }}
-                        className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full border border-border/40 bg-background/50 text-muted-foreground transition-colors hover:text-foreground"
+                        className="absolute right-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-border/40 bg-background/80 text-muted-foreground transition-colors hover:text-foreground active:scale-95 md:h-8 md:w-8 md:right-4 md:top-4"
                       >
-                        <X size={14} />
+                        <X size={16} />
                       </button>
 
                       {/* Header */}
