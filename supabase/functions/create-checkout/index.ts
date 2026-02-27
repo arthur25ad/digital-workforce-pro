@@ -51,7 +51,7 @@ serve(async (req) => {
       customerId = customers.data[0].id;
     }
 
-    // Trial periods
+    // Trial periods per plan
     const trialDays: Record<string, number> = {
       "price_1T5QmBK99ArQ30pFn7FGni9h": 3,
       "price_1T5QmTK99ArQ30pFmRrxLr1w": 7,
@@ -92,6 +92,9 @@ serve(async (req) => {
           };
 
           if (promoData.first_billing_cycle_only) {
+            // "once" means it applies to the first PAID invoice only
+            // Stripe automatically skips the $0 trial invoice and applies
+            // the coupon to the first real invoice after the trial ends
             couponParams.duration = "once";
           } else {
             couponParams.duration = "forever";
@@ -125,7 +128,10 @@ serve(async (req) => {
       cancel_url: `${req.headers.get("origin")}/pricing`,
     };
 
-    if (trialPeriodDays && !discounts) {
+    // ALWAYS apply trial if the plan has one — trials and discounts are independent.
+    // Stripe applies the coupon to the first PAID invoice (after trial ends),
+    // so they layer correctly: trial first, then discounted first paid month, then normal.
+    if (trialPeriodDays) {
       sessionParams.subscription_data = { trial_period_days: trialPeriodDays };
     }
 
