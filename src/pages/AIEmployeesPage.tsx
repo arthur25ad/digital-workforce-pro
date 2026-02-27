@@ -8,21 +8,25 @@ const roles = [
     icon: Share2, title: "Social Media Manager", slug: "social-media-manager",
     value: "Keep your brand active with structured content workflows.",
     workflow: ["Strategy", "Content", "Approval", "Publishing"],
+    color: "text-blue-400", bg: "bg-blue-500/10", hoverBorder: "hover:border-blue-500/30",
   },
   {
     icon: Headphones, title: "Customer Support", slug: "customer-support",
     value: "Respond faster with organized, on-brand support drafts.",
     workflow: ["Knowledge", "Drafting", "Review", "Resolution"],
+    color: "text-violet-400", bg: "bg-violet-500/10", hoverBorder: "hover:border-violet-500/30",
   },
   {
     icon: Mail, title: "Email Marketer", slug: "email-marketer",
     value: "Plan, draft, and schedule campaigns that keep customers engaged.",
     workflow: ["Campaigns", "Scheduling", "Review", "Performance"],
+    color: "text-emerald-400", bg: "bg-emerald-500/10", hoverBorder: "hover:border-emerald-500/30",
   },
   {
     icon: CalendarCheck, title: "Virtual Assistant", slug: "virtual-assistant",
     value: "Stay organized with automated scheduling, tasks, and follow-ups.",
     workflow: ["Tasks", "Tools", "Summaries", "Coordination"],
+    color: "text-amber-400", bg: "bg-amber-500/10", hoverBorder: "hover:border-amber-500/30",
   },
 ];
 
@@ -64,14 +68,14 @@ const AIEmployeesPage = () => (
       </div>
     </section>
 
-    {/* Role cards — 2×2, more breathing room */}
+    {/* Role cards — 2×2 */}
     <section className="px-4 pb-24 md:px-8 md:pb-32">
       <div className="mx-auto max-w-[1400px]">
         <div className="grid gap-8 sm:grid-cols-2">
           {roles.map((role, i) => (
             <motion.div key={role.slug} initial={{ opacity: 0, y: 25 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: i * 0.1 }}>
-              <Link to={`/ai-employees/${role.slug}`} className="card-glass group block cursor-pointer rounded-xl p-8">
-                <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary/20">
+              <Link to={`/ai-employees/${role.slug}`} className={`card-glass group block cursor-pointer rounded-xl p-8 ${role.hoverBorder}`}>
+                <div className={`mb-5 flex h-14 w-14 items-center justify-center rounded-xl ${role.bg} ${role.color} transition-colors`}>
                   <role.icon size={28} />
                 </div>
                 <h3 className="font-display text-xl font-semibold text-foreground">{role.title}</h3>
@@ -81,7 +85,7 @@ const AIEmployeesPage = () => (
                     <span key={w} className="rounded-full bg-secondary/80 px-2.5 py-0.5 text-[10px] font-medium text-muted-foreground/70">{w}</span>
                   ))}
                 </div>
-                <span className="mt-5 inline-block text-sm font-medium text-primary transition-colors group-hover:text-primary/80">
+                <span className={`mt-5 inline-block text-sm font-medium ${role.color} transition-colors`}>
                   Explore this role →
                 </span>
               </Link>
