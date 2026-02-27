@@ -24,8 +24,8 @@ const footerLinks = [
 const Footer = () => {
   return (
     <footer className="border-t border-border/40 bg-background px-6 py-12 md:px-12 lg:px-16">
-      <div className="mx-auto grid max-w-[1600px] gap-10 lg:grid-cols-4">
-        <div className="lg:col-span-2">
+      <div className="mx-auto grid max-w-[1600px] gap-10 md:grid-cols-4">
+        <div className="md:col-span-2">
           <Link to="/" className="font-display text-xl font-bold tracking-tight">
             <span style={{
               backgroundImage: "linear-gradient(135deg, hsl(0 0% 100%), hsl(225 60% 82%), hsl(0 0% 100%), hsl(225 50% 78%))",

@@ -69,7 +69,7 @@ const HeroSection = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.8 }}
-          className="mt-16 grid grid-cols-2 gap-4 border-t border-border/40 pt-10 lg:grid-cols-4 lg:gap-8"
+          className="mt-16 grid grid-cols-2 gap-4 border-t border-border/40 pt-10 md:grid-cols-4 md:gap-8"
         >
           {trustItems.map((item) => (
             <div key={item.label} className="flex items-center gap-3">

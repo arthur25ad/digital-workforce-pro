@@ -46,8 +46,8 @@ const HowItWorks = () => {
           </h2>
         </motion.div>
 
-        <div className="relative grid gap-8 lg:grid-cols-3">
-          <div className="absolute left-0 right-0 top-12 hidden h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent lg:block" />
+        <div className="relative grid gap-8 md:grid-cols-3">
+          <div className="absolute left-0 right-0 top-12 hidden h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent md:block" />
 
           {steps.map((step, i) => (
             <motion.div

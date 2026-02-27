@@ -13,7 +13,7 @@ const PricingSection = () => {
           <h2 className="font-display text-3xl font-bold text-foreground md:text-4xl">Simple Pricing for Your First AI Team</h2>
         </motion.div>
 
-        <div className="grid gap-6 lg:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-3">
           {plans.map((plan, i) => {
             const isPopular = plan.key === "growth";
             return (
