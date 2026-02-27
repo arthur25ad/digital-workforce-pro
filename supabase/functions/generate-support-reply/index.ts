@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { fetchBrainIntelligence, INTELLIGENCE_ENGINE_PREAMBLE } from "../_shared/brain-context.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -35,29 +36,59 @@ serve(async (req) => {
       });
     }
 
-    const { ticket, knowledgeBase, knowledgeItems, brainContext } = await req.json();
+    const { ticket, knowledgeBase, knowledgeItems, workspaceId } = await req.json();
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
+    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+
+    // Fetch full brain intelligence server-side
+    const brain = workspaceId
+      ? await fetchBrainIntelligence(supabase, workspaceId, "customer-support")
+      : { fullPromptBlock: "" };
+
+    // Also fetch recent similar tickets for similarity matching
+    let similarTicketContext = "";
+    if (workspaceId && ticket.customerMessage) {
+      const { data: recentDrafts } = await supabase
+        .from("support_drafts")
+        .select("issue_summary, suggested_reply, status, confidence_level")
+        .eq("workspace_id", workspaceId)
+        .in("status", ["approved", "sent"])
+        .order("created_at", { ascending: false })
+        .limit(5);
+
+      if (recentDrafts && recentDrafts.length > 0) {
+        similarTicketContext = `\nPREVIOUSLY APPROVED RESPONSES (use as reference for tone and structure):\n${recentDrafts.map((d: any) =>
+          `Issue: ${d.issue_summary || "N/A"} → Reply style: ${(d.suggested_reply || "").slice(0, 150)}... [${d.confidence_level}]`
+        ).join("\n")}`;
+      }
     }
 
-    const systemPrompt = `You are a customer support AI assistant. Given a customer message and business context, generate a structured support response. Return a JSON object (no markdown, no code fences, just raw JSON) with this exact schema:
+    const systemPrompt = `${INTELLIGENCE_ENGINE_PREAMBLE}
+
+ROLE: You are the Customer Support AI Employee.
+
+YOUR TASK: Generate a structured support response. You MUST include a "reasoning" field that explains WHY you drafted the reply this way — referencing specific patterns, similar past tickets, or learned preferences.
+
+Return a JSON object (no markdown, no code fences, just raw JSON):
 {
   "issueSummary": "brief 1-sentence summary of the issue",
-  "suggestedReply": "a complete, professional, empathetic reply ready to send to the customer (3-5 sentences)",
+  "suggestedReply": "a complete, professional, empathetic reply ready to send (3-5 sentences)",
   "confidenceLevel": "high" or "medium" or "low",
   "escalationFlag": true or false,
-  "referencedPolicy": "relevant policy snippet or empty string if none applies",
-  "recommendedAction": "brief next step recommendation"
+  "referencedPolicy": "relevant policy snippet or empty string",
+  "recommendedAction": "brief next step recommendation",
+  "reasoning": "plain English explanation of WHY this reply was structured this way — reference patterns, similar past cases, or learned preferences"
 }
 
-Guidelines:
-- Match the brand tone provided
-- Reference specific policies when relevant
-- Flag for escalation if the issue is complex, involves refunds over policy limits, or requires manager approval
-- Set confidence to "low" if you lack enough context to draft a good reply
-- Keep the reply warm, professional, and specific to the customer's issue`;
+INTELLIGENCE RULES:
+- If the brain shows the user prefers a certain reply tone, match it
+- If the brain shows patterns about escalation preferences, follow them
+- If similar past tickets were resolved a certain way, reference that
+- If the brain shows reply length preferences, respect them
+- Flag for escalation if the issue is complex, involves refunds over policy limits, or matches learned escalation patterns
+- Set confidence to "low" if you lack enough context
+- Keep the reply warm, professional, and specific`;
 
     const policyContext = [
       knowledgeBase?.refund_policy ? `Refund Policy: ${knowledgeBase.refund_policy}` : "",
@@ -84,7 +115,10 @@ Customer: ${ticket.customerName || "Customer"}
 Channel: ${ticket.channel || "email"}
 Urgency: ${ticket.urgency || "medium"}
 Issue Type: ${ticket.issueType || "General inquiry"}
-Message: ${ticket.customerMessage}${brainContext ? `\n\n--- VANTABRAIN CONTEXT ---\n${brainContext}` : ""}`;
+Message: ${ticket.customerMessage}
+${similarTicketContext}
+
+${brain.fullPromptBlock ? `\n--- VANTABRAIN INTELLIGENCE ---\n${brain.fullPromptBlock}` : ""}`;
 
     const response = await fetch(
       "https://ai.gateway.lovable.dev/v1/chat/completions",

@@ -26,8 +26,8 @@ const toolPlatforms = [
 ];
 
 const VirtualAssistantDemo = () => {
-  const { session } = useAuth();
-  const { getContext, recordInteraction } = useVantaBrainActions();
+  const { session, workspace } = useAuth();
+  const { recordInteraction } = useVantaBrainActions();
   const { suggestions: brainSuggestions, loading: suggestionsLoading, sendFeedback } = useVantaBrainSuggestions("virtual-assistant");
   const {
     profile, tasks, requests, drafts, connections, activities, loading,
@@ -61,8 +61,7 @@ const VirtualAssistantDemo = () => {
     if (!session?.access_token) return;
     setGenerating(request.id);
     try {
-      const brainContext = await getContext("virtual-assistant");
-      const { data, error } = await supabase.functions.invoke("generate-assistant-draft", { body: { request, profile, brainContext } });
+      const { data, error } = await supabase.functions.invoke("generate-assistant-draft", { body: { request, profile, workspaceId: workspace?.id } });
       if (error) throw error;
       if (data?.draft) {
         const d = data.draft;

@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { INTELLIGENCE_ENGINE_PREAMBLE } from "../_shared/brain-context.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -198,11 +199,14 @@ serve(async (req) => {
           messages: [
             {
               role: "system",
-              content: `You analyze learned behavioral patterns and memories for a ${roleScope} AI Employee to generate smart, adaptive suggestions.
+              content: `${INTELLIGENCE_ENGINE_PREAMBLE}
+
+You analyze learned behavioral patterns and memories for a ${roleScope} AI Employee to generate smart, adaptive suggestions.
 
 RULES:
 - Only suggest things with strong pattern evidence (multiple occurrences)
-- Phrase each suggestion as a friendly, helpful question (e.g. "You usually schedule posts at 5 PM. Want to use that time again?")
+- Phrase each suggestion as a friendly, helpful question that EXPLAINS WHY you're suggesting it (e.g. "You've approved posts at 5 PM three times in a row. Want to use that time again?")
+- Reference the specific pattern or memory that drives each suggestion
 - Focus on: ${focusAreas}
 - Max 5 suggestions, only include genuinely useful ones
 - Each suggestion should feel earned through repeated behavior, not assumed from a single action
@@ -346,12 +350,18 @@ RULES:
           messages: [
             {
               role: "system",
-              content: `You analyze user interaction patterns to extract useful preferences and behavioral patterns. Return JSON (no markdown):
+              content: `${INTELLIGENCE_ENGINE_PREAMBLE}
+
+You analyze user interaction patterns to extract useful preferences and behavioral patterns for VANTABRAIN's memory system. Return JSON (no markdown):
 {
   "memories": [{"key": "short_key", "value": "what was learned", "category": "preference|style|timing|tone|workflow", "confidence": 0.5-1.0}],
-  "patterns": [{"type": "approval_trend|edit_pattern|timing_preference|rejection_reason|style_preference|platform_preference|content_preference|priority_preference|follow_up_pattern|escalation_preference", "description": "pattern observed", "confidence": 0.5-1.0}]
+  "patterns": [{"type": "approval_trend|edit_pattern|timing_preference|rejection_reason|style_preference|platform_preference|content_preference|priority_preference|follow_up_pattern|escalation_preference", "description": "pattern observed — be specific about what behavior was repeated", "confidence": 0.5-1.0}]
 }
-Only include genuinely useful insights from REPEATED behaviors. Do not form strong preferences from single actions. A preference should only be learned after multiple consistent signals. Existing memory keys to avoid duplicating: ${existingKeys.join(", ") || "none"}`
+RULES:
+- Only include genuinely useful insights from REPEATED behaviors
+- Do not form strong preferences from single actions — require at least 2 consistent signals
+- Each memory and pattern should be specific enough to inform future AI outputs
+- Existing memory keys to avoid duplicating: ${existingKeys.join(", ") || "none"}`
             },
             {
               role: "user",

@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { fetchBrainIntelligence, INTELLIGENCE_ENGINE_PREAMBLE } from "../_shared/brain-context.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -35,14 +36,23 @@ serve(async (req) => {
       });
     }
 
-    const { brandProfile, brainContext } = await req.json();
+    const { brandProfile, workspaceId } = await req.json();
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
-    }
+    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    const systemPrompt = `You are a social media strategist. Generate exactly 3 unique post ideas for a business. Return a JSON array using this exact schema (no markdown, no code fences, just raw JSON):
+    // Fetch full brain intelligence server-side
+    const brain = workspaceId
+      ? await fetchBrainIntelligence(supabase, workspaceId, "social-media-manager")
+      : { fullPromptBlock: "" };
+
+    const systemPrompt = `${INTELLIGENCE_ENGINE_PREAMBLE}
+
+ROLE: You are the Social Media Manager AI Employee.
+
+YOUR TASK: Generate exactly 3 unique post ideas. For EACH idea, you MUST include a "reasoning" field that explains WHY you chose this specific angle, platform, timing, or format — referencing specific memories, patterns, or business context when available.
+
+Return a JSON array (no markdown, no code fences, just raw JSON):
 [
   {
     "ideaTitle": "short title",
@@ -51,10 +61,19 @@ serve(async (req) => {
     "hook": "attention-grabbing opening line",
     "caption": "full caption draft (2-3 sentences)",
     "cta": "call to action",
-    "format": "carousel" or "single image" or "story" or "short post" or "video"
+    "format": "carousel" or "single image" or "story" or "short post" or "video",
+    "suggestedTime": "best time to post based on learned patterns or general best practice",
+    "reasoning": "plain English explanation of WHY this idea was chosen — reference specific patterns, memories, or business context"
   }
 ]
-Make each idea distinctly different in angle, platform, and format. Be specific to the business context provided.`;
+
+INTELLIGENCE RULES:
+- If the brain shows a timing preference pattern, use it and mention it in reasoning
+- If the brain shows preferred platforms, prioritize those
+- If the brain shows content style preferences (from past approvals/edits), match them
+- If the brain shows approval patterns for certain formats, favor those
+- Make each idea distinctly different in angle, platform, and format
+- Be specific to the business context provided`;
 
     const userPrompt = `Business: ${brandProfile.businessName || "My Business"}
 What they sell: ${brandProfile.offerType || "Professional services"}
@@ -62,7 +81,9 @@ Who they serve: ${brandProfile.targetAudience || "Small business owners"}
 Brand voice: ${brandProfile.brandVoice || "Professional yet approachable"}
 Content goals: ${brandProfile.contentGoals || "Increase engagement and awareness"}
 Content themes: ${(brandProfile.contentThemes || []).join(", ") || "Tips, updates, stories"}
-Preferred platforms: ${(brandProfile.preferredPlatforms || []).join(", ") || "Instagram, LinkedIn"}${brainContext ? `\n\n--- VANTABRAIN CONTEXT ---\n${brainContext}` : ""}`;
+Preferred platforms: ${(brandProfile.preferredPlatforms || []).join(", ") || "Instagram, LinkedIn"}
+
+${brain.fullPromptBlock ? `\n--- VANTABRAIN INTELLIGENCE ---\n${brain.fullPromptBlock}` : ""}`;
 
     const response = await fetch(
       "https://ai.gateway.lovable.dev/v1/chat/completions",
@@ -102,11 +123,9 @@ Preferred platforms: ${(brandProfile.preferredPlatforms || []).join(", ") || "In
 
     const data = await response.json();
     const content = data.choices?.[0]?.message?.content || "[]";
-    
-    // Parse the JSON from the response
+
     let ideas;
     try {
-      // Try to extract JSON from potential markdown code fences
       const jsonMatch = content.match(/\[[\s\S]*\]/);
       ideas = JSON.parse(jsonMatch ? jsonMatch[0] : content);
     } catch {
