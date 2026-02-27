@@ -96,7 +96,7 @@ const FeaturesPage = () => (
             <span className="h-2.5 w-2.5 rounded-full bg-destructive/60" />
             <span className="h-2.5 w-2.5 rounded-full bg-yellow-500/60" />
             <span className="h-2.5 w-2.5 rounded-full bg-green-500/60" />
-            <span className="ml-3 text-xs text-muted-foreground">Vantory Dashboard</span>
+            <span className="ml-3 text-xs text-muted-foreground">VANTORY Dashboard</span>
           </div>
           <div className="grid grid-cols-4 gap-4 p-6">
             {[

@@ -27,7 +27,7 @@ const Footer = () => {
       <div className="mx-auto grid max-w-7xl gap-10 md:grid-cols-4">
         <div className="md:col-span-2">
           <Link to="/" className="font-display text-xl font-bold tracking-tight text-foreground">
-            <span className="text-primary">Van</span>tory
+            <span className="text-primary">VAN</span>TORY
           </Link>
           <p className="mt-3 max-w-sm text-sm text-muted-foreground">
             Your first digital workers team that never sleep. Built for small businesses that need real help.
@@ -56,7 +56,7 @@ const Footer = () => {
       </div>
       <div className="mx-auto mt-10 max-w-7xl border-t border-border/30 pt-6">
         <p className="text-center text-xs text-muted-foreground">
-          © {new Date().getFullYear()} Vantory. All rights reserved.
+          © {new Date().getFullYear()} VANTORY. All rights reserved.
         </p>
       </div>
     </footer>

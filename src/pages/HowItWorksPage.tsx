@@ -25,7 +25,7 @@ const HowItWorksPage = () => (
       <div className="mx-auto max-w-7xl">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-20 text-center">
           <h1 className="font-display text-4xl font-bold text-foreground md:text-5xl">
-            How <span className="gradient-text">Vantory</span> Works
+            How <span className="gradient-text">VANTORY</span> Works
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-lg text-muted-foreground">
             Get your AI team up and running in minutes — no technical experience required.

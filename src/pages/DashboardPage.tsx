@@ -182,7 +182,7 @@ const DashboardPage = () => {
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <h3 className="font-display text-sm font-semibold text-foreground">VantaBrain</h3>
+                  <h3 className="font-display text-sm font-semibold text-foreground">VANTABRAIN</h3>
                   <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary">Intelligence</span>
                 </div>
                 <p className="mt-1 text-xs text-muted-foreground">
