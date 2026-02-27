@@ -158,9 +158,10 @@ const FeaturesPage = () => (
                     <h3 className="font-display text-base font-semibold text-foreground">{feat.title}</h3>
                     <p className="mt-1.5 text-sm text-muted-foreground">{feat.desc}</p>
                     <div className="mt-3 flex flex-wrap gap-2">
-                      {feat.items.map((item) => (
-                        <span key={item} className="rounded-full bg-secondary/80 px-2.5 py-0.5 text-[11px] text-muted-foreground/80">{item}</span>
-                      ))}
+                     {feat.items.map((item, idx) => {
+                        const pillColors = ["bg-primary/8 text-primary/60", "bg-accent-violet/8 text-accent-violet/60", "bg-accent-teal/8 text-accent-teal/60"];
+                        return <span key={item} className={`rounded-full px-2.5 py-0.5 text-[11px] ${pillColors[idx % pillColors.length]}`}>{item}</span>;
+                      })}
                     </div>
                   </div>
                 </motion.div>
@@ -183,9 +184,10 @@ const FeaturesPage = () => (
                   <h3 className="font-display text-base font-semibold text-foreground">{feat.title}</h3>
                   <p className="mt-2 text-sm text-muted-foreground">{feat.desc}</p>
                   <div className="mt-4 flex flex-wrap gap-2">
-                    {feat.items.map((item) => (
-                      <span key={item} className="rounded-full bg-secondary/80 px-2.5 py-0.5 text-[11px] text-muted-foreground/80">{item}</span>
-                    ))}
+                    {feat.items.map((item, idx) => {
+                      const pillColors = ["bg-primary/8 text-primary/60", "bg-accent-violet/8 text-accent-violet/60", "bg-accent-teal/8 text-accent-teal/60"];
+                      return <span key={item} className={`rounded-full px-2.5 py-0.5 text-[11px] ${pillColors[idx % pillColors.length]}`}>{item}</span>;
+                    })}
                   </div>
                 </motion.div>
               ))}

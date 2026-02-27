@@ -2,14 +2,14 @@ import { motion } from "framer-motion";
 import { Sparkles, Home, Scissors, Building2, Briefcase, Users2, Paintbrush, Wrench } from "lucide-react";
 
 const industries = [
-  { icon: Sparkles, name: "Med Spas" },
-  { icon: Home, name: "Realtors" },
-  { icon: Scissors, name: "Salons" },
-  { icon: Wrench, name: "Home Services" },
-  { icon: Building2, name: "Cleaning Companies" },
-  { icon: Paintbrush, name: "Local Agencies" },
-  { icon: Briefcase, name: "Consultants" },
-  { icon: Users2, name: "Small Service Businesses" },
+  { icon: Sparkles, name: "Med Spas", accent: "text-accent-violet" },
+  { icon: Home, name: "Realtors", accent: "text-accent-amber" },
+  { icon: Scissors, name: "Salons", accent: "text-accent-violet" },
+  { icon: Wrench, name: "Home Services", accent: "text-accent-teal" },
+  { icon: Building2, name: "Cleaning Companies", accent: "text-accent-teal" },
+  { icon: Paintbrush, name: "Local Agencies", accent: "text-accent-amber" },
+  { icon: Briefcase, name: "Consultants", accent: "text-accent-amber" },
+  { icon: Users2, name: "Small Service Businesses", accent: "text-primary" },
 ];
 
 const IndustriesSection = () => {
@@ -38,7 +38,7 @@ const IndustriesSection = () => {
               transition={{ duration: 0.4, delay: i * 0.05 }}
               className="card-glass flex flex-col items-center gap-3 rounded-xl px-4 py-6 text-center"
             >
-              <item.icon size={24} className="text-primary" />
+              <item.icon size={24} className={item.accent} />
               <span className="text-sm font-medium text-foreground">{item.name}</span>
             </motion.div>
           ))}

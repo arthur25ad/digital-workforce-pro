@@ -61,6 +61,9 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        "accent-violet": "hsl(var(--accent-violet))",
+        "accent-teal": "hsl(var(--accent-teal))",
+        "accent-amber": "hsl(var(--accent-amber))",
       },
       borderRadius: {
         lg: "var(--radius)",

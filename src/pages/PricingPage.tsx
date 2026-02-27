@@ -4,9 +4,9 @@ import { Check } from "lucide-react";
 import PageLayout from "@/components/PageLayout";
 
 const plans = [
-  { name: "Starter", price: "$49", period: "/mo", key: "Starter", description: "Good for solo operators", features: ["1 AI employee", "Basic workflows", "Email support", "Standard setup"], popular: false },
-  { name: "Growth", price: "$129", period: "/mo", key: "Growth", description: "Best for growing businesses", features: ["3 AI employees", "Multi-role support", "Priority setup", "Custom workflows", "Platform integrations"], popular: true },
-  { name: "Team", price: "$299", period: "/mo", key: "Team", description: "Best for operational scale", features: ["Full AI team", "Cross-functional workflows", "Dedicated support", "Advanced integrations", "Custom reporting"], popular: false },
+  { name: "Starter", price: "$64", period: "/mo", key: "Starter", description: "Good for solo operators", features: ["1 AI employee", "Basic workflows", "Email support", "Standard setup"], popular: false },
+  { name: "Growth", price: "$149", period: "/mo", key: "Growth", description: "Best for growing businesses", features: ["3 AI employees", "Multi-role support", "Priority setup", "Custom workflows", "Platform integrations"], popular: true },
+  { name: "Team", price: "$199", period: "/mo", key: "Team", description: "Best for operational scale", features: ["Full AI team", "Cross-functional workflows", "Dedicated support", "Advanced integrations", "Custom reporting"], popular: false },
 ];
 
 const PricingPage = () => (
