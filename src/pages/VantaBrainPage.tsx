@@ -55,9 +55,6 @@ const VantaBrainPage = () => {
 
         <div className="mx-auto max-w-5xl relative">
           <motion.div {...fadeUp} className="text-center mb-6">
-            <Link to="/dashboard" className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
-              <ArrowLeft size={14} /> Back to Dashboard
-            </Link>
 
             <div className="mt-4 flex justify-center">
               <div className="relative">
