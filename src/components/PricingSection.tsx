@@ -1,13 +1,17 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Check, Tag } from "lucide-react";
 import { Link } from "react-router-dom";
 import { PACKAGES, PACKAGE_ORDER } from "@/lib/packages";
-import { useActivePromos, getDiscountForPlan, applyDiscount } from "@/hooks/useActivePromos";
+import { useActivePromos, getDiscountForPlan, applyDiscount, type PromoCode } from "@/hooks/useActivePromos";
+import PromoCodeInput from "@/components/PromoCodeInput";
 
 const PricingSection = () => {
   const plans = PACKAGE_ORDER.map((key) => PACKAGES[key]);
   const { pricingPromos } = useActivePromos();
   const topPromo = pricingPromos[0] || null;
+  const [appliedPromo, setAppliedPromo] = useState<PromoCode | null>(null);
+  const activePromo = appliedPromo || topPromo;
 
   return (
     <section id="pricing" className="section-padding">
@@ -26,13 +30,22 @@ const PricingSection = () => {
           )}
         </motion.div>
 
+        {/* Promo code input */}
+        <div className="mx-auto max-w-xs mb-8">
+          <PromoCodeInput
+            onApply={setAppliedPromo}
+            onClear={() => setAppliedPromo(null)}
+            appliedPromo={appliedPromo}
+          />
+        </div>
+
         <div className="grid gap-6 md:grid-cols-3">
           {plans.map((plan, i) => {
             const isPopular = plan.key === "growth";
             const priceNum = parseInt(plan.price.replace("$", ""));
-            const discount = topPromo ? getDiscountForPlan(topPromo, plan.key) : 0;
+            const discount = activePromo ? getDiscountForPlan(activePromo, plan.key) : 0;
             const hasDiscount = discount > 0;
-            const discountedPrice = hasDiscount ? applyDiscount(priceNum, discount, topPromo!.discount_type) : priceNum;
+            const discountedPrice = hasDiscount ? applyDiscount(priceNum, discount, activePromo!.discount_type) : priceNum;
 
             return (
               <motion.div
@@ -59,7 +72,7 @@ const PricingSection = () => {
                     <span className="font-display text-4xl font-bold text-foreground">{plan.price}</span>
                   )}
                   <span className="text-sm text-muted-foreground">{plan.period}</span>
-                  {hasDiscount && topPromo?.first_billing_cycle_only && (
+                  {hasDiscount && activePromo?.first_billing_cycle_only && (
                     <p className="mt-1 text-xs text-emerald-400/70">First month only · then {plan.price}/mo</p>
                   )}
                   {plan.trialDays && (
