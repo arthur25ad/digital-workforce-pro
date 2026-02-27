@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useLocation } from "react-router-dom";
+import { useAppState } from "@/context/AppContext";
 
 const navLinks = [
   { label: "Features", href: "/features" },
@@ -15,6 +16,7 @@ const navLinks = [
 const Navbar = () => {
   const [open, setOpen] = useState(false);
   const location = useLocation();
+  const { state } = useAppState();
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
@@ -23,57 +25,40 @@ const Navbar = () => {
           <span className="text-primary">Van</span>tory
         </Link>
 
-        {/* Desktop */}
         <div className="hidden items-center gap-8 md:flex">
           {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              to={link.href}
+            <Link key={link.href} to={link.href}
               className={`text-sm transition-colors duration-200 hover:text-foreground ${
                 location.pathname === link.href ? "text-foreground" : "text-muted-foreground"
-              }`}
-            >
-              {link.label}
-            </Link>
+              }`}>{link.label}</Link>
           ))}
-          <Link to="/get-started" className="btn-glow inline-block text-sm">
-            Get Started
-          </Link>
+          {state.onboardingComplete ? (
+            <Link to="/dashboard" className="btn-glow inline-block text-sm">Dashboard</Link>
+          ) : (
+            <Link to="/get-started" className="btn-glow inline-block text-sm">Get Started</Link>
+          )}
         </div>
 
-        {/* Mobile toggle */}
-        <button
-          className="text-foreground md:hidden"
-          onClick={() => setOpen(!open)}
-          aria-label="Toggle menu"
-        >
+        <button className="text-foreground md:hidden" onClick={() => setOpen(!open)} aria-label="Toggle menu">
           {open ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
 
-      {/* Mobile menu */}
       <AnimatePresence>
         {open && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="overflow-hidden border-t border-border/50 bg-background/95 backdrop-blur-xl md:hidden"
-          >
+          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}
+            className="overflow-hidden border-t border-border/50 bg-background/95 backdrop-blur-xl md:hidden">
             <div className="flex flex-col gap-4 px-4 py-6">
               {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  to={link.href}
-                  className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-                  onClick={() => setOpen(false)}
-                >
+                <Link key={link.href} to={link.href} className="text-sm text-muted-foreground transition-colors hover:text-foreground" onClick={() => setOpen(false)}>
                   {link.label}
                 </Link>
               ))}
-              <Link to="/get-started" className="btn-glow mt-2 inline-block text-center text-sm" onClick={() => setOpen(false)}>
-                Get Started
-              </Link>
+              {state.onboardingComplete ? (
+                <Link to="/dashboard" className="btn-glow mt-2 inline-block text-center text-sm" onClick={() => setOpen(false)}>Dashboard</Link>
+              ) : (
+                <Link to="/get-started" className="btn-glow mt-2 inline-block text-center text-sm" onClick={() => setOpen(false)}>Get Started</Link>
+              )}
             </div>
           </motion.div>
         )}
