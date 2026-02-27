@@ -29,7 +29,7 @@ const roleDetails = [
       { icon: BarChart2, text: "Tracks performance & suggests improvements" },
       { icon: Target, text: "Generates content ideas from your niche" },
     ],
-    workflow: ["Content Ideas", "Draft & Edit", "Schedule", "Publish", "Analyze"],
+    metrics: [{ label: "Avg. Response", value: "< 2 min" }, { label: "Platforms", value: "5+" }, { label: "Accuracy", value: "96%" }],
   },
   {
     icon: Mail, label: "Email Marketing", ...roleColors.email, stat: "8", unit: "campaigns active", trend: "+15%",
@@ -41,7 +41,7 @@ const roleDetails = [
       { icon: Send, text: "Sends at optimal open-rate times" },
       { icon: Megaphone, text: "Creates promo & nurture sequences" },
     ],
-    workflow: ["Audience Segment", "Draft Copy", "A/B Test", "Send", "Report"],
+    metrics: [{ label: "Open Rate", value: "42%" }, { label: "Click Rate", value: "8.3%" }, { label: "Deliverability", value: "99%" }],
   },
   {
     icon: Headphones, label: "Customer Support", ...roleColors.support, stat: "47", unit: "replies drafted", trend: "+32%",
@@ -53,7 +53,7 @@ const roleDetails = [
       { icon: FileText, text: "References your policies & FAQs" },
       { icon: Bell, text: "Escalates critical issues to you" },
     ],
-    workflow: ["Ticket Received", "Classify", "Draft Reply", "Review", "Resolve"],
+    metrics: [{ label: "First Reply", value: "< 30s" }, { label: "Resolution", value: "94%" }, { label: "CSAT", value: "4.8/5" }],
   },
   {
     icon: CalendarCheck, label: "Calendar Assistant", ...roleColors.assistant, stat: "23", unit: "appointments managed", trend: "+18%",
@@ -65,7 +65,7 @@ const roleDetails = [
       { icon: RefreshCw, text: "Handles reschedules & cancellations" },
       { icon: Clock, text: "Detects scheduling conflicts" },
     ],
-    workflow: ["Request In", "Check Slots", "Confirm", "Remind", "Follow Up"],
+    metrics: [{ label: "No-Shows", value: "↓ 70%" }, { label: "Bookings", value: "Auto" }, { label: "Reminders", value: "Smart" }],
   },
 ];
 
@@ -247,27 +247,20 @@ const DashboardPreview = () => {
                         ))}
                       </div>
 
-                      {/* Workflow pipeline */}
-                      <div className="relative mt-6 rounded-xl border border-border/20 bg-background/20 px-4 py-3">
-                        <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/50 mb-2">Workflow</p>
-                        <div className="flex items-center gap-1">
-                          {role.workflow.map((step, si) => (
-                            <motion.div
-                              key={si}
-                              initial={{ opacity: 0, x: -8 }}
-                              animate={{ opacity: 1, x: 0 }}
-                              transition={{ delay: 0.2 + si * 0.1 }}
-                              className="flex items-center gap-1 flex-1 min-w-0"
-                            >
-                              <div className={`flex-1 rounded-md border ${role.border} bg-background/30 px-2 py-1.5 text-center`}>
-                                <span className="text-[10px] font-medium text-foreground/70 leading-tight block truncate">{step}</span>
-                              </div>
-                              {si < role.workflow.length - 1 && (
-                                <ArrowRight size={10} className="shrink-0 text-muted-foreground/30" />
-                              )}
-                            </motion.div>
-                          ))}
-                        </div>
+                      {/* Key metrics */}
+                      <div className="relative mt-6 grid grid-cols-3 gap-2">
+                        {role.metrics.map((m, mi) => (
+                          <motion.div
+                            key={mi}
+                            initial={{ opacity: 0, y: 6 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.25 + mi * 0.08 }}
+                            className={`rounded-lg border ${role.border} bg-background/30 px-3 py-2.5 text-center`}
+                          >
+                            <p className="font-display text-sm font-bold text-foreground">{m.value}</p>
+                            <p className="text-[10px] text-muted-foreground/60 mt-0.5">{m.label}</p>
+                          </motion.div>
+                        ))}
                       </div>
                     </div>
                   );
