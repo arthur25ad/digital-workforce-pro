@@ -14,13 +14,284 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      activity_logs: {
+        Row: {
+          created_at: string
+          id: string
+          message: string
+          type: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message: string
+          type: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string
+          type?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activity_logs_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      brand_profiles: {
+        Row: {
+          approval_required: boolean
+          brand_voice: string | null
+          business_summary: string | null
+          content_goals: string | null
+          content_themes: string[] | null
+          created_at: string
+          hashtags: string[] | null
+          id: string
+          offer_type: string | null
+          posting_frequency: string | null
+          preferred_platforms: string[] | null
+          target_audience: string | null
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          approval_required?: boolean
+          brand_voice?: string | null
+          business_summary?: string | null
+          content_goals?: string | null
+          content_themes?: string[] | null
+          created_at?: string
+          hashtags?: string[] | null
+          id?: string
+          offer_type?: string | null
+          posting_frequency?: string | null
+          preferred_platforms?: string[] | null
+          target_audience?: string | null
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          approval_required?: boolean
+          brand_voice?: string | null
+          business_summary?: string | null
+          content_goals?: string | null
+          content_themes?: string[] | null
+          created_at?: string
+          hashtags?: string[] | null
+          id?: string
+          offer_type?: string | null
+          posting_frequency?: string | null
+          preferred_platforms?: string[] | null
+          target_audience?: string | null
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brand_profiles_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      platform_connections: {
+        Row: {
+          account_name: string | null
+          connected: boolean
+          connected_at: string | null
+          created_at: string
+          id: string
+          last_synced_at: string | null
+          platform: string
+          status: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          account_name?: string | null
+          connected?: boolean
+          connected_at?: string | null
+          created_at?: string
+          id?: string
+          last_synced_at?: string | null
+          platform: string
+          status?: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          account_name?: string | null
+          connected?: boolean
+          connected_at?: string | null
+          created_at?: string
+          id?: string
+          last_synced_at?: string | null
+          platform?: string
+          status?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "platform_connections_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          active_package: string
+          active_workspace_id: string | null
+          created_at: string
+          email: string
+          full_name: string | null
+          id: string
+          purchase_date: string | null
+          renewal_date: string | null
+          subscription_status: string
+          unlocked_roles: string[]
+          updated_at: string
+        }
+        Insert: {
+          active_package?: string
+          active_workspace_id?: string | null
+          created_at?: string
+          email: string
+          full_name?: string | null
+          id: string
+          purchase_date?: string | null
+          renewal_date?: string | null
+          subscription_status?: string
+          unlocked_roles?: string[]
+          updated_at?: string
+        }
+        Update: {
+          active_package?: string
+          active_workspace_id?: string | null
+          created_at?: string
+          email?: string
+          full_name?: string | null
+          id?: string
+          purchase_date?: string | null
+          renewal_date?: string | null
+          subscription_status?: string
+          unlocked_roles?: string[]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      social_drafts: {
+        Row: {
+          caption: string | null
+          created_at: string
+          cta: string | null
+          format: string | null
+          hook: string | null
+          id: string
+          idea_title: string
+          platform: string
+          scheduled_date: string | null
+          status: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string
+          cta?: string | null
+          format?: string | null
+          hook?: string | null
+          id?: string
+          idea_title?: string
+          platform?: string
+          scheduled_date?: string | null
+          status?: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string
+          cta?: string | null
+          format?: string | null
+          hook?: string | null
+          id?: string
+          idea_title?: string
+          platform?: string
+          scheduled_date?: string | null
+          status?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "social_drafts_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspaces: {
+        Row: {
+          audience: string | null
+          brand_tone: string | null
+          business_name: string
+          created_at: string
+          goals: string | null
+          id: string
+          industry: string | null
+          updated_at: string
+          user_id: string
+          website: string | null
+        }
+        Insert: {
+          audience?: string | null
+          brand_tone?: string | null
+          business_name?: string
+          created_at?: string
+          goals?: string | null
+          id?: string
+          industry?: string | null
+          updated_at?: string
+          user_id: string
+          website?: string | null
+        }
+        Update: {
+          audience?: string | null
+          brand_tone?: string | null
+          business_name?: string
+          created_at?: string
+          goals?: string | null
+          id?: string
+          industry?: string | null
+          updated_at?: string
+          user_id?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_workspace_owner: { Args: { _workspace_id: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
