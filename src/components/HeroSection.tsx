@@ -24,7 +24,7 @@ const HeroSection = () => {
   const [demoOpen, setDemoOpen] = useState(false);
 
   return (
-    <section className="blue-ambient relative overflow-hidden pt-20 pb-16 md:pt-24 md:pb-20">
+    <section className="blue-ambient relative overflow-hidden pt-16 pb-16 md:pt-20 md:pb-20">
       <PromoBanner />
       <div className="mx-auto max-w-[1600px] px-6 md:px-12 lg:px-16">
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-20 xl:gap-28">
