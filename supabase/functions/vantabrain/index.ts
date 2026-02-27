@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { INTELLIGENCE_ENGINE_PREAMBLE } from "../_shared/brain-context.ts";
+import { INTELLIGENCE_ENGINE_PREAMBLE, fetchBrainSettings, DEFAULT_SETTINGS } from "../_shared/brain-context.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -39,7 +39,73 @@ serve(async (req) => {
     const body = await req.json();
     const { action } = body;
 
-    // ── GET CONTEXT: Fetch brain data for AI prompt enrichment ──
+    // ── GET SETTINGS ──
+    if (action === "get-settings") {
+      const { workspaceId } = body;
+      const settings = await fetchBrainSettings(supabase, workspaceId);
+      return new Response(JSON.stringify(settings), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // ── UPDATE SETTINGS ──
+    if (action === "update-settings") {
+      const { workspaceId, settings } = body;
+      
+      // Upsert settings
+      const { data: existing } = await supabase
+        .from("brain_settings")
+        .select("id")
+        .eq("workspace_id", workspaceId)
+        .maybeSingle();
+
+      if (existing) {
+        await supabase.from("brain_settings").update(settings).eq("workspace_id", workspaceId);
+      } else {
+        await supabase.from("brain_settings").insert({ workspace_id: workspaceId, ...settings });
+      }
+
+      return new Response(JSON.stringify({ success: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // ── CLEAR ROLE MEMORY ──
+    if (action === "clear-role-memory") {
+      const { workspaceId, roleScope } = body;
+
+      // Delete role-specific memories
+      await supabase
+        .from("brain_memories")
+        .delete()
+        .eq("workspace_id", workspaceId)
+        .eq("scope", roleScope);
+
+      // Deactivate role-specific patterns
+      await supabase
+        .from("brain_patterns")
+        .update({ is_active: false })
+        .eq("workspace_id", workspaceId)
+        .eq("role_scope", roleScope);
+
+      return new Response(JSON.stringify({ success: true, cleared: roleScope }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // ── CLEAR ALL MEMORY ──
+    if (action === "clear-all-memory") {
+      const { workspaceId } = body;
+
+      await supabase.from("brain_memories").delete().eq("workspace_id", workspaceId);
+      await supabase.from("brain_patterns").update({ is_active: false }).eq("workspace_id", workspaceId);
+
+      return new Response(JSON.stringify({ success: true, cleared: "all" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // ── GET CONTEXT ──
     if (action === "get-context") {
       const { workspaceId, roleScope } = body;
 
@@ -77,9 +143,31 @@ serve(async (req) => {
       });
     }
 
-    // ── RECORD INTERACTION: Log approval/edit/rejection ──
+    // ── RECORD INTERACTION ──
     if (action === "record-interaction") {
       const { workspaceId, roleScope, interactionType, actionTaken, originalContent, editedContent, metadata } = body;
+
+      // Check if learning is paused
+      const settings = await fetchBrainSettings(supabase, workspaceId);
+      
+      // Skip recording edits if learn_from_edits is off
+      if (interactionType === "edit" && !settings.learn_from_edits) {
+        return new Response(JSON.stringify({ success: true, skipped: "learning_from_edits_disabled" }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      // Skip recording approvals if learn_from_approvals is off
+      if (interactionType === "approval" && !settings.learn_from_approvals) {
+        return new Response(JSON.stringify({ success: true, skipped: "learning_from_approvals_disabled" }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      if (settings.learning_paused) {
+        return new Response(JSON.stringify({ success: true, skipped: "learning_paused" }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
 
       const { error: insertErr } = await supabase
         .from("brain_interactions")
@@ -100,15 +188,15 @@ serve(async (req) => {
       });
     }
 
-    // ── GET SUGGESTIONS: Generate adaptive suggestions from patterns ──
+    // ── GET SUGGESTIONS ──
     if (action === "get-suggestions") {
       const { workspaceId, roleScope } = body;
 
-      // Require minimum confidence & evidence for suggestions
+      const settings = await fetchBrainSettings(supabase, workspaceId);
+
       const MIN_CONFIDENCE = 0.55;
       const MIN_EVIDENCE = 2;
 
-      // Fetch qualifying patterns
       const { data: patterns } = await supabase
         .from("brain_patterns")
         .select("*")
@@ -120,7 +208,6 @@ serve(async (req) => {
         .order("confidence", { ascending: false })
         .limit(10);
 
-      // Fetch high-confidence memories
       const { data: memories } = await supabase
         .from("brain_memories")
         .select("*")
@@ -140,7 +227,13 @@ serve(async (req) => {
       const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
       if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-      const patternSummary = (patterns || []).map(
+      // Filter out timing patterns if user disabled timing suggestions
+      let filteredPatterns = patterns || [];
+      if (!settings.learn_timing_suggestions) {
+        filteredPatterns = filteredPatterns.filter((p: any) => p.pattern_type !== "timing_preference");
+      }
+
+      const patternSummary = filteredPatterns.map(
         (p: any) => `[${p.pattern_type}] ${p.description} (confidence: ${Math.round(p.confidence * 100)}%, evidence: ${p.evidence_count}x)`
       ).join("\n");
 
@@ -178,14 +271,15 @@ serve(async (req) => {
                     items: {
                       type: "object",
                       properties: {
-                        id: { type: "string", description: "Unique short ID for this suggestion (snake_case)" },
-                        message: { type: "string", description: "Natural language suggestion message, phrased as a helpful question. Max 120 chars." },
+                        id: { type: "string", description: "Unique short ID (snake_case)" },
+                        message: { type: "string", description: "Natural language suggestion that EXPLAINS WHY it is being made. Max 140 chars." },
                         category: { type: "string", enum: ["timing", "style", "platform", "workflow", "tone", "content", "priority"] },
-                        confidence: { type: "number", description: "How confident this suggestion is (0.5-1.0)" },
+                        confidence: { type: "number", description: "Confidence (0.5-1.0)" },
                         source_pattern_type: { type: "string", description: "The pattern type that drives this suggestion" },
-                        actionable_value: { type: "string", description: "The specific value being suggested (e.g. '5:00 PM', 'Instagram', 'concise tone')" },
+                        actionable_value: { type: "string", description: "The specific value being suggested" },
+                        reasoning: { type: "string", description: "Plain English explanation of WHY this is being suggested, referencing specific evidence. E.g. 'You approved 3 posts at 5 PM this week.'" },
                       },
-                      required: ["id", "message", "category", "confidence", "source_pattern_type", "actionable_value"],
+                      required: ["id", "message", "category", "confidence", "source_pattern_type", "actionable_value", "reasoning"],
                       additionalProperties: false,
                     },
                   },
@@ -205,12 +299,17 @@ You analyze learned behavioral patterns and memories for a ${roleScope} AI Emplo
 
 RULES:
 - Only suggest things with strong pattern evidence (multiple occurrences)
-- Phrase each suggestion as a friendly, helpful question that EXPLAINS WHY you're suggesting it (e.g. "You've approved posts at 5 PM three times in a row. Want to use that time again?")
+- Each suggestion MUST include a "reasoning" field that explains in plain English WHY this is being suggested, citing specific evidence counts and patterns
+- Example reasoning: "You've approved posts at 5 PM three times in a row — suggesting that time again."
+- Example reasoning: "Based on 4 similar refund cases where you used a gentle tone, recommending the same approach."
+- Phrase each suggestion as a friendly, helpful question
 - Reference the specific pattern or memory that drives each suggestion
 - Focus on: ${focusAreas}
 - Max 5 suggestions, only include genuinely useful ones
 - Each suggestion should feel earned through repeated behavior, not assumed from a single action
-- Confidence should reflect the strength of the underlying pattern`,
+- Confidence should reflect the strength of the underlying pattern
+- For low confidence (< 0.65), use softer language: "You might want to..." instead of "I recommend..."
+- ${settings.require_approval ? "IMPORTANT: All suggestions require user approval before being applied." : ""}`,
             },
             {
               role: "user",
@@ -233,14 +332,12 @@ RULES:
       const data = await response.json();
       let suggestions: any[] = [];
       
-      // Parse tool call response
       const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
       if (toolCall?.function?.arguments) {
         try {
           const parsed = JSON.parse(toolCall.function.arguments);
           suggestions = parsed.suggestions || [];
         } catch {
-          // fallback: try content
           const content = data.choices?.[0]?.message?.content || "{}";
           try {
             const jsonMatch = content.match(/\{[\s\S]*\}/);
@@ -255,12 +352,10 @@ RULES:
       });
     }
 
-    // ── SUGGESTION FEEDBACK: Accept/Reject/Edit strengthens or weakens patterns ──
+    // ── SUGGESTION FEEDBACK ──
     if (action === "suggestion-feedback") {
       const { workspaceId, roleScope, suggestionId, feedback, patternType, editedValue } = body;
-      // feedback: "accepted" | "rejected" | "edited" | "not_preferred"
 
-      // Record the interaction
       await supabase.from("brain_interactions").insert({
         workspace_id: workspaceId,
         role_scope: roleScope,
@@ -271,7 +366,6 @@ RULES:
         metadata: { suggestion_feedback: true, pattern_type: patternType, feedback },
       });
 
-      // Find matching patterns and adjust confidence
       if (patternType) {
         const { data: matchingPatterns } = await supabase
           .from("brain_patterns")
@@ -291,7 +385,6 @@ RULES:
             newConfidence = Math.min(1, pat.confidence + 0.02);
           }
 
-          // Deactivate if confidence drops too low
           if (newConfidence < 0.3) {
             await supabase.from("brain_patterns").update({ is_active: false, confidence: newConfidence }).eq("id", pat.id);
           } else {
@@ -305,9 +398,17 @@ RULES:
       });
     }
 
-    // ── LEARN: Analyze recent interactions and update memories/patterns ──
+    // ── LEARN ──
     if (action === "learn") {
       const { workspaceId, roleScope } = body;
+
+      // Check if learning is paused
+      const settings = await fetchBrainSettings(supabase, workspaceId);
+      if (settings.learning_paused) {
+        return new Response(JSON.stringify({ learned: false, reason: "Learning is paused" }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
 
       const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
       if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
@@ -321,7 +422,7 @@ RULES:
         .limit(20);
 
       if (!recentInteractions || recentInteractions.length < 3) {
-        return new Response(JSON.stringify({ learned: false, reason: "Not enough interactions yet" }), {
+        return new Response(JSON.stringify({ learned: false, reason: "Not enough interactions yet (minimum 3 required)" }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
@@ -339,6 +440,17 @@ RULES:
         `[${i.interaction_type}] ${i.action_taken}${i.edited_content ? ` | Edit: ${i.edited_content.slice(0, 200)}` : ""}`
       ).join("\n");
 
+      // Build learning constraints based on settings
+      const learningConstraints = [
+        !settings.learn_from_approvals ? "- Do NOT learn from approval actions" : "",
+        !settings.learn_from_edits ? "- Do NOT learn from edit actions" : "",
+        !settings.learn_timing_suggestions ? "- Do NOT learn timing preferences" : "",
+      ].filter(Boolean);
+
+      const constraintBlock = learningConstraints.length > 0
+        ? `\n\nUSER LEARNING CONSTRAINTS (respect these):\n${learningConstraints.join("\n")}`
+        : "";
+
       const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
         method: "POST",
         headers: {
@@ -355,13 +467,14 @@ RULES:
 You analyze user interaction patterns to extract useful preferences and behavioral patterns for VANTABRAIN's memory system. Return JSON (no markdown):
 {
   "memories": [{"key": "short_key", "value": "what was learned", "category": "preference|style|timing|tone|workflow", "confidence": 0.5-1.0}],
-  "patterns": [{"type": "approval_trend|edit_pattern|timing_preference|rejection_reason|style_preference|platform_preference|content_preference|priority_preference|follow_up_pattern|escalation_preference", "description": "pattern observed — be specific about what behavior was repeated", "confidence": 0.5-1.0}]
+  "patterns": [{"type": "approval_trend|edit_pattern|timing_preference|rejection_reason|style_preference|platform_preference|content_preference|priority_preference|follow_up_pattern|escalation_preference", "description": "pattern observed — be specific about what behavior was repeated and cite evidence count", "confidence": 0.5-1.0}]
 }
 RULES:
 - Only include genuinely useful insights from REPEATED behaviors
 - Do not form strong preferences from single actions — require at least 2 consistent signals
 - Each memory and pattern should be specific enough to inform future AI outputs
-- Existing memory keys to avoid duplicating: ${existingKeys.join(", ") || "none"}`
+- Every pattern description MUST cite evidence (e.g. "Approved 3 times", "Edited in 2 drafts")
+- Existing memory keys to avoid duplicating: ${existingKeys.join(", ") || "none"}${constraintBlock}`
             },
             {
               role: "user",
@@ -457,7 +570,7 @@ RULES:
       });
     }
 
-    // ── GET STATS: Return brain stats for dashboard ──
+    // ── GET STATS ──
     if (action === "get-stats") {
       const { workspaceId } = body;
 
