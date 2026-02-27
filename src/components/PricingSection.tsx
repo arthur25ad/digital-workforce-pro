@@ -27,7 +27,7 @@ const PricingSection = () => {
                 style={isPopular ? { boxShadow: "0 0 40px hsl(217 91% 60% / 0.1)" } : {}}
               >
                 {isPopular && (
-                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-primary px-4 py-1 text-xs font-semibold text-primary-foreground">Most Popular</span>
+                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full px-4 py-1 text-xs font-semibold" style={{ background: "hsl(38 80% 55%)", color: "hsl(225 25% 3%)" }}>Most Popular</span>
                 )}
                 <h3 className="font-display text-lg font-semibold text-foreground">{plan.name}</h3>
                 <p className="mt-1 text-sm text-muted-foreground">{plan.description}</p>

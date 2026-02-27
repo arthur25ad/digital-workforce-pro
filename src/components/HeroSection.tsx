@@ -14,7 +14,7 @@ const summaryItems = [
 const trustItems = [
   { icon: Clock, label: "24/7 Availability" },
   { icon: Users, label: "No Extra Headcount" },
-  { icon: Shield, label: "Built for Small Business" },
+  { icon: Shield, label: "Built for Small Businesses" },
   { icon: Zap, label: "Fast Setup" },
 ];
 
