@@ -5,8 +5,9 @@ import { useAuth } from "@/hooks/useAuth";
 import { useVantaBrainMemories, useVantaBrainStats, useVantaBrainActions } from "@/hooks/useVantaBrain";
 import {
   Brain, Sparkles, Trash2, Eye, EyeOff, TrendingUp,
-  Lightbulb, Clock, Shield, ArrowLeft, Zap, Database,
-  Activity, Network, BarChart3, Layers,
+  Lightbulb, Clock, Shield, Zap, Database,
+  Activity, Network, BarChart3, Layers, ArrowRight,
+  CheckCircle2, Globe, Lock, Cpu, Workflow,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -21,12 +22,207 @@ const categoryIcons: Record<string, any> = {
 };
 
 const fadeUp = {
-  initial: { opacity: 0, y: 20 },
+  initial: { opacity: 0, y: 24 },
   animate: { opacity: 1, y: 0 },
 };
 
-const VantaBrainPage = () => {
-  const { workspace } = useAuth();
+/* ═══════════════════════════════════════════════
+   PUBLIC / MARKETING VIEW
+   ═══════════════════════════════════════════════ */
+const PublicView = () => (
+  <>
+    {/* ── Massive Hero ── */}
+    <section className="relative overflow-hidden px-4 pt-32 pb-24 md:pt-40 md:pb-32 md:px-8">
+      {/* Multi-layer ambient glow */}
+      <div className="pointer-events-none absolute inset-0" style={{
+        background: "radial-gradient(ellipse 60% 45% at 50% 10%, hsl(280 70% 65% / 0.18), transparent)"
+      }} />
+      <div className="pointer-events-none absolute inset-0" style={{
+        background: "radial-gradient(ellipse 40% 30% at 50% 5%, hsl(280 80% 75% / 0.1), transparent)"
+      }} />
+
+      <div className="mx-auto max-w-5xl relative text-center">
+        {/* Brain Icon */}
+        <motion.div {...fadeUp} className="flex justify-center mb-10">
+          <div className="relative">
+            <div className="flex h-28 w-28 items-center justify-center rounded-[2rem] border border-border/50 bg-card md:h-32 md:w-32" style={{
+              boxShadow: "0 0 80px hsl(280 70% 65% / 0.25), 0 0 160px hsl(280 70% 65% / 0.1), inset 0 1px 0 hsl(0 0% 100% / 0.05)"
+            }}>
+              <Brain size={52} style={{ color: "hsl(280 70% 65%)" }} className="md:hidden" />
+              <Brain size={60} style={{ color: "hsl(280 70% 65%)" }} className="hidden md:block" />
+            </div>
+            <div className="absolute -right-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full border border-border/50 bg-card" style={{
+              boxShadow: "0 0 20px hsl(280 70% 65% / 0.3)"
+            }}>
+              <Zap size={14} style={{ color: "hsl(280 70% 65%)" }} />
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Title — massive */}
+        <motion.h1
+          {...fadeUp}
+          transition={{ delay: 0.08 }}
+          className="font-display text-6xl font-black tracking-tight md:text-8xl lg:text-9xl"
+          style={{
+            backgroundImage: "linear-gradient(135deg, hsl(280 70% 80%), hsl(280 70% 60%), hsl(0 0% 100% / 0.9), hsl(280 60% 55%))",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            backgroundClip: "text",
+          }}
+        >
+          VANTABRAIN
+        </motion.h1>
+
+        {/* Subtitle — large */}
+        <motion.p
+          {...fadeUp}
+          transition={{ delay: 0.14 }}
+          className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground md:text-xl lg:text-2xl leading-relaxed"
+        >
+          The intelligence layer that makes your entire AI team smarter.
+          VantaBrain learns how your business works — and remembers everything.
+        </motion.p>
+
+        {/* CTA */}
+        <motion.div {...fadeUp} transition={{ delay: 0.2 }} className="mt-10 flex justify-center gap-4">
+          <Link to="/auth" className="btn-glow inline-flex items-center gap-2 text-sm uppercase tracking-wide">
+            Get Started <ArrowRight size={16} />
+          </Link>
+          <Link to="/how-it-works" className="btn-outline-glow inline-flex items-center gap-2 text-sm uppercase tracking-wide">
+            How It Works
+          </Link>
+        </motion.div>
+      </div>
+    </section>
+
+    {/* ── What VantaBrain Does ── */}
+    <section className="px-4 pb-24 md:px-8">
+      <div className="mx-auto max-w-5xl">
+        <motion.div {...fadeUp} transition={{ delay: 0.1 }} className="text-center mb-16">
+          <h2 className="font-display text-3xl font-bold text-foreground md:text-4xl">
+            Your AI Team's <span style={{ color: "hsl(280 70% 65%)" }}>Shared Brain</span>
+          </h2>
+          <p className="mx-auto mt-4 max-w-xl text-muted-foreground text-base md:text-lg">
+            Every approval, edit, and decision trains VantaBrain. It becomes the memory that powers smarter outputs across all your AI Employees.
+          </p>
+        </motion.div>
+
+        {/* Feature Grid */}
+        <div className="grid md:grid-cols-3 gap-5">
+          {[
+            {
+              icon: Database,
+              title: "Persistent Memory",
+              desc: "VantaBrain remembers your brand voice, preferences, and patterns across every session. It never forgets.",
+            },
+            {
+              icon: Activity,
+              title: "Pattern Recognition",
+              desc: "Detects trends in how you approve, edit, and reject — then adapts to match your style automatically.",
+            },
+            {
+              icon: Network,
+              title: "Cross-Role Intelligence",
+              desc: "What one AI Employee learns, they all benefit from. Your Social Manager's insights sharpen your Email Marketer.",
+            },
+            {
+              icon: Shield,
+              title: "Human-Controlled",
+              desc: "VantaBrain suggests — you decide. Every high-impact action still requires your approval. Always.",
+            },
+            {
+              icon: Cpu,
+              title: "Gets Smarter Over Time",
+              desc: "The more you use Vantory, the better it gets. VantaBrain compounds your team's intelligence with every interaction.",
+            },
+            {
+              icon: Lock,
+              title: "Private & Secure",
+              desc: "Your brain is yours alone. Completely isolated per workspace. No data leaks across accounts — ever.",
+            },
+          ].map((f, i) => (
+            <motion.div
+              key={f.title}
+              {...fadeUp}
+              transition={{ delay: 0.05 * i }}
+              className="group rounded-2xl border border-border/40 bg-card p-6 transition-all duration-300 hover:border-border/60"
+              style={{ boxShadow: "0 0 0 0 transparent" }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLDivElement).style.boxShadow = "0 0 40px hsl(280 70% 65% / 0.08)";
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLDivElement).style.boxShadow = "0 0 0 0 transparent";
+              }}
+            >
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-border/40 bg-background mb-4">
+                <f.icon size={20} style={{ color: "hsl(280 70% 65%)" }} />
+              </div>
+              <h3 className="font-display text-base font-semibold text-foreground">{f.title}</h3>
+              <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{f.desc}</p>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    {/* ── How It Works ── */}
+    <section className="px-4 pb-24 md:px-8">
+      <div className="mx-auto max-w-5xl">
+        <motion.div {...fadeUp} className="rounded-2xl border border-border/40 bg-card p-8 md:p-10">
+          <div className="text-center mb-10">
+            <h2 className="font-display text-2xl font-bold text-foreground md:text-3xl">
+              Three Steps. Infinite Intelligence.
+            </h2>
+          </div>
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              { step: "01", title: "Observe", desc: "Every time you approve a draft, edit a reply, or schedule a post — VantaBrain is watching and learning.", icon: Eye },
+              { step: "02", title: "Learn", desc: "Patterns and preferences are extracted into persistent memory — your brand voice, timing, style, and more.", icon: Brain },
+              { step: "03", title: "Improve", desc: "Your AI Employees pull from VantaBrain before every action, delivering outputs that feel like you wrote them.", icon: Sparkles },
+            ].map((s) => (
+              <div key={s.step} className="text-center">
+                <span className="font-display text-5xl font-black tracking-tighter" style={{ color: "hsl(280 70% 65% / 0.2)" }}>{s.step}</span>
+                <div className="flex justify-center mt-3 mb-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-border/40 bg-background">
+                    <s.icon size={18} style={{ color: "hsl(280 70% 65%)" }} />
+                  </div>
+                </div>
+                <h3 className="font-display text-lg font-semibold text-foreground">{s.title}</h3>
+                <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{s.desc}</p>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      </div>
+    </section>
+
+    {/* ── Bottom CTA ── */}
+    <section className="px-4 pb-28 md:px-8">
+      <div className="mx-auto max-w-3xl text-center">
+        <motion.div {...fadeUp}>
+          <Brain size={32} className="mx-auto mb-4" style={{ color: "hsl(280 70% 65%)" }} />
+          <h2 className="font-display text-2xl font-bold text-foreground md:text-3xl">
+            Ready to build your AI's memory?
+          </h2>
+          <p className="mx-auto mt-3 max-w-md text-muted-foreground">
+            Start using Vantory and VantaBrain starts learning from day one. The longer you use it, the smarter it gets.
+          </p>
+          <div className="mt-8">
+            <Link to="/auth" className="btn-glow inline-flex items-center gap-2 text-sm uppercase tracking-wide">
+              Start Free <ArrowRight size={16} />
+            </Link>
+          </div>
+        </motion.div>
+      </div>
+    </section>
+  </>
+);
+
+/* ═══════════════════════════════════════════════
+   AUTHENTICATED / DASHBOARD VIEW
+   ═══════════════════════════════════════════════ */
+const AuthenticatedView = () => {
   const { stats, loading: statsLoading } = useVantaBrainStats();
   const { memories, patterns, loading, refresh } = useVantaBrainMemories();
   const { deleteMemory, deletePattern } = useVantaBrainActions();
@@ -45,54 +241,61 @@ const VantaBrainPage = () => {
   };
 
   return (
-    <PageLayout>
+    <>
       {/* ── Hero ── */}
-      <section className="relative overflow-hidden px-4 pt-28 pb-0 md:px-8">
-        {/* Ambient glow */}
+      <section className="relative overflow-hidden px-4 pt-32 pb-4 md:pt-36 md:px-8">
         <div className="pointer-events-none absolute inset-0" style={{
-          background: "radial-gradient(ellipse 70% 50% at 50% 0%, hsl(280 70% 65% / 0.12), transparent)"
+          background: "radial-gradient(ellipse 60% 45% at 50% 10%, hsl(280 70% 65% / 0.14), transparent)"
         }} />
 
-        <div className="mx-auto max-w-5xl relative">
-          <motion.div {...fadeUp} className="text-center mb-6">
-
-            <div className="mt-4 flex justify-center">
-              <div className="relative">
-                <div className="flex h-20 w-20 items-center justify-center rounded-3xl border border-border/50 bg-card" style={{
-                  boxShadow: "0 0 60px hsl(280 70% 65% / 0.2), 0 0 120px hsl(280 70% 65% / 0.08)"
-                }}>
-                  <Brain size={36} style={{ color: "hsl(280 70% 65%)" }} />
-                </div>
-                <div className="absolute -right-1 -top-1 flex h-6 w-6 items-center justify-center rounded-full border border-border/50 bg-card">
-                  <Zap size={12} style={{ color: "hsl(280 70% 65%)" }} />
-                </div>
+        <div className="mx-auto max-w-5xl relative text-center">
+          <motion.div {...fadeUp} className="flex justify-center mb-8">
+            <div className="relative">
+              <div className="flex h-24 w-24 items-center justify-center rounded-3xl border border-border/50 bg-card" style={{
+                boxShadow: "0 0 60px hsl(280 70% 65% / 0.2), 0 0 120px hsl(280 70% 65% / 0.08)"
+              }}>
+                <Brain size={44} style={{ color: "hsl(280 70% 65%)" }} />
+              </div>
+              <div className="absolute -right-1.5 -top-1.5 flex h-7 w-7 items-center justify-center rounded-full border border-border/50 bg-card" style={{
+                boxShadow: "0 0 16px hsl(280 70% 65% / 0.3)"
+              }}>
+                <Zap size={13} style={{ color: "hsl(280 70% 65%)" }} />
               </div>
             </div>
-
-            <h1 className="mt-6 font-display text-4xl font-bold tracking-tight md:text-5xl">
-              <span className="bg-clip-text text-transparent" style={{
-                backgroundImage: "linear-gradient(135deg, hsl(280 70% 75%), hsl(280 70% 55%), hsl(217 91% 70%))"
-              }}>VANTABRAIN</span>
-            </h1>
-            <p className="mx-auto mt-3 max-w-lg text-muted-foreground">
-              Your workspace intelligence layer. VantaBrain learns how your business operates and makes every AI Employee smarter over time.
-            </p>
           </motion.div>
+
+          <motion.h1
+            {...fadeUp}
+            transition={{ delay: 0.06 }}
+            className="font-display text-5xl font-black tracking-tight md:text-7xl"
+            style={{
+              backgroundImage: "linear-gradient(135deg, hsl(280 70% 80%), hsl(280 70% 60%), hsl(0 0% 100% / 0.9), hsl(280 60% 55%))",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+            }}
+          >
+            VANTABRAIN
+          </motion.h1>
+
+          <motion.p {...fadeUp} transition={{ delay: 0.1 }} className="mx-auto mt-4 max-w-lg text-muted-foreground text-base md:text-lg">
+            Your workspace intelligence — learning how your business operates and making every AI Employee smarter over time.
+          </motion.p>
         </div>
       </section>
 
-      {/* ── Dashboard ── */}
+      {/* ── Dashboard Content ── */}
       <section className="px-4 pb-20 md:px-8">
         <div className="mx-auto max-w-5xl">
 
           {/* Stats Row */}
-          <motion.div {...fadeUp} transition={{ delay: 0.1 }} className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-10">
+          <motion.div {...fadeUp} transition={{ delay: 0.14 }} className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-10 mt-10">
             {[
               { label: "Memories Stored", value: stats.totalMemories, icon: Database, desc: "Learned preferences" },
               { label: "Patterns Found", value: stats.totalPatterns, icon: Activity, desc: "Behavioral insights" },
               { label: "Interactions", value: stats.totalInteractions, icon: BarChart3, desc: "Actions tracked" },
               { label: "Connected Roles", value: 4, icon: Network, desc: "AI Employees" },
-            ].map((s, i) => (
+            ].map((s) => (
               <div key={s.label} className="group rounded-2xl border border-border/40 bg-card p-5 transition-all duration-300 hover:border-border/60">
                 <div className="flex items-center gap-2 mb-3">
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-card border border-border/40">
@@ -106,8 +309,8 @@ const VantaBrainPage = () => {
             ))}
           </motion.div>
 
-          {/* How VantaBrain Works */}
-          <motion.div {...fadeUp} transition={{ delay: 0.15 }} className="mb-10">
+          {/* How It Works */}
+          <motion.div {...fadeUp} transition={{ delay: 0.18 }} className="mb-10">
             <div className="rounded-2xl border border-border/40 bg-card p-6">
               <div className="flex items-center gap-2 mb-4">
                 <Layers size={16} style={{ color: "hsl(280 70% 65%)" }} />
@@ -133,11 +336,9 @@ const VantaBrainPage = () => {
             </div>
           </motion.div>
 
-          {/* Content Grid: Memories + Patterns side by side */}
+          {/* Memories + Patterns */}
           <div className="grid md:grid-cols-5 gap-4">
-
-            {/* Memories — wider panel */}
-            <motion.div {...fadeUp} transition={{ delay: 0.2 }} className="md:col-span-3">
+            <motion.div {...fadeUp} transition={{ delay: 0.22 }} className="md:col-span-3">
               <div className="rounded-2xl border border-border/40 bg-card p-6 h-full">
                 <div className="flex items-center justify-between mb-5">
                   <div className="flex items-center gap-2">
@@ -175,12 +376,7 @@ const VantaBrainPage = () => {
                               <span className="text-[10px] text-muted-foreground/60">{Math.round(m.confidence * 100)}%</span>
                             </div>
                           </div>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
-                            onClick={() => handleDeleteMemory(m.id)}
-                          >
+                          <Button variant="ghost" size="icon" className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" onClick={() => handleDeleteMemory(m.id)}>
                             <Trash2 size={13} className="text-muted-foreground" />
                           </Button>
                         </div>
@@ -191,8 +387,7 @@ const VantaBrainPage = () => {
               </div>
             </motion.div>
 
-            {/* Patterns — narrower side panel */}
-            <motion.div {...fadeUp} transition={{ delay: 0.25 }} className="md:col-span-2">
+            <motion.div {...fadeUp} transition={{ delay: 0.26 }} className="md:col-span-2">
               <div className="rounded-2xl border border-border/40 bg-card p-6 h-full">
                 <div className="flex items-center justify-between mb-5">
                   <div className="flex items-center gap-2">
@@ -235,12 +430,7 @@ const VantaBrainPage = () => {
                             </div>
                             <p className="text-[10px] text-muted-foreground/50 mt-1">{Math.round(p.confidence * 100)}% confidence</p>
                           </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-6 px-2 mt-2 opacity-0 group-hover:opacity-100 transition-opacity text-xs text-muted-foreground"
-                            onClick={() => handleDismissPattern(p.id)}
-                          >
+                          <Button variant="ghost" size="sm" className="h-6 px-2 mt-2 opacity-0 group-hover:opacity-100 transition-opacity text-xs text-muted-foreground" onClick={() => handleDismissPattern(p.id)}>
                             <Trash2 size={11} className="mr-1" /> Dismiss
                           </Button>
                         </div>
@@ -254,6 +444,19 @@ const VantaBrainPage = () => {
 
         </div>
       </section>
+    </>
+  );
+};
+
+/* ═══════════════════════════════════════════════
+   PAGE WRAPPER
+   ═══════════════════════════════════════════════ */
+const VantaBrainPage = () => {
+  const { user } = useAuth();
+
+  return (
+    <PageLayout>
+      {user ? <AuthenticatedView /> : <PublicView />}
     </PageLayout>
   );
 };
