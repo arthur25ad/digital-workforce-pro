@@ -5,14 +5,12 @@ import { Link } from "react-router-dom";
 import BookDemoModal from "./BookDemoModal";
 
 const summaryItems = [
-  { icon: Share2, text: "LinkedIn post performing 3x above average", color: "text-blue-400", bg: "bg-blue-500/10", status: "Trending" },
-  { icon: Mail, text: "Welcome drip sequence sent to 1,240 subscribers", color: "text-emerald-400", bg: "bg-emerald-500/10", status: "Sent" },
   { icon: Headphones, text: "Refund request resolved — customer rated 5★", color: "text-violet-400", bg: "bg-violet-500/10", status: "Resolved" },
-  { icon: CalendarCheck, text: "Weekly team report compiled & sent to inbox", color: "text-amber-400", bg: "bg-amber-500/10", status: "Done" },
-  { icon: Share2, text: "TikTok video scheduled for peak engagement hour", color: "text-blue-400", bg: "bg-blue-500/10", status: "Queued" },
-  { icon: Mail, text: "Abandoned cart recovery email — 12% conversion", color: "text-emerald-400", bg: "bg-emerald-500/10", status: "Active" },
-  { icon: Headphones, text: "Shipping delay responses auto-drafted for 8 tickets", color: "text-violet-400", bg: "bg-violet-500/10", status: "Review" },
+  { icon: Mail, text: "Appointment reminder emails sent to 86 clients", color: "text-emerald-400", bg: "bg-emerald-500/10", status: "Sent" },
+  { icon: Share2, text: "Google Business post published for weekend promo", color: "text-blue-400", bg: "bg-blue-500/10", status: "Live" },
   { icon: CalendarCheck, text: "3 client follow-ups sent before deadline", color: "text-amber-400", bg: "bg-amber-500/10", status: "Done" },
+  { icon: Headphones, text: "Late cancellation policy reply drafted for 4 clients", color: "text-violet-400", bg: "bg-violet-500/10", status: "Review" },
+  { icon: Mail, text: "Re-engagement email to 52 inactive customers", color: "text-emerald-400", bg: "bg-emerald-500/10", status: "Sent" },
 ];
 
 const trustItems = [

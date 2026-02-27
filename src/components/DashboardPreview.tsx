@@ -10,12 +10,12 @@ const roleColors = {
 };
 
 const activityRows = [
-  { icon: CheckCircle2, role: "support", roleIcon: Headphones, text: "Drafted 3 customer replies", status: "Done", statusColor: "text-emerald-400", statusBg: "bg-emerald-500/10", time: "2 min ago" },
-  { icon: CheckCircle2, role: "email", roleIcon: Mail, text: "Scheduled welcome email sequence", status: "Done", statusColor: "text-emerald-400", statusBg: "bg-emerald-500/10", time: "8 min ago" },
-  { icon: Clock4, role: "social", roleIcon: Share2, text: "Instagram carousel ready for approval", status: "Needs Review", statusColor: "text-blue-400", statusBg: "bg-blue-500/10", time: "15 min ago" },
-  { icon: CheckCircle2, role: "assistant", roleIcon: CalendarCheck, text: "Organized 5 tasks & set follow-ups", status: "Done", statusColor: "text-emerald-400", statusBg: "bg-emerald-500/10", time: "22 min ago" },
-  { icon: Clock4, role: "email", roleIcon: Mail, text: "Flash sale email awaiting approval", status: "Needs Review", statusColor: "text-amber-400", statusBg: "bg-amber-500/10", time: "35 min ago" },
-  { icon: ArrowRight, role: "social", roleIcon: Share2, text: "3 LinkedIn posts scheduled for tomorrow", status: "Queued", statusColor: "text-blue-300", statusBg: "bg-blue-500/10", time: "1h ago" },
+  { icon: CheckCircle2, role: "support", roleIcon: Headphones, text: "Answered pricing inquiry for new client consultation", status: "Done", statusColor: "text-emerald-400", statusBg: "bg-emerald-500/10", time: "3 min ago" },
+  { icon: CheckCircle2, role: "email", roleIcon: Mail, text: "Monthly newsletter sent to 310 local customers", status: "Sent", statusColor: "text-emerald-400", statusBg: "bg-emerald-500/10", time: "12 min ago" },
+  { icon: Clock4, role: "social", roleIcon: Share2, text: "Before & after photo post ready for approval", status: "Needs Review", statusColor: "text-blue-400", statusBg: "bg-blue-500/10", time: "18 min ago" },
+  { icon: CheckCircle2, role: "assistant", roleIcon: CalendarCheck, text: "Rescheduled 2 client appointments & notified them", status: "Done", statusColor: "text-emerald-400", statusBg: "bg-emerald-500/10", time: "25 min ago" },
+  { icon: Clock4, role: "email", roleIcon: Mail, text: "Holiday promo email draft awaiting your review", status: "Needs Review", statusColor: "text-amber-400", statusBg: "bg-amber-500/10", time: "40 min ago" },
+  { icon: ArrowRight, role: "social", roleIcon: Share2, text: "5-star review response posted to Google Business", status: "Done", statusColor: "text-emerald-400", statusBg: "bg-emerald-500/10", time: "1h ago" },
 ];
 
 const roleStats = [
