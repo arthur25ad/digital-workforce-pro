@@ -2,9 +2,11 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { useAppState } from "@/context/AppContext";
 import ConnectPlatformModal from "@/components/ConnectPlatformModal";
+import { generateCampaignDraft, generateSubjectVariations } from "@/lib/ai-generators";
+import { toast } from "@/hooks/use-toast";
 import {
   Check, ThumbsUp, X, Calendar, BarChart3, PenLine, Eye, Send,
-  MailOpen, Mail,
+  MailOpen, Mail, Loader2, Sparkles,
 } from "lucide-react";
 
 const emailPlatforms = [
@@ -16,14 +18,38 @@ const emailPlatforms = [
 ];
 
 const EmailMarketerDemo = () => {
-  const { state, isConnected, addConnection, removeConnection, updateCampaignStatus, setEmailStrategy } = useAppState();
+  const { state, isConnected, addConnection, removeConnection, updateCampaignStatus, setEmailStrategy, addEmailCampaign, updateCampaignSubjectVariations, setCampaignSubject } = useAppState();
   const [connectModal, setConnectModal] = useState<string | null>(null);
   const [demoStep, setDemoStep] = useState(0);
   const [foundation, setFoundation] = useState({ brand: state.preferences.businessName || "", audience: "", sells: "", tone: state.preferences.brandTone || "Professional", goals: "" });
   const [foundationSaved, setFoundationSaved] = useState(false);
   const [strategySaved, setStrategySaved] = useState(false);
+  const [generatingCampaign, setGeneratingCampaign] = useState(false);
+  const [generatingSubjects, setGeneratingSubjects] = useState<string | null>(null);
 
-  const tabs = ["Foundation", "Email Tools", "Strategy", "Review", "Performance"];
+  const tabs = ["Foundation", "Email Tools", "Strategy", "AI Actions", "Review", "Performance"];
+
+  const handleGenerateCampaign = () => {
+    setGeneratingCampaign(true);
+    setTimeout(() => {
+      const campaign = generateCampaignDraft(foundation.brand);
+      addEmailCampaign(campaign);
+      setGeneratingCampaign(false);
+      toast({ title: "Campaign draft created", description: `"${campaign.name}" added.` });
+    }, 1500);
+  };
+
+  const handleGenerateSubjects = (campaignId: string) => {
+    const campaign = state.emailCampaigns.find(c => c.id === campaignId);
+    if (!campaign) return;
+    setGeneratingSubjects(campaignId);
+    setTimeout(() => {
+      const variations = generateSubjectVariations(campaign.subject);
+      updateCampaignSubjectVariations(campaignId, variations);
+      setGeneratingSubjects(null);
+      toast({ title: "Subject variations ready" });
+    }, 1000);
+  };
 
   return (
     <>
@@ -37,7 +63,7 @@ const EmailMarketerDemo = () => {
       {demoStep === 0 && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
           <h3 className="font-display text-lg font-semibold text-foreground">Step 1: Explain Your Business</h3>
-          <p className="text-sm text-muted-foreground">Help your AI understand what you sell, who you serve, and how to write for your brand.</p>
+          <p className="text-sm text-muted-foreground">Help your AI understand what you sell and how to write for your brand.</p>
           {[
             { key: "brand", label: "Brand Name" },
             { key: "audience", label: "Target Audience" },
@@ -51,7 +77,7 @@ const EmailMarketerDemo = () => {
                 className="w-full rounded-lg border border-border bg-secondary px-4 py-2.5 text-sm text-foreground focus:border-primary/50 focus:outline-none" />
             </div>
           ))}
-          <button onClick={() => { setFoundationSaved(true); setTimeout(() => setDemoStep(1), 500); }} className="btn-glow text-sm">
+          <button onClick={() => { setFoundationSaved(true); toast({ title: "Saved" }); setTimeout(() => setDemoStep(1), 500); }} className="btn-glow text-sm">
             {foundationSaved ? <span className="flex items-center gap-1"><Check size={14} /> Saved</span> : "Save & Continue"}
           </button>
         </motion.div>
@@ -60,15 +86,16 @@ const EmailMarketerDemo = () => {
       {demoStep === 1 && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
           <h3 className="font-display text-lg font-semibold text-foreground">Step 2: Plug Your Email Tools</h3>
-          <p className="text-sm text-muted-foreground">Connect the platforms where you send and manage email campaigns.</p>
+          <p className="text-sm text-muted-foreground">Connect the platforms where you send campaigns.</p>
           <div className="space-y-3">
             {emailPlatforms.map((p) => {
               const connected = isConnected(p.name);
+              const conn = state.connections.find(c => c.platform === p.name);
               return (
                 <div key={p.name} className={`flex items-center justify-between rounded-xl border p-4 transition-all ${connected ? "border-primary/30 bg-primary/5" : "border-border/50 bg-card hover:border-primary/30"}`}>
                   <div className="flex items-center gap-3">
                     <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${connected ? "bg-primary/20 text-primary" : "bg-primary/10 text-primary"}`}><p.icon size={20} /></div>
-                    <div><p className="text-sm font-medium text-foreground">{p.name}</p><p className="text-xs text-muted-foreground">{connected ? "Connected" : "Not connected"}</p></div>
+                    <div><p className="text-sm font-medium text-foreground">{p.name}</p><p className="text-xs text-muted-foreground">{connected ? <span className="text-emerald-400">Connected · {conn?.accountName}</span> : "Not connected"}</p></div>
                   </div>
                   {connected ? <button onClick={() => removeConnection(p.name)} className="rounded-lg border border-border px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground">Disconnect</button>
                     : <button onClick={() => setConnectModal(p.name)} className="btn-glow !px-4 !py-1.5 text-xs">Connect</button>}
@@ -88,7 +115,7 @@ const EmailMarketerDemo = () => {
             { key: "campaignTypes", label: "Campaign Types", placeholder: "Newsletters, Promotions, Welcome series" },
             { key: "flows", label: "Flows / Automations", placeholder: "Welcome, Post-purchase, Re-engagement" },
             { key: "frequency", label: "Sending Frequency", placeholder: "Weekly newsletters, 2x monthly promos" },
-            { key: "segments", label: "Audience Segments", placeholder: "New subscribers, Active users, Inactive" },
+            { key: "segments", label: "Audience Segments", placeholder: "New subscribers, Active users" },
             { key: "kpis", label: "KPIs", placeholder: "Open rate, Click rate, Conversion" },
             { key: "offerTypes", label: "Offer Types", placeholder: "Discounts, Free trials, Early access" },
           ].map(({ key, label, placeholder }) => (
@@ -100,14 +127,31 @@ const EmailMarketerDemo = () => {
           ))}
           <div className="flex gap-3">
             <button onClick={() => setDemoStep(1)} className="btn-outline-glow text-sm">Back</button>
-            <button onClick={() => { setStrategySaved(true); setTimeout(() => setDemoStep(3), 500); }} className="btn-glow text-sm">
+            <button onClick={() => { setStrategySaved(true); toast({ title: "Strategy saved" }); setTimeout(() => setDemoStep(3), 400); }} className="btn-glow text-sm">
               {strategySaved ? <span className="flex items-center gap-1"><Check size={14} /> Saved</span> : "Save & Continue"}
             </button>
           </div>
         </motion.div>
       )}
 
+      {/* AI Actions */}
       {demoStep === 3 && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
+          <h3 className="font-display text-lg font-semibold text-foreground">AI Email Actions</h3>
+          <p className="text-sm text-muted-foreground">Generate campaign drafts and subject line variations.</p>
+
+          <button onClick={handleGenerateCampaign} disabled={generatingCampaign} className="btn-glow text-sm flex items-center gap-2">
+            {generatingCampaign ? <><Loader2 size={14} className="animate-spin" /> Generating...</> : <><Sparkles size={14} /> Generate Campaign Draft</>}
+          </button>
+
+          <div className="flex gap-3 mt-4">
+            <button onClick={() => setDemoStep(2)} className="btn-outline-glow text-sm">Back</button>
+            <button onClick={() => setDemoStep(4)} className="btn-glow text-sm">Review Campaigns</button>
+          </div>
+        </motion.div>
+      )}
+
+      {demoStep === 4 && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
           <h3 className="font-display text-lg font-semibold text-foreground">Step 4: Stay in Control</h3>
           <p className="text-sm text-muted-foreground">Review AI-drafted campaigns before they send.</p>
@@ -128,26 +172,45 @@ const EmailMarketerDemo = () => {
                   <p className="text-xs text-muted-foreground">To: <span className="text-foreground">{campaign.recipients}</span></p>
                   <p className="text-xs text-muted-foreground mt-2 whitespace-pre-line">{campaign.body}</p>
                 </div>
-                {(campaign.status === "draft" || campaign.status === "pending") && (
-                  <div className="flex gap-2">
-                    <button onClick={() => updateCampaignStatus(campaign.id, "approved")} className="flex items-center gap-1 rounded-lg bg-emerald-500/10 px-3 py-1.5 text-xs font-medium text-emerald-400 hover:bg-emerald-500/20"><ThumbsUp size={12} /> Approve</button>
-                    <button onClick={() => updateCampaignStatus(campaign.id, "scheduled")} className="flex items-center gap-1 rounded-lg bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary hover:bg-primary/20"><Calendar size={12} /> Schedule</button>
-                    <button onClick={() => updateCampaignStatus(campaign.id, "rejected")} className="flex items-center gap-1 rounded-lg bg-red-500/10 px-3 py-1.5 text-xs font-medium text-red-400 hover:bg-red-500/20"><X size={12} /> Reject</button>
+
+                {/* Subject variations */}
+                {campaign.subjectVariations && campaign.subjectVariations.length > 0 && (
+                  <div className="rounded-lg bg-primary/5 border border-primary/10 p-3 mb-3">
+                    <p className="text-xs text-primary/60 mb-2">Subject Variations — click to use:</p>
+                    <div className="space-y-1">
+                      {campaign.subjectVariations.map((v, i) => (
+                        <button key={i} onClick={() => { setCampaignSubject(campaign.id, v); toast({ title: "Subject updated" }); }}
+                          className="block w-full text-left rounded px-2 py-1 text-xs text-foreground hover:bg-primary/10 transition-colors">{v}</button>
+                      ))}
+                    </div>
                   </div>
                 )}
+
+                <div className="flex flex-wrap gap-2">
+                  {(campaign.status === "draft" || campaign.status === "pending") && (
+                    <>
+                      <button onClick={() => { updateCampaignStatus(campaign.id, "approved"); toast({ title: "Campaign approved" }); }} className="flex items-center gap-1 rounded-lg bg-emerald-500/10 px-3 py-1.5 text-xs font-medium text-emerald-400 hover:bg-emerald-500/20"><ThumbsUp size={12} /> Approve</button>
+                      <button onClick={() => updateCampaignStatus(campaign.id, "scheduled")} className="flex items-center gap-1 rounded-lg bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary hover:bg-primary/20"><Calendar size={12} /> Schedule</button>
+                      <button onClick={() => updateCampaignStatus(campaign.id, "rejected")} className="flex items-center gap-1 rounded-lg bg-red-500/10 px-3 py-1.5 text-xs font-medium text-red-400 hover:bg-red-500/20"><X size={12} /> Reject</button>
+                    </>
+                  )}
+                  <button onClick={() => handleGenerateSubjects(campaign.id)} disabled={generatingSubjects === campaign.id} className="flex items-center gap-1 rounded-lg bg-secondary px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground">
+                    {generatingSubjects === campaign.id ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />} Subject Variations
+                  </button>
+                </div>
               </div>
             ))}
           </div>
-          <div className="flex gap-3"><button onClick={() => setDemoStep(2)} className="btn-outline-glow text-sm">Back</button><button onClick={() => setDemoStep(4)} className="btn-glow text-sm">View Performance</button></div>
+          <div className="flex gap-3"><button onClick={() => setDemoStep(3)} className="btn-outline-glow text-sm">Back</button><button onClick={() => setDemoStep(5)} className="btn-glow text-sm">View Performance</button></div>
         </motion.div>
       )}
 
-      {demoStep === 4 && (
+      {demoStep === 5 && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
           <h3 className="font-display text-lg font-semibold text-foreground">Step 5: Review Performance</h3>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {[
-              { label: "Draft Campaigns", value: String(state.emailCampaigns.filter(c => c.status === "draft").length), icon: PenLine },
+              { label: "Campaigns", value: String(state.emailCampaigns.length), icon: PenLine },
               { label: "Scheduled", value: String(state.emailCampaigns.filter(c => c.status === "scheduled" || c.status === "approved").length), icon: Send },
               { label: "Open Rate", value: "24.3%", icon: Eye },
               { label: "Click Rate", value: "3.8%", icon: BarChart3 },
@@ -157,21 +220,12 @@ const EmailMarketerDemo = () => {
               </div>
             ))}
           </div>
-          <div className="rounded-xl border border-border/50 bg-card p-5">
-            <h4 className="mb-3 font-display text-sm font-semibold text-foreground">Performance Summary</h4>
-            <div className="space-y-2 text-sm text-muted-foreground">
-              <p>• Welcome series performing above benchmark (32% open rate)</p>
-              <p>• Re-engagement campaign ready for review</p>
-              <p>• 8 follow-ups queued for this week</p>
-              <p>• Recommendation: A/B test subject lines for newsletters</p>
-            </div>
-          </div>
           <button onClick={() => setDemoStep(0)} className="btn-outline-glow text-sm">Back to Foundation</button>
         </motion.div>
       )}
 
       <ConnectPlatformModal open={!!connectModal} onClose={() => setConnectModal(null)} platformName={connectModal || ""}
-        onConnect={(accountName) => { if (connectModal) addConnection({ platform: connectModal, accountName, connectedAt: new Date().toISOString() }); setConnectModal(null); }} />
+        onConnect={(accountName) => { if (connectModal) { addConnection({ platform: connectModal, accountName, connectedAt: new Date().toISOString() }); toast({ title: "Connected", description: `${connectModal} linked.` }); } setConnectModal(null); }} />
     </>
   );
 };
