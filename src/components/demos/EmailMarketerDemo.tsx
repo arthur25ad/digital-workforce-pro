@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import { useVantaBrainActions, useVantaBrainSuggestions } from "@/hooks/useVantaBrain";
 import SmartSuggestions from "@/components/SmartSuggestions";
 import { useEmailMarketingData } from "@/hooks/useEmailMarketingData";
@@ -56,16 +56,17 @@ const EmailMarketerDemo = () => {
   const [audienceForm, setAudienceForm] = useState({ list_name: "", audience_type: "general", estimated_size: 0 });
   const [showAudienceForm, setShowAudienceForm] = useState(false);
 
-  useState(() => {
-    if (brandProfile && !foundationDirty) {
-      setFoundationForm({
-        business_overview: brandProfile.business_overview || "", audience_description: brandProfile.audience_description || "",
-        brand_voice: brandProfile.brand_voice || "", offer_summary: brandProfile.offer_summary || "",
-        campaign_goals: brandProfile.campaign_goals || "", preferred_email_style: brandProfile.preferred_email_style || "",
-        frequency_preference: brandProfile.frequency_preference || "", keywords: brandProfile.keywords || "",
-      });
-    }
-  });
+  // Sync foundation form when brandProfile loads
+  const [foundationLoaded, setFoundationLoaded] = useState(false);
+  if (brandProfile && !foundationLoaded && !foundationDirty) {
+    setFoundationForm({
+      business_overview: brandProfile.business_overview || "", audience_description: brandProfile.audience_description || "",
+      brand_voice: brandProfile.brand_voice || "", offer_summary: brandProfile.offer_summary || "",
+      campaign_goals: brandProfile.campaign_goals || "", preferred_email_style: brandProfile.preferred_email_style || "",
+      frequency_preference: brandProfile.frequency_preference || "", keywords: brandProfile.keywords || "",
+    });
+    setFoundationLoaded(true);
+  }
 
   const tabs = [
     { label: "Foundation", icon: <Zap size={14} /> },
