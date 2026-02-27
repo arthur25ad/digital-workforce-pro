@@ -86,6 +86,14 @@ export function getPackageConfig(key: string): PackageConfig | undefined {
   return PACKAGES[key];
 }
 
+export function getPackageByPriceId(priceId: string): PackageConfig | undefined {
+  return Object.values(PACKAGES).find((pkg) => pkg.stripePriceId === priceId);
+}
+
+export function getPackageByProductId(productId: string): PackageConfig | undefined {
+  return Object.values(PACKAGES).find((pkg) => pkg.stripeProductId === productId);
+}
+
 export function getMaxSelectableRoles(packageKey: string): number {
   return PACKAGES[packageKey]?.maxRoles ?? 0;
 }
