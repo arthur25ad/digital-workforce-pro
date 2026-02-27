@@ -50,7 +50,7 @@ const PricingPage = () => {
 
       <section className="px-4 pb-24 md:px-8 md:pb-32">
         <div className="mx-auto max-w-[1200px]">
-          <div className="grid gap-8 md:grid-cols-3">
+          <div className="grid gap-8 lg:grid-cols-3">
             {plans.map((plan, i) => {
               const isCurrentPlan = profile?.active_package === plan.key;
               const isPopular = plan.key === "growth";

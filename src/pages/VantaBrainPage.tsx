@@ -116,7 +116,7 @@ const PublicView = () => (
             <h2 className="font-display text-center text-2xl font-bold text-foreground md:text-3xl mb-8">
               Three Steps. <span style={{ color: PURPLE }}>Infinite Intelligence.</span>
             </h2>
-            <div className="grid md:grid-cols-3 gap-6">
+            <div className="grid lg:grid-cols-3 gap-6">
               {[
                 { step: "01", title: "Observe", desc: "Every approval, edit, and action is quietly tracked across all your AI Employees.", icon: Eye },
                 { step: "02", title: "Learn", desc: "Repeated patterns become persistent memory — your voice, timing, style, and more.", icon: Brain },
@@ -139,7 +139,7 @@ const PublicView = () => (
 
         {/* Core capabilities — compact 2x3 grid */}
         <motion.div {...fadeUp} transition={{ delay: 0.12 }}>
-          <div className="grid md:grid-cols-3 gap-4">
+          <div className="grid lg:grid-cols-3 gap-4">
             {[
               { icon: Database, title: "Persistent Memory", desc: "Remembers your brand voice and preferences across every session." },
               { icon: Activity, title: "Pattern Recognition", desc: "Detects trends in how you approve, edit, and reject — then adapts." },
@@ -287,7 +287,7 @@ const AuthenticatedView = () => {
         <div className="mx-auto max-w-[1400px]">
 
           {/* Stats Row */}
-          <motion.div {...fadeUp} transition={{ delay: 0.1 }} className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8 mt-8">
+          <motion.div {...fadeUp} transition={{ delay: 0.1 }} className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8 mt-8">
             {[
               { label: "Memories", value: stats.totalMemories, icon: Database, desc: "Learned preferences" },
               { label: "Patterns", value: stats.totalPatterns, icon: Activity, desc: "Behavioral insights" },
@@ -317,7 +317,7 @@ const AuthenticatedView = () => {
               <p className="text-sm text-muted-foreground mb-4">
                 This is what VANTABRAIN currently understands about your business based on your workspace setup and usage patterns.
               </p>
-              <div className="grid md:grid-cols-3 gap-3">
+              <div className="grid lg:grid-cols-3 gap-3">
                 {memories.filter(m => m.scope === "shared").length > 0 ? (
                   memories.filter(m => m.scope === "shared").slice(0, 6).map((m) => (
                     <div key={m.id} className="rounded-xl border border-border/30 bg-background/50 p-3">
@@ -369,9 +369,9 @@ const AuthenticatedView = () => {
               </div>
 
               {/* Memories + Patterns side by side */}
-              <div className="grid md:grid-cols-5 gap-4">
+              <div className="grid lg:grid-cols-5 gap-4">
                 {/* Memories */}
-                <div className="md:col-span-3">
+                <div className="lg:col-span-3">
                   <div className="flex items-center gap-2 mb-3">
                     <Lightbulb size={14} style={{ color: PURPLE }} />
                     <h3 className="text-sm font-semibold text-foreground">Learned Preferences</h3>
@@ -473,7 +473,7 @@ const AuthenticatedView = () => {
           </motion.div>
 
           {/* ── Bottom row: Connected Context + Learning Controls + Recent Activity ── */}
-          <div className="grid md:grid-cols-3 gap-4">
+          <div className="grid lg:grid-cols-3 gap-4">
 
             {/* Connected Context */}
             <motion.div {...fadeUp} transition={{ delay: 0.22 }}>

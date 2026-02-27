@@ -168,7 +168,7 @@ const FeaturesPage = () => (
               ))}
             </div>
           ) : (
-            <div className={`grid gap-6 ${group.features.length === 2 ? "md:grid-cols-2" : "md:grid-cols-3"}`}>
+            <div className={`grid gap-6 ${group.features.length === 2 ? "lg:grid-cols-2" : "lg:grid-cols-3"}`}>
               {group.features.map((feat, fi) => (
                 <motion.div
                   key={feat.title}
