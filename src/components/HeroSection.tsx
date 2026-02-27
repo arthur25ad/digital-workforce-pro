@@ -1,14 +1,18 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { Shield, Users, Zap, Clock, CheckCircle2, Clock4, ArrowRight } from "lucide-react";
+import { Shield, Users, Zap, Clock, Share2, Mail, Headphones, CalendarCheck, TrendingUp } from "lucide-react";
 import { Link } from "react-router-dom";
 import BookDemoModal from "./BookDemoModal";
 
 const summaryItems = [
-  { icon: CheckCircle2, text: "3 customer replies sent", color: "text-[hsl(174,60%,50%)]" },
-  { icon: CheckCircle2, text: "1 email campaign drafted", color: "text-[hsl(174,60%,50%)]" },
-  { icon: Clock4, text: "1 social post needs approval", color: "text-[hsl(38,80%,55%)]" },
-  { icon: ArrowRight, text: "2 follow-ups scheduled today", color: "text-[hsl(262,60%,58%)]" },
+  { icon: Share2, text: "LinkedIn post performing 3x above average", color: "text-blue-400", bg: "bg-blue-500/10", status: "Trending" },
+  { icon: Mail, text: "Welcome drip sequence sent to 1,240 subscribers", color: "text-emerald-400", bg: "bg-emerald-500/10", status: "Sent" },
+  { icon: Headphones, text: "Refund request resolved — customer rated 5★", color: "text-violet-400", bg: "bg-violet-500/10", status: "Resolved" },
+  { icon: CalendarCheck, text: "Weekly team report compiled & sent to inbox", color: "text-amber-400", bg: "bg-amber-500/10", status: "Done" },
+  { icon: Share2, text: "TikTok video scheduled for peak engagement hour", color: "text-blue-400", bg: "bg-blue-500/10", status: "Queued" },
+  { icon: Mail, text: "Abandoned cart recovery email — 12% conversion", color: "text-emerald-400", bg: "bg-emerald-500/10", status: "Active" },
+  { icon: Headphones, text: "Shipping delay responses auto-drafted for 8 tickets", color: "text-violet-400", bg: "bg-violet-500/10", status: "Review" },
+  { icon: CalendarCheck, text: "3 client follow-ups sent before deadline", color: "text-amber-400", bg: "bg-amber-500/10", status: "Done" },
 ];
 
 const trustItems = [
@@ -43,23 +47,38 @@ const HeroSection = () => {
               <div className="mb-5 flex items-center justify-between">
                 <span className="font-display text-base font-semibold text-foreground">Today's AI Summary</span>
                 <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <span className="inline-block h-2 w-2 animate-pulse-glow rounded-full bg-green-500" />
+                  <span className="relative flex h-2 w-2">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
+                  </span>
                   Active now
                 </span>
               </div>
-              <div className="space-y-4">
+              <div className="space-y-2.5">
                 {summaryItems.map((item, i) => (
                   <motion.div
                     key={item.text}
                     initial={{ opacity: 0, x: 15 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.4, delay: 0.4 + i * 0.12 }}
-                    className="flex items-center gap-3 rounded-lg bg-secondary px-4 py-3"
+                    transition={{ duration: 0.4, delay: 0.4 + i * 0.1 }}
+                    className="flex items-center gap-3 rounded-xl bg-secondary/80 px-4 py-3"
                   >
-                    <item.icon size={18} className={`shrink-0 ${item.color}`} />
-                    <span className="text-sm text-foreground">{item.text}</span>
+                    <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${item.bg} ${item.color}`}>
+                      <item.icon size={14} />
+                    </div>
+                    <span className="flex-1 text-sm text-foreground">{item.text}</span>
+                    <span className={`hidden sm:inline-block shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium ${item.color} ${item.bg}`}>
+                      {item.status}
+                    </span>
                   </motion.div>
                 ))}
+              </div>
+              <div className="mt-4 flex items-center justify-between rounded-xl border border-border/20 bg-background/30 px-4 py-2.5">
+                <div className="flex items-center gap-2">
+                  <TrendingUp size={13} className="text-emerald-400" />
+                  <span className="text-[11px] text-muted-foreground"><span className="font-semibold text-foreground">34 hrs</span> saved this week</span>
+                </div>
+                <span className="text-[10px] text-muted-foreground/40">Updated just now</span>
               </div>
             </div>
           </motion.div>
