@@ -97,7 +97,7 @@ const DashboardPreview = () => {
   const [expandedCard, setExpandedCard] = useState<number | null>(null);
 
   return (
-    <section className="relative overflow-hidden pb-24 pt-4 md:pb-32 md:pt-8">
+    <section className="relative overflow-hidden pb-10 pt-4 md:pb-14 md:pt-8">
       {/* Ambient background effects */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute left-1/4 top-0 h-[600px] w-[600px] rounded-full opacity-20 blur-[120px]" style={{ background: "radial-gradient(circle, hsl(217 91% 60% / 0.3), transparent 70%)" }} />
