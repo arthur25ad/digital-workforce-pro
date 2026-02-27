@@ -27,7 +27,7 @@ const supportChannels = [
 
 const CustomerSupportDemo = () => {
   const { workspace } = useAuth();
-  const { getContext, recordInteraction } = useVantaBrainActions();
+  const { recordInteraction } = useVantaBrainActions();
   const { suggestions: brainSuggestions, loading: suggestionsLoading, sendFeedback } = useVantaBrainSuggestions("customer-support");
   const {
     knowledgeBase, knowledgeItems, tickets, drafts, connections, activities, loading,
@@ -93,8 +93,7 @@ const CustomerSupportDemo = () => {
   const handleGenerateReply = async (ticket: SupportTicket) => {
     setGeneratingReply(ticket.id);
     try {
-      const brainContext = await getContext("customer-support");
-      const { data, error } = await supabase.functions.invoke("generate-support-reply", { body: { ticket, knowledgeBase, knowledgeItems, brainContext } });
+      const { data, error } = await supabase.functions.invoke("generate-support-reply", { body: { ticket, knowledgeBase, knowledgeItems, workspaceId: workspace?.id } });
       if (error) throw error;
       if (data?.error) { toast({ title: "AI Error", description: data.error, variant: "destructive" }); return; }
       const reply = data.reply;

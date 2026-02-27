@@ -34,8 +34,8 @@ const EmailMarketerDemo = () => {
     connectSender, disconnectSender, isSenderConnected, getSenderConnection,
     logActivity,
   } = useEmailMarketingData();
-  const { session } = useAuth();
-  const { getContext, recordInteraction } = useVantaBrainActions();
+  const { session, workspace } = useAuth();
+  const { recordInteraction } = useVantaBrainActions();
   const { suggestions: brainSuggestions, loading: suggestionsLoading, sendFeedback } = useVantaBrainSuggestions("email-marketer");
 
   const [activeTab, setActiveTab] = useState(0);
@@ -84,8 +84,7 @@ const EmailMarketerDemo = () => {
     const campaign = campaigns.find(c => c.id === campaignId); if (!campaign) return;
     setGenerating(true);
     try {
-      const brainContext = await getContext("email-marketer");
-      const { data, error } = await supabase.functions.invoke("generate-email-draft", { body: { brandProfile, campaign, count: 3, brainContext } });
+      const { data, error } = await supabase.functions.invoke("generate-email-draft", { body: { brandProfile, campaign, count: 3, workspaceId: workspace?.id } });
       if (error) throw error;
       for (const d of (data?.drafts || [])) { await addDraft({ campaign_id: campaignId, subject_line: d.subjectLine || "", preview_text: d.previewText || "", body_copy: d.bodyCopy || "", call_to_action: d.callToAction || "", email_type: d.emailType || "promotional" }); }
       toast({ title: `${(data?.drafts || []).length} email draft(s) generated` });

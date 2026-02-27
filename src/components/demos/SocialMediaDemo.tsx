@@ -30,7 +30,7 @@ const SocialMediaDemo = () => {
   const { workspace, brandProfile, updateBrandProfile, updateWorkspace } = useAuth();
   const { drafts, isConnected, getConnection, connectPlatform, disconnectPlatform, addDraft, updateDraftStatus, updateDraftSchedule, logActivity, activities } = useWorkspaceData();
   const [connectModal, setConnectModal] = useState<string | null>(null);
-  const { getContext, recordInteraction } = useVantaBrainActions();
+  const { recordInteraction } = useVantaBrainActions();
   const { suggestions: brainSuggestions, loading: suggestionsLoading, sendFeedback } = useVantaBrainSuggestions("social-media-manager");
   const [activeTab, setActiveTab] = useState(0);
   const [generating, setGenerating] = useState(false);
@@ -75,9 +75,8 @@ const SocialMediaDemo = () => {
   const handleGenerateIdeas = async () => {
     setGenerating(true);
     try {
-      const brainContext = await getContext("social-media-manager");
       const { data, error } = await supabase.functions.invoke("generate-social-ideas", {
-        body: { brainContext, brandProfile: { businessName: brain.businessName || workspace?.business_name, offerType: brain.offerType || brandProfile?.offer_type, targetAudience: brain.targetAudience || brandProfile?.target_audience, brandVoice: brain.brandVoice || brandProfile?.brand_voice, contentGoals: brain.contentGoals || brandProfile?.content_goals, contentThemes: brain.contentThemes.split(",").map(s => s.trim()).filter(Boolean), preferredPlatforms: brain.preferredPlatforms } },
+        body: { workspaceId: workspace?.id, brandProfile: { businessName: brain.businessName || workspace?.business_name, offerType: brain.offerType || brandProfile?.offer_type, targetAudience: brain.targetAudience || brandProfile?.target_audience, brandVoice: brain.brandVoice || brandProfile?.brand_voice, contentGoals: brain.contentGoals || brandProfile?.content_goals, contentThemes: brain.contentThemes.split(",").map(s => s.trim()).filter(Boolean), preferredPlatforms: brain.preferredPlatforms } },
       });
       if (error) throw error;
       if (data?.error) { toast({ title: "AI Error", description: data.error, variant: "destructive" }); }
