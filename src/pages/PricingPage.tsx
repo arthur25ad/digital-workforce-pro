@@ -130,7 +130,7 @@ const PricingPage = () => {
                     {plan.trialDays && (
                       <p className="mt-3 flex items-center gap-2 text-base font-semibold text-emerald-400">
                         <Check size={20} className="text-emerald-400" />
-                        {plan.trialDays}-day free trial · auto-bills after
+                        {plan.trialDays}-day free trial
                       </p>
                     )}
                   </div>
