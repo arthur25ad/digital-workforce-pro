@@ -36,7 +36,7 @@ const PricingPage = () => {
   return (
     <PageLayout>
       <section className="section-padding blue-ambient pb-12 md:pb-16">
-        <div className="mx-auto max-w-7xl">
+        <div className="mx-auto max-w-[1600px]">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center">
             <h1 className="font-display text-4xl font-bold text-foreground md:text-5xl">
               Simple Pricing for Your <span className="gradient-text">Digital Team</span>
@@ -49,7 +49,7 @@ const PricingPage = () => {
       </section>
 
       <section className="px-4 pb-24 md:px-8 md:pb-32">
-        <div className="mx-auto max-w-5xl">
+        <div className="mx-auto max-w-[1200px]">
           <div className="grid gap-8 md:grid-cols-3">
             {plans.map((plan, i) => {
               const isCurrentPlan = profile?.active_package === plan.key;

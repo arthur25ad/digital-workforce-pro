@@ -61,7 +61,7 @@ const AIEmployeeDetailPage = () => {
     <PageLayout>
       {/* Hero */}
       <section className="blue-ambient px-4 md:px-8 pt-20 pb-12 md:pt-28 md:pb-16">
-        <div className="mx-auto max-w-4xl text-center">
+        <div className="mx-auto max-w-[1200px] text-center">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary"><Icon size={28} /></div>
             <h1 className="font-display text-3xl font-bold text-foreground md:text-4xl">{role.title}</h1>
@@ -98,7 +98,7 @@ const AIEmployeeDetailPage = () => {
         </section>
       ) : user && hasAccess ? (
         <section className="px-4 md:px-8 py-10 md:py-14">
-          <div className="mx-auto max-w-5xl">
+          <div className="mx-auto max-w-[1400px]">
             <Demo />
           </div>
         </section>
@@ -112,7 +112,7 @@ const AIEmployeeDetailPage = () => {
 
       {/* What This AI Can Do */}
       <section className="blue-ambient-bottom px-4 md:px-8 py-16 md:py-20">
-        <div className="mx-auto max-w-5xl">
+        <div className="mx-auto max-w-[1400px]">
           <h2 className="font-display text-2xl font-bold text-foreground md:text-3xl mb-6">What This AI Can Do</h2>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {role.capabilities.map(cap => (

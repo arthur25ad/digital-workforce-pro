@@ -97,7 +97,7 @@ const DashboardPage = () => {
   return (
     <PageLayout>
       <section className="px-4 pt-28 pb-20 md:px-8">
-        <div className="mx-auto max-w-5xl">
+        <div className="mx-auto max-w-[1400px]">
 
           {/* ── Welcome header ── */}
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="mb-12">
