@@ -26,8 +26,13 @@ const Footer = () => {
     <footer className="border-t border-border/40 bg-background px-4 py-12 md:px-8">
       <div className="mx-auto grid max-w-7xl gap-10 md:grid-cols-4">
         <div className="md:col-span-2">
-          <Link to="/" className="font-display text-xl font-bold tracking-tight text-foreground">
-            <span className="text-primary">VAN</span>TORY
+          <Link to="/" className="font-display text-xl font-bold tracking-tight">
+            <span style={{
+              backgroundImage: "linear-gradient(135deg, hsl(217 91% 70%), hsl(217 91% 55%), hsl(0 0% 100% / 0.9), hsl(217 80% 50%))",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+            }}>VANTORY</span>
           </Link>
           <p className="mt-3 max-w-sm text-sm text-muted-foreground">
             AI Employees that work while you sleep. Built for small businesses that need real help.

@@ -28,8 +28,13 @@ const Navbar = () => {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 md:px-8">
-        <Link to="/" className="font-display text-xl font-bold tracking-tight text-foreground">
-          <span className="text-primary">VAN</span>TORY
+        <Link to="/" className="font-display text-xl font-bold tracking-tight">
+          <span style={{
+            backgroundImage: "linear-gradient(135deg, hsl(217 91% 70%), hsl(217 91% 55%), hsl(0 0% 100% / 0.9), hsl(217 80% 50%))",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            backgroundClip: "text",
+          }}>VANTORY</span>
         </Link>
 
         <div className="hidden items-center gap-8 md:flex">
