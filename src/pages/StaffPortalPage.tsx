@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { Shield, DollarSign, Tag, Megaphone, LifeBuoy, Users, TrendingUp, RefreshCw, Plus, Trash2, ToggleLeft, ToggleRight, ArrowLeft, Eye, EyeOff, Clock } from "lucide-react";
+import { Shield, DollarSign, Tag, Megaphone, LifeBuoy, Users, TrendingUp, RefreshCw, Plus, Trash2, ToggleLeft, ToggleRight, ArrowLeft, Eye, EyeOff, Clock, Pencil, X, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -46,6 +46,8 @@ const StaffPortalPage = () => {
   const [promoTeamDiscount, setPromoTeamDiscount] = useState("");
   const [promoFirstCycleOnly, setPromoFirstCycleOnly] = useState(false);
   const [creatingPromo, setCreatingPromo] = useState(false);
+  const [editingPromoId, setEditingPromoId] = useState<string | null>(null);
+  const [editForm, setEditForm] = useState<any>({});
 
   const verifyAccess = useCallback(async () => {
     try {
@@ -149,6 +151,50 @@ const StaffPortalPage = () => {
     await callAction("delete-promo", { id });
     toast({ title: "Promo deleted" });
     fetchData();
+  };
+
+  const startEditPromo = (p: any) => {
+    setEditingPromoId(p.id);
+    setEditForm({
+      label: p.label || "",
+      discount_type: p.discount_type || "percentage",
+      discount_value: p.discount_value?.toString() || "0",
+      description: p.description || "",
+      max_uses: p.max_uses?.toString() || "",
+      starter_discount: p.starter_discount?.toString() || "0",
+      growth_discount: p.growth_discount?.toString() || "0",
+      team_discount: p.team_discount?.toString() || "0",
+      first_billing_cycle_only: p.first_billing_cycle_only || false,
+      is_visible_on_homepage: p.is_visible_on_homepage || false,
+      is_visible_on_pricing: p.is_visible_on_pricing || false,
+      is_private: p.is_private || false,
+    });
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editingPromoId) return;
+    try {
+      await callAction("update-promo", {
+        id: editingPromoId,
+        label: editForm.label,
+        discount_type: editForm.discount_type,
+        discount_value: parseFloat(editForm.discount_value) || 0,
+        description: editForm.description,
+        max_uses: editForm.max_uses ? parseInt(editForm.max_uses) : null,
+        starter_discount: parseFloat(editForm.starter_discount) || 0,
+        growth_discount: parseFloat(editForm.growth_discount) || 0,
+        team_discount: parseFloat(editForm.team_discount) || 0,
+        first_billing_cycle_only: editForm.first_billing_cycle_only,
+        is_visible_on_homepage: editForm.is_visible_on_homepage,
+        is_visible_on_pricing: editForm.is_visible_on_pricing,
+        is_private: editForm.is_private,
+      });
+      toast({ title: "Promo updated" });
+      setEditingPromoId(null);
+      fetchData();
+    } catch {
+      toast({ title: "Failed to update promo", variant: "destructive" });
+    }
   };
 
   const handleUpdateTicketStatus = async (id: string, status: string) => {
@@ -370,54 +416,133 @@ const StaffPortalPage = () => {
                   <div className="space-y-3">
                     {data.promo_codes.map((p: any) => (
                       <div key={p.id} className="py-3 px-4 rounded-lg bg-muted/20 border border-border/30 space-y-2">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3 flex-wrap">
-                            <Badge variant={p.is_active ? "default" : "secondary"} className="text-[10px] font-mono">{p.code}</Badge>
-                            <span className="text-sm text-muted-foreground">
-                              {p.discount_type === "percentage" ? `${p.discount_value}% off` : `$${p.discount_value} off`}
-                            </span>
-                            {p.label && <span className="text-xs text-muted-foreground">— {p.label}</span>}
-                            {p.first_billing_cycle_only && (
-                              <Badge variant="outline" className="text-[9px] border-amber-500/40 text-amber-400"><Clock size={10} className="mr-1" />1st month only</Badge>
-                            )}
+                        {editingPromoId === p.id ? (
+                          /* ---- EDIT MODE ---- */
+                          <div className="space-y-3">
+                            <div className="flex items-center justify-between">
+                              <Badge variant="default" className="text-[10px] font-mono">{p.code}</Badge>
+                              <div className="flex gap-1">
+                                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setEditingPromoId(null)}><X size={14} /></Button>
+                                <Button variant="default" size="sm" className="h-7 text-[11px] px-2 gap-1" onClick={handleSaveEdit}><Save size={12} />Save</Button>
+                              </div>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                              <div>
+                                <Label className="text-[10px] text-muted-foreground mb-0.5 block">Banner headline</Label>
+                                <Input className="h-8 text-xs" value={editForm.label} onChange={(e) => setEditForm({ ...editForm, label: e.target.value })} />
+                              </div>
+                              <div>
+                                <Label className="text-[10px] text-muted-foreground mb-0.5 block">Internal note</Label>
+                                <Input className="h-8 text-xs" value={editForm.description} onChange={(e) => setEditForm({ ...editForm, description: e.target.value })} />
+                              </div>
+                              <div>
+                                <Label className="text-[10px] text-muted-foreground mb-0.5 block">Max uses</Label>
+                                <Input className="h-8 text-xs" type="number" value={editForm.max_uses} onChange={(e) => setEditForm({ ...editForm, max_uses: e.target.value })} placeholder="Unlimited" />
+                              </div>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                              <div>
+                                <Label className="text-[10px] text-muted-foreground mb-0.5 block">Discount type</Label>
+                                <Select value={editForm.discount_type} onValueChange={(v) => setEditForm({ ...editForm, discount_type: v })}>
+                                  <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="percentage">Percentage (%)</SelectItem>
+                                    <SelectItem value="fixed">Fixed ($)</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <div>
+                                <Label className="text-[10px] text-muted-foreground mb-0.5 block">Discount amount</Label>
+                                <Input className="h-8 text-xs" type="number" value={editForm.discount_value} onChange={(e) => setEditForm({ ...editForm, discount_value: e.target.value })} />
+                              </div>
+                            </div>
+                            <div className="grid grid-cols-3 gap-2">
+                              <div>
+                                <Label className="text-[10px] text-muted-foreground mb-0.5 block">Starter override</Label>
+                                <Input className="h-8 text-xs" type="number" value={editForm.starter_discount} onChange={(e) => setEditForm({ ...editForm, starter_discount: e.target.value })} />
+                              </div>
+                              <div>
+                                <Label className="text-[10px] text-muted-foreground mb-0.5 block">Growth override</Label>
+                                <Input className="h-8 text-xs" type="number" value={editForm.growth_discount} onChange={(e) => setEditForm({ ...editForm, growth_discount: e.target.value })} />
+                              </div>
+                              <div>
+                                <Label className="text-[10px] text-muted-foreground mb-0.5 block">Team override</Label>
+                                <Input className="h-8 text-xs" type="number" value={editForm.team_discount} onChange={(e) => setEditForm({ ...editForm, team_discount: e.target.value })} />
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-4 flex-wrap">
+                              <div className="flex items-center gap-1.5">
+                                <Switch checked={editForm.is_visible_on_homepage} onCheckedChange={(v) => setEditForm({ ...editForm, is_visible_on_homepage: v })} className="scale-75" />
+                                <span className="text-[10px]">Homepage</span>
+                              </div>
+                              <div className="flex items-center gap-1.5">
+                                <Switch checked={editForm.is_visible_on_pricing} onCheckedChange={(v) => setEditForm({ ...editForm, is_visible_on_pricing: v })} className="scale-75" />
+                                <span className="text-[10px]">Pricing</span>
+                              </div>
+                              <div className="flex items-center gap-1.5">
+                                <Switch checked={editForm.is_private} onCheckedChange={(v) => setEditForm({ ...editForm, is_private: v })} className="scale-75" />
+                                <span className="text-[10px]">Private</span>
+                              </div>
+                              <div className="flex items-center gap-1.5">
+                                <Switch checked={editForm.first_billing_cycle_only} onCheckedChange={(v) => setEditForm({ ...editForm, first_billing_cycle_only: v })} className="scale-75" />
+                                <span className="text-[10px]">1st month only</span>
+                              </div>
+                            </div>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs text-muted-foreground">{p.usage_count} uses</span>
-                            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleTogglePromo(p.id, p.is_active)} title={p.is_active ? "Deactivate" : "Activate"}>
-                              {p.is_active ? <ToggleRight size={16} className="text-primary" /> : <ToggleLeft size={16} />}
-                            </Button>
-                            <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => handleDeletePromo(p.id)}>
-                              <Trash2 size={14} />
-                            </Button>
-                          </div>
-                        </div>
-                        {/* Visibility toggles */}
-                        <div className="flex items-center gap-4 flex-wrap">
-                          <button
-                            onClick={() => handleToggleField(p.id, "is_visible_on_homepage", !p.is_visible_on_homepage)}
-                            className={`flex items-center gap-1 text-[10px] rounded-full px-2 py-0.5 border transition-colors ${p.is_visible_on_homepage ? "border-emerald-500/40 text-emerald-400 bg-emerald-500/10" : "border-border/40 text-muted-foreground"}`}
-                          >
-                            {p.is_visible_on_homepage ? <Eye size={10} /> : <EyeOff size={10} />} Homepage banner
-                          </button>
-                          <button
-                            onClick={() => handleToggleField(p.id, "is_visible_on_pricing", !p.is_visible_on_pricing)}
-                            className={`flex items-center gap-1 text-[10px] rounded-full px-2 py-0.5 border transition-colors ${p.is_visible_on_pricing ? "border-emerald-500/40 text-emerald-400 bg-emerald-500/10" : "border-border/40 text-muted-foreground"}`}
-                          >
-                            {p.is_visible_on_pricing ? <Eye size={10} /> : <EyeOff size={10} />} Pricing badge
-                          </button>
-                          <button
-                            onClick={() => handleToggleField(p.id, "is_private", !p.is_private)}
-                            className={`flex items-center gap-1 text-[10px] rounded-full px-2 py-0.5 border transition-colors ${p.is_private ? "border-amber-500/40 text-amber-400 bg-amber-500/10" : "border-border/40 text-muted-foreground"}`}
-                          >
-                            {p.is_private ? <EyeOff size={10} /> : <Eye size={10} />} {p.is_private ? "Hidden / private" : "Public"}
-                          </button>
-                          {/* Plan-specific badges */}
-                          {(p.starter_discount > 0 || p.growth_discount > 0 || p.team_discount > 0) && (
-                            <span className="text-[10px] text-muted-foreground">
-                              Overrides: {p.starter_discount > 0 ? `Starter: ${p.starter_discount}` : ""} {p.growth_discount > 0 ? `Growth: ${p.growth_discount}` : ""} {p.team_discount > 0 ? `Team: ${p.team_discount}` : ""}
-                            </span>
-                          )}
-                        </div>
+                        ) : (
+                          /* ---- VIEW MODE ---- */
+                          <>
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-3 flex-wrap">
+                                <Badge variant={p.is_active ? "default" : "secondary"} className="text-[10px] font-mono">{p.code}</Badge>
+                                <span className="text-sm text-muted-foreground">
+                                  {p.discount_type === "percentage" ? `${p.discount_value}% off` : `$${p.discount_value} off`}
+                                </span>
+                                {p.label && <span className="text-xs text-muted-foreground">— {p.label}</span>}
+                                {p.first_billing_cycle_only && (
+                                  <Badge variant="outline" className="text-[9px] border-amber-500/40 text-amber-400"><Clock size={10} className="mr-1" />1st month only</Badge>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs text-muted-foreground">{p.usage_count} uses</span>
+                                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => startEditPromo(p)} title="Edit">
+                                  <Pencil size={14} />
+                                </Button>
+                                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleTogglePromo(p.id, p.is_active)} title={p.is_active ? "Deactivate" : "Activate"}>
+                                  {p.is_active ? <ToggleRight size={16} className="text-primary" /> : <ToggleLeft size={16} />}
+                                </Button>
+                                <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => handleDeletePromo(p.id)}>
+                                  <Trash2 size={14} />
+                                </Button>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-4 flex-wrap">
+                              <button
+                                onClick={() => handleToggleField(p.id, "is_visible_on_homepage", !p.is_visible_on_homepage)}
+                                className={`flex items-center gap-1 text-[10px] rounded-full px-2 py-0.5 border transition-colors ${p.is_visible_on_homepage ? "border-emerald-500/40 text-emerald-400 bg-emerald-500/10" : "border-border/40 text-muted-foreground"}`}
+                              >
+                                {p.is_visible_on_homepage ? <Eye size={10} /> : <EyeOff size={10} />} Homepage banner
+                              </button>
+                              <button
+                                onClick={() => handleToggleField(p.id, "is_visible_on_pricing", !p.is_visible_on_pricing)}
+                                className={`flex items-center gap-1 text-[10px] rounded-full px-2 py-0.5 border transition-colors ${p.is_visible_on_pricing ? "border-emerald-500/40 text-emerald-400 bg-emerald-500/10" : "border-border/40 text-muted-foreground"}`}
+                              >
+                                {p.is_visible_on_pricing ? <Eye size={10} /> : <EyeOff size={10} />} Pricing badge
+                              </button>
+                              <button
+                                onClick={() => handleToggleField(p.id, "is_private", !p.is_private)}
+                                className={`flex items-center gap-1 text-[10px] rounded-full px-2 py-0.5 border transition-colors ${p.is_private ? "border-amber-500/40 text-amber-400 bg-amber-500/10" : "border-border/40 text-muted-foreground"}`}
+                              >
+                                {p.is_private ? <EyeOff size={10} /> : <Eye size={10} />} {p.is_private ? "Hidden / private" : "Public"}
+                              </button>
+                              {(p.starter_discount > 0 || p.growth_discount > 0 || p.team_discount > 0) && (
+                                <span className="text-[10px] text-muted-foreground">
+                                  Overrides: {p.starter_discount > 0 ? `Starter: ${p.starter_discount}` : ""} {p.growth_discount > 0 ? `Growth: ${p.growth_discount}` : ""} {p.team_discount > 0 ? `Team: ${p.team_discount}` : ""}
+                                </span>
+                              )}
+                            </div>
+                          </>
+                        )}
                       </div>
                     ))}
                   </div>
