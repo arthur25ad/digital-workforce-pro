@@ -1,231 +1,493 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { useAppState } from "@/context/AppContext";
+import { useEmailMarketingData } from "@/hooks/useEmailMarketingData";
+import { useAuth } from "@/hooks/useAuth";
 import ConnectPlatformModal from "@/components/ConnectPlatformModal";
-import { generateCampaignDraft, generateSubjectVariations } from "@/lib/ai-generators";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import {
-  Check, ThumbsUp, X, Calendar, BarChart3, PenLine, Eye, Send,
-  MailOpen, Mail, Loader2, Sparkles,
+  Check, ThumbsUp, X, Calendar, BarChart3, PenLine, Eye, Send, Copy,
+  MailOpen, Mail, Loader2, Sparkles, Plus, Trash2, Clock, Users, FileText,
 } from "lucide-react";
 
-const emailPlatforms = [
+const senderPlatforms = [
   { name: "Gmail", icon: MailOpen },
   { name: "Outlook", icon: MailOpen },
   { name: "Mailchimp", icon: Mail },
-  { name: "Klaviyo", icon: Mail },
-  { name: "HubSpot", icon: Mail },
+  { name: "SendGrid", icon: Send },
+  { name: "SMTP", icon: Mail },
 ];
 
+const campaignTypes = ["newsletter", "promotional", "welcome", "follow-up", "announcement"];
+
 const EmailMarketerDemo = () => {
-  const { state, isConnected, addConnection, removeConnection, updateCampaignStatus, setEmailStrategy, addEmailCampaign, updateCampaignSubjectVariations, setCampaignSubject } = useAppState();
+  const {
+    brandProfile, campaigns, drafts, audienceLists, connections, activities, loading,
+    updateBrandProfile, addCampaign, updateCampaignStatus,
+    addDraft, updateDraftStatus, duplicateDraft, scheduleDraft, deleteDraft,
+    addAudienceList, deleteAudienceList,
+    connectSender, disconnectSender, isSenderConnected, getSenderConnection,
+    logActivity,
+  } = useEmailMarketingData();
+  const { session } = useAuth();
+
+  const [tab, setTab] = useState(0);
   const [connectModal, setConnectModal] = useState<string | null>(null);
-  const [demoStep, setDemoStep] = useState(0);
-  const [foundation, setFoundation] = useState({ brand: state.preferences.businessName || "", audience: "", sells: "", tone: state.preferences.brandTone || "Professional", goals: "" });
-  const [foundationSaved, setFoundationSaved] = useState(false);
-  const [strategySaved, setStrategySaved] = useState(false);
-  const [generatingCampaign, setGeneratingCampaign] = useState(false);
-  const [generatingSubjects, setGeneratingSubjects] = useState<string | null>(null);
+  const [generating, setGenerating] = useState(false);
+  const [scheduleModal, setScheduleModal] = useState<string | null>(null);
+  const [scheduleDate, setScheduleDate] = useState("");
 
-  const tabs = ["Foundation", "Email Tools", "Strategy", "AI Actions", "Review", "Performance"];
+  // Foundation form
+  const [foundationForm, setFoundationForm] = useState({
+    business_overview: brandProfile?.business_overview || "",
+    audience_description: brandProfile?.audience_description || "",
+    brand_voice: brandProfile?.brand_voice || "",
+    offer_summary: brandProfile?.offer_summary || "",
+    campaign_goals: brandProfile?.campaign_goals || "",
+    preferred_email_style: brandProfile?.preferred_email_style || "",
+    frequency_preference: brandProfile?.frequency_preference || "",
+    keywords: brandProfile?.keywords || "",
+  });
+  const [foundationDirty, setFoundationDirty] = useState(false);
 
-  const handleGenerateCampaign = () => {
-    setGeneratingCampaign(true);
-    setTimeout(() => {
-      const campaign = generateCampaignDraft(foundation.brand);
-      addEmailCampaign(campaign);
-      setGeneratingCampaign(false);
-      toast({ title: "Campaign draft created", description: `"${campaign.name}" added.` });
-    }, 1500);
+  // Campaign form
+  const [campaignForm, setCampaignForm] = useState({ name: "", campaign_type: "newsletter", target_audience: "", objective: "" });
+  const [showCampaignForm, setShowCampaignForm] = useState(false);
+
+  // Audience form
+  const [audienceForm, setAudienceForm] = useState({ list_name: "", audience_type: "general", estimated_size: 0 });
+  const [showAudienceForm, setShowAudienceForm] = useState(false);
+
+  // Sync foundation form with loaded data
+  const syncFoundation = () => {
+    if (brandProfile && !foundationDirty) {
+      setFoundationForm({
+        business_overview: brandProfile.business_overview || "",
+        audience_description: brandProfile.audience_description || "",
+        brand_voice: brandProfile.brand_voice || "",
+        offer_summary: brandProfile.offer_summary || "",
+        campaign_goals: brandProfile.campaign_goals || "",
+        preferred_email_style: brandProfile.preferred_email_style || "",
+        frequency_preference: brandProfile.frequency_preference || "",
+        keywords: brandProfile.keywords || "",
+      });
+    }
   };
 
-  const handleGenerateSubjects = (campaignId: string) => {
-    const campaign = state.emailCampaigns.find(c => c.id === campaignId);
+  // biome-ignore: run sync once brandProfile loads
+  useState(() => { syncFoundation(); });
+
+  const tabs = ["Foundation", "Campaigns", "Drafts", "Calendar", "Senders", "Audiences", "Insights", "Activity"];
+
+  const handleSaveFoundation = async () => {
+    await updateBrandProfile(foundationForm);
+    setFoundationDirty(false);
+    toast({ title: "Email Foundation saved" });
+  };
+
+  const handleCreateCampaign = async () => {
+    if (!campaignForm.name.trim()) return;
+    await addCampaign(campaignForm);
+    setCampaignForm({ name: "", campaign_type: "newsletter", target_audience: "", objective: "" });
+    setShowCampaignForm(false);
+    toast({ title: "Campaign created" });
+  };
+
+  const handleGenerateDrafts = async (campaignId: string) => {
+    const campaign = campaigns.find((c) => c.id === campaignId);
     if (!campaign) return;
-    setGeneratingSubjects(campaignId);
-    setTimeout(() => {
-      const variations = generateSubjectVariations(campaign.subject);
-      updateCampaignSubjectVariations(campaignId, variations);
-      setGeneratingSubjects(null);
-      toast({ title: "Subject variations ready" });
-    }, 1000);
+    setGenerating(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("generate-email-draft", {
+        body: { brandProfile, campaign, count: 3 },
+      });
+      if (error) throw error;
+      const generated = data?.drafts || [];
+      for (const d of generated) {
+        await addDraft({
+          campaign_id: campaignId,
+          subject_line: d.subjectLine || "",
+          preview_text: d.previewText || "",
+          body_copy: d.bodyCopy || "",
+          call_to_action: d.callToAction || "",
+          email_type: d.emailType || "promotional",
+        });
+      }
+      toast({ title: `${generated.length} email draft(s) generated` });
+    } catch (e: any) {
+      toast({ title: "Generation failed", description: e.message || "Try again", variant: "destructive" });
+    } finally {
+      setGenerating(false);
+    }
   };
+
+  const handleSchedule = async () => {
+    if (!scheduleModal || !scheduleDate) return;
+    await scheduleDraft(scheduleModal, new Date(scheduleDate).toISOString());
+    setScheduleModal(null);
+    setScheduleDate("");
+    toast({ title: "Email scheduled" });
+  };
+
+  const handleCreateAudience = async () => {
+    if (!audienceForm.list_name.trim()) return;
+    await addAudienceList(audienceForm);
+    setAudienceForm({ list_name: "", audience_type: "general", estimated_size: 0 });
+    setShowAudienceForm(false);
+    toast({ title: "Audience list created" });
+  };
+
+  if (loading) {
+    return <div className="flex items-center justify-center py-12"><Loader2 className="animate-spin text-primary" size={24} /></div>;
+  }
+
+  const scheduledDrafts = drafts.filter((d) => d.status === "scheduled" && d.scheduled_date).sort((a, b) => new Date(a.scheduled_date!).getTime() - new Date(b.scheduled_date!).getTime());
 
   return (
     <>
+      {/* Tabs */}
       <div className="mb-8 flex flex-wrap gap-2">
-        {tabs.map((tab, i) => (
-          <button key={tab} onClick={() => setDemoStep(i)}
-            className={`rounded-lg px-4 py-2 text-sm font-medium transition-all ${demoStep === i ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground hover:text-foreground"}`}>{tab}</button>
+        {tabs.map((t, i) => (
+          <button key={t} onClick={() => setTab(i)}
+            className={`rounded-lg px-4 py-2 text-sm font-medium transition-all ${tab === i ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground hover:text-foreground"}`}>{t}</button>
         ))}
       </div>
 
-      {demoStep === 0 && (
+      {/* Foundation */}
+      {tab === 0 && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-          <h3 className="font-display text-lg font-semibold text-foreground">Step 1: Explain Your Business</h3>
-          <p className="text-sm text-muted-foreground">Help your AI understand what you sell and how to write for your brand.</p>
+          <h3 className="font-display text-lg font-semibold text-foreground">Email Foundation</h3>
+          <p className="text-sm text-muted-foreground">Help your AI understand your business before it writes campaigns.</p>
           {[
-            { key: "brand", label: "Brand Name" },
-            { key: "audience", label: "Target Audience" },
-            { key: "sells", label: "What You Sell" },
-            { key: "tone", label: "Email Tone" },
-            { key: "goals", label: "Campaign Goals" },
-          ].map(({ key, label }) => (
+            { key: "business_overview", label: "Business Overview", placeholder: "What does your business do?" },
+            { key: "audience_description", label: "Who You Serve", placeholder: "Your target audience" },
+            { key: "brand_voice", label: "Brand Voice", placeholder: "Professional, friendly, bold..." },
+            { key: "offer_summary", label: "Primary Offers", placeholder: "Your main products or services" },
+            { key: "campaign_goals", label: "Marketing Goals", placeholder: "Drive sales, grow list, retain customers..." },
+            { key: "preferred_email_style", label: "Preferred Email Style", placeholder: "Clean and scannable, rich and visual..." },
+            { key: "frequency_preference", label: "Send Frequency", placeholder: "Weekly, bi-weekly, monthly..." },
+            { key: "keywords", label: "Keywords / Themes", placeholder: "Keywords that define your brand" },
+          ].map(({ key, label, placeholder }) => (
             <div key={key}>
               <label className="mb-1 block text-xs font-medium text-muted-foreground">{label}</label>
-              <input value={foundation[key as keyof typeof foundation]} onChange={(e) => { setFoundation({ ...foundation, [key]: e.target.value }); setFoundationSaved(false); }}
-                className="w-full rounded-lg border border-border bg-secondary px-4 py-2.5 text-sm text-foreground focus:border-primary/50 focus:outline-none" />
+              <input
+                value={foundationForm[key as keyof typeof foundationForm]}
+                onChange={(e) => { setFoundationForm({ ...foundationForm, [key]: e.target.value }); setFoundationDirty(true); }}
+                placeholder={placeholder}
+                className="w-full rounded-lg border border-border bg-secondary px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/50 focus:border-primary/50 focus:outline-none"
+              />
             </div>
           ))}
-          <button onClick={() => { setFoundationSaved(true); toast({ title: "Saved" }); setTimeout(() => setDemoStep(1), 500); }} className="btn-glow text-sm">
-            {foundationSaved ? <span className="flex items-center gap-1"><Check size={14} /> Saved</span> : "Save & Continue"}
+          <button onClick={handleSaveFoundation} className="btn-glow text-sm">
+            {!foundationDirty ? <span className="flex items-center gap-1"><Check size={14} /> Saved</span> : "Save Foundation"}
           </button>
         </motion.div>
       )}
 
-      {demoStep === 1 && (
+      {/* Campaigns */}
+      {tab === 1 && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-          <h3 className="font-display text-lg font-semibold text-foreground">Step 2: Plug Your Email Tools</h3>
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-display text-lg font-semibold text-foreground">Your Campaigns</h3>
+              <p className="text-sm text-muted-foreground">Plan campaigns, then generate email drafts.</p>
+            </div>
+            <button onClick={() => setShowCampaignForm(true)} className="btn-glow text-sm flex items-center gap-1"><Plus size={14} /> New Campaign</button>
+          </div>
+
+          {showCampaignForm && (
+            <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 space-y-3">
+              <input value={campaignForm.name} onChange={(e) => setCampaignForm({ ...campaignForm, name: e.target.value })} placeholder="Campaign Name"
+                className="w-full rounded-lg border border-border bg-secondary px-4 py-2.5 text-sm text-foreground focus:border-primary/50 focus:outline-none" />
+              <select value={campaignForm.campaign_type} onChange={(e) => setCampaignForm({ ...campaignForm, campaign_type: e.target.value })}
+                className="w-full rounded-lg border border-border bg-secondary px-4 py-2.5 text-sm text-foreground focus:outline-none">
+                {campaignTypes.map((t) => <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>)}
+              </select>
+              <input value={campaignForm.target_audience} onChange={(e) => setCampaignForm({ ...campaignForm, target_audience: e.target.value })} placeholder="Target Audience"
+                className="w-full rounded-lg border border-border bg-secondary px-4 py-2.5 text-sm text-foreground focus:border-primary/50 focus:outline-none" />
+              <input value={campaignForm.objective} onChange={(e) => setCampaignForm({ ...campaignForm, objective: e.target.value })} placeholder="Campaign Objective"
+                className="w-full rounded-lg border border-border bg-secondary px-4 py-2.5 text-sm text-foreground focus:border-primary/50 focus:outline-none" />
+              <div className="flex gap-2">
+                <button onClick={handleCreateCampaign} className="btn-glow text-sm">Create Campaign</button>
+                <button onClick={() => setShowCampaignForm(false)} className="btn-outline-glow text-sm">Cancel</button>
+              </div>
+            </div>
+          )}
+
+          <div className="space-y-3">
+            {campaigns.map((c) => (
+              <div key={c.id} className="rounded-xl border border-border/50 bg-card p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <div>
+                    <span className="text-sm font-medium text-foreground">{c.name}</span>
+                    <span className="ml-2 text-xs text-muted-foreground">{c.campaign_type}</span>
+                  </div>
+                  <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${
+                    c.status === "active" ? "bg-emerald-500/10 text-emerald-400" :
+                    c.status === "completed" ? "bg-primary/10 text-primary" :
+                    "bg-secondary text-muted-foreground"
+                  }`}>{c.status}</span>
+                </div>
+                {c.target_audience && <p className="text-xs text-muted-foreground mb-1">Audience: {c.target_audience}</p>}
+                {c.objective && <p className="text-xs text-muted-foreground mb-3">Goal: {c.objective}</p>}
+                <div className="flex flex-wrap gap-2">
+                  <button onClick={() => handleGenerateDrafts(c.id)} disabled={generating}
+                    className="flex items-center gap-1 rounded-lg bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary hover:bg-primary/20">
+                    {generating ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />} Generate 3 Emails
+                  </button>
+                  {c.status === "draft" && (
+                    <button onClick={() => updateCampaignStatus(c.id, "active")}
+                      className="flex items-center gap-1 rounded-lg bg-emerald-500/10 px-3 py-1.5 text-xs font-medium text-emerald-400 hover:bg-emerald-500/20">
+                      <Check size={12} /> Activate
+                    </button>
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground mt-2">{drafts.filter((d) => d.campaign_id === c.id).length} draft(s)</p>
+              </div>
+            ))}
+            {campaigns.length === 0 && <p className="text-sm text-muted-foreground py-6 text-center">No campaigns yet. Create one to get started.</p>}
+          </div>
+        </motion.div>
+      )}
+
+      {/* Drafts */}
+      {tab === 2 && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+          <h3 className="font-display text-lg font-semibold text-foreground">Email Drafts</h3>
+          <p className="text-sm text-muted-foreground">Review, approve, edit, or schedule your AI-generated emails.</p>
+          <div className="space-y-4">
+            {drafts.map((d) => (
+              <div key={d.id} className={`rounded-xl border p-4 transition-all ${
+                d.status === "approved" ? "border-emerald-500/30 bg-emerald-500/5" :
+                d.status === "scheduled" ? "border-primary/30 bg-primary/5" :
+                d.status === "sent" ? "border-muted bg-muted/5" :
+                "border-border/50 bg-card"
+              }`}>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-foreground">{d.subject_line || "Untitled"}</span>
+                  <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${
+                    d.status === "approved" ? "bg-emerald-500/10 text-emerald-400" :
+                    d.status === "scheduled" ? "bg-primary/10 text-primary" :
+                    d.status === "sent" ? "bg-muted text-muted-foreground" :
+                    d.status === "pending" ? "bg-yellow-500/10 text-yellow-400" :
+                    "bg-secondary text-muted-foreground"
+                  }`}>{d.status}</span>
+                </div>
+                {d.preview_text && <p className="text-xs text-muted-foreground mb-1">Preview: {d.preview_text}</p>}
+                <div className="rounded-lg bg-secondary/50 p-3 mb-3">
+                  <p className="text-xs text-foreground whitespace-pre-line">{d.body_copy}</p>
+                  {d.call_to_action && <p className="text-xs text-primary mt-2 font-medium">CTA: {d.call_to_action}</p>}
+                </div>
+                {d.scheduled_date && <p className="text-xs text-muted-foreground mb-2"><Clock size={10} className="inline mr-1" />Scheduled: {new Date(d.scheduled_date).toLocaleString()}</p>}
+                <div className="flex flex-wrap gap-2">
+                  {(d.status === "draft" || d.status === "pending") && (
+                    <>
+                      <button onClick={() => updateDraftStatus(d.id, "approved")} className="flex items-center gap-1 rounded-lg bg-emerald-500/10 px-3 py-1.5 text-xs font-medium text-emerald-400 hover:bg-emerald-500/20"><ThumbsUp size={12} /> Approve</button>
+                      <button onClick={() => { setScheduleModal(d.id); setScheduleDate(""); }} className="flex items-center gap-1 rounded-lg bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary hover:bg-primary/20"><Calendar size={12} /> Schedule</button>
+                    </>
+                  )}
+                  {d.status === "approved" && (
+                    <button onClick={() => updateDraftStatus(d.id, "sent")} className="flex items-center gap-1 rounded-lg bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary hover:bg-primary/20"><Send size={12} /> Mark Sent</button>
+                  )}
+                  <button onClick={() => duplicateDraft(d.id)} className="flex items-center gap-1 rounded-lg bg-secondary px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground"><Copy size={12} /> Duplicate</button>
+                  <button onClick={() => deleteDraft(d.id)} className="flex items-center gap-1 rounded-lg bg-red-500/10 px-3 py-1.5 text-xs font-medium text-red-400 hover:bg-red-500/20"><Trash2 size={12} /> Delete</button>
+                </div>
+              </div>
+            ))}
+            {drafts.length === 0 && <p className="text-sm text-muted-foreground py-6 text-center">No drafts yet. Generate emails from a campaign.</p>}
+          </div>
+        </motion.div>
+      )}
+
+      {/* Calendar */}
+      {tab === 3 && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+          <h3 className="font-display text-lg font-semibold text-foreground">Upcoming Emails</h3>
+          <p className="text-sm text-muted-foreground">See what's going out next.</p>
+          {scheduledDrafts.length > 0 ? (
+            <div className="space-y-3">
+              {scheduledDrafts.map((d) => {
+                const campaign = campaigns.find((c) => c.id === d.campaign_id);
+                return (
+                  <div key={d.id} className="flex items-center justify-between rounded-xl border border-border/50 bg-card p-4">
+                    <div>
+                      <p className="text-sm font-medium text-foreground">{d.subject_line}</p>
+                      {campaign && <p className="text-xs text-muted-foreground">{campaign.name}</p>}
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm text-primary">{new Date(d.scheduled_date!).toLocaleDateString()}</p>
+                      <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] text-primary font-medium">Scheduled</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground py-6 text-center">No emails scheduled yet.</p>
+          )}
+        </motion.div>
+      )}
+
+      {/* Senders */}
+      {tab === 4 && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+          <h3 className="font-display text-lg font-semibold text-foreground">Connect Your Email Sender</h3>
           <p className="text-sm text-muted-foreground">Connect the platforms where you send campaigns.</p>
           <div className="space-y-3">
-            {emailPlatforms.map((p) => {
-              const connected = isConnected(p.name);
-              const conn = state.connections.find(c => c.platform === p.name);
+            {senderPlatforms.map((p) => {
+              const connected = isSenderConnected(p.name);
+              const conn = getSenderConnection(p.name);
               return (
                 <div key={p.name} className={`flex items-center justify-between rounded-xl border p-4 transition-all ${connected ? "border-primary/30 bg-primary/5" : "border-border/50 bg-card hover:border-primary/30"}`}>
                   <div className="flex items-center gap-3">
                     <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${connected ? "bg-primary/20 text-primary" : "bg-primary/10 text-primary"}`}><p.icon size={20} /></div>
-                    <div><p className="text-sm font-medium text-foreground">{p.name}</p><p className="text-xs text-muted-foreground">{connected ? <span className="text-emerald-400">Connected · {conn?.accountName}</span> : "Not connected"}</p></div>
+                    <div>
+                      <p className="text-sm font-medium text-foreground">{p.name}</p>
+                      <p className="text-xs text-muted-foreground">{connected ? <span className="text-emerald-400">Connected · {conn?.account_name}</span> : "Not connected"}</p>
+                    </div>
                   </div>
-                  {connected ? <button onClick={() => removeConnection(p.name)} className="rounded-lg border border-border px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground">Disconnect</button>
+                  {connected
+                    ? <button onClick={() => disconnectSender(p.name)} className="rounded-lg border border-border px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground">Disconnect</button>
                     : <button onClick={() => setConnectModal(p.name)} className="btn-glow !px-4 !py-1.5 text-xs">Connect</button>}
                 </div>
               );
             })}
           </div>
-          <div className="flex gap-3"><button onClick={() => setDemoStep(0)} className="btn-outline-glow text-sm">Back</button><button onClick={() => setDemoStep(2)} className="btn-glow text-sm">Continue</button></div>
         </motion.div>
       )}
 
-      {demoStep === 2 && (
+      {/* Audiences */}
+      {tab === 5 && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-          <h3 className="font-display text-lg font-semibold text-foreground">Step 3: Set the Email Strategy</h3>
-          <p className="text-sm text-muted-foreground">Define campaign types, segments, and sending rules.</p>
-          {[
-            { key: "campaignTypes", label: "Campaign Types", placeholder: "Newsletters, Promotions, Welcome series" },
-            { key: "flows", label: "Flows / Automations", placeholder: "Welcome, Post-purchase, Re-engagement" },
-            { key: "frequency", label: "Sending Frequency", placeholder: "Weekly newsletters, 2x monthly promos" },
-            { key: "segments", label: "Audience Segments", placeholder: "New subscribers, Active users" },
-            { key: "kpis", label: "KPIs", placeholder: "Open rate, Click rate, Conversion" },
-            { key: "offerTypes", label: "Offer Types", placeholder: "Discounts, Free trials, Early access" },
-          ].map(({ key, label, placeholder }) => (
-            <div key={key}>
-              <label className="mb-1 block text-xs font-medium text-muted-foreground">{label}</label>
-              <input value={state.emailStrategy[key as keyof typeof state.emailStrategy]} onChange={(e) => { setEmailStrategy({ [key]: e.target.value }); setStrategySaved(false); }}
-                placeholder={placeholder} className="w-full rounded-lg border border-border bg-secondary px-4 py-2.5 text-sm text-foreground focus:border-primary/50 focus:outline-none" />
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-display text-lg font-semibold text-foreground">Audience Lists</h3>
+              <p className="text-sm text-muted-foreground">Organize your email recipients.</p>
             </div>
-          ))}
-          <div className="flex gap-3">
-            <button onClick={() => setDemoStep(1)} className="btn-outline-glow text-sm">Back</button>
-            <button onClick={() => { setStrategySaved(true); toast({ title: "Strategy saved" }); setTimeout(() => setDemoStep(3), 400); }} className="btn-glow text-sm">
-              {strategySaved ? <span className="flex items-center gap-1"><Check size={14} /> Saved</span> : "Save & Continue"}
-            </button>
+            <button onClick={() => setShowAudienceForm(true)} className="btn-glow text-sm flex items-center gap-1"><Plus size={14} /> New List</button>
           </div>
-        </motion.div>
-      )}
 
-      {/* AI Actions */}
-      {demoStep === 3 && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
-          <h3 className="font-display text-lg font-semibold text-foreground">AI Email Actions</h3>
-          <p className="text-sm text-muted-foreground">Generate campaign drafts and subject line variations.</p>
+          {showAudienceForm && (
+            <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 space-y-3">
+              <input value={audienceForm.list_name} onChange={(e) => setAudienceForm({ ...audienceForm, list_name: e.target.value })} placeholder="List Name"
+                className="w-full rounded-lg border border-border bg-secondary px-4 py-2.5 text-sm text-foreground focus:border-primary/50 focus:outline-none" />
+              <select value={audienceForm.audience_type} onChange={(e) => setAudienceForm({ ...audienceForm, audience_type: e.target.value })}
+                className="w-full rounded-lg border border-border bg-secondary px-4 py-2.5 text-sm text-foreground focus:outline-none">
+                <option value="general">General</option>
+                <option value="subscribers">Subscribers</option>
+                <option value="customers">Customers</option>
+                <option value="leads">Leads</option>
+                <option value="vip">VIP</option>
+              </select>
+              <input type="number" value={audienceForm.estimated_size} onChange={(e) => setAudienceForm({ ...audienceForm, estimated_size: parseInt(e.target.value) || 0 })} placeholder="Estimated Size"
+                className="w-full rounded-lg border border-border bg-secondary px-4 py-2.5 text-sm text-foreground focus:border-primary/50 focus:outline-none" />
+              <div className="flex gap-2">
+                <button onClick={handleCreateAudience} className="btn-glow text-sm">Create List</button>
+                <button onClick={() => setShowAudienceForm(false)} className="btn-outline-glow text-sm">Cancel</button>
+              </div>
+            </div>
+          )}
 
-          <button onClick={handleGenerateCampaign} disabled={generatingCampaign} className="btn-glow text-sm flex items-center gap-2">
-            {generatingCampaign ? <><Loader2 size={14} className="animate-spin" /> Generating...</> : <><Sparkles size={14} /> Generate Campaign Draft</>}
-          </button>
-
-          <div className="flex gap-3 mt-4">
-            <button onClick={() => setDemoStep(2)} className="btn-outline-glow text-sm">Back</button>
-            <button onClick={() => setDemoStep(4)} className="btn-glow text-sm">Review Campaigns</button>
-          </div>
-        </motion.div>
-      )}
-
-      {demoStep === 4 && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-          <h3 className="font-display text-lg font-semibold text-foreground">Step 4: Stay in Control</h3>
-          <p className="text-sm text-muted-foreground">Review AI-drafted campaigns before they send.</p>
-          <div className="space-y-4">
-            {state.emailCampaigns.map((campaign) => (
-              <div key={campaign.id} className={`rounded-xl border p-4 transition-all ${
-                campaign.status === "approved" || campaign.status === "scheduled" ? "border-emerald-500/30 bg-emerald-500/5" : campaign.status === "rejected" ? "border-red-500/30 bg-red-500/5" : "border-border/50 bg-card"
-              }`}>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-foreground">{campaign.name}</span>
-                  <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${
-                    campaign.status === "approved" || campaign.status === "scheduled" ? "bg-emerald-500/10 text-emerald-400" : campaign.status === "rejected" ? "bg-red-500/10 text-red-400" : campaign.status === "pending" ? "bg-yellow-500/10 text-yellow-400" : "bg-secondary text-muted-foreground"
-                  }`}>{campaign.status}</span>
-                </div>
-                <div className="rounded-lg bg-secondary/50 p-3 mb-2 space-y-1">
-                  <p className="text-xs text-muted-foreground">Subject: <span className="text-foreground">{campaign.subject}</span></p>
-                  <p className="text-xs text-muted-foreground">Preview: <span className="text-foreground">{campaign.previewText}</span></p>
-                  <p className="text-xs text-muted-foreground">To: <span className="text-foreground">{campaign.recipients}</span></p>
-                  <p className="text-xs text-muted-foreground mt-2 whitespace-pre-line">{campaign.body}</p>
-                </div>
-
-                {/* Subject variations */}
-                {campaign.subjectVariations && campaign.subjectVariations.length > 0 && (
-                  <div className="rounded-lg bg-primary/5 border border-primary/10 p-3 mb-3">
-                    <p className="text-xs text-primary/60 mb-2">Subject Variations — click to use:</p>
-                    <div className="space-y-1">
-                      {campaign.subjectVariations.map((v, i) => (
-                        <button key={i} onClick={() => { setCampaignSubject(campaign.id, v); toast({ title: "Subject updated" }); }}
-                          className="block w-full text-left rounded px-2 py-1 text-xs text-foreground hover:bg-primary/10 transition-colors">{v}</button>
-                      ))}
-                    </div>
+          <div className="space-y-3">
+            {audienceLists.map((l) => (
+              <div key={l.id} className="flex items-center justify-between rounded-xl border border-border/50 bg-card p-4">
+                <div className="flex items-center gap-3">
+                  <Users size={18} className="text-primary" />
+                  <div>
+                    <p className="text-sm font-medium text-foreground">{l.list_name}</p>
+                    <p className="text-xs text-muted-foreground">{l.audience_type} · ~{l.estimated_size || 0} contacts</p>
                   </div>
-                )}
-
-                <div className="flex flex-wrap gap-2">
-                  {(campaign.status === "draft" || campaign.status === "pending") && (
-                    <>
-                      <button onClick={() => { updateCampaignStatus(campaign.id, "approved"); toast({ title: "Campaign approved" }); }} className="flex items-center gap-1 rounded-lg bg-emerald-500/10 px-3 py-1.5 text-xs font-medium text-emerald-400 hover:bg-emerald-500/20"><ThumbsUp size={12} /> Approve</button>
-                      <button onClick={() => updateCampaignStatus(campaign.id, "scheduled")} className="flex items-center gap-1 rounded-lg bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary hover:bg-primary/20"><Calendar size={12} /> Schedule</button>
-                      <button onClick={() => updateCampaignStatus(campaign.id, "rejected")} className="flex items-center gap-1 rounded-lg bg-red-500/10 px-3 py-1.5 text-xs font-medium text-red-400 hover:bg-red-500/20"><X size={12} /> Reject</button>
-                    </>
-                  )}
-                  <button onClick={() => handleGenerateSubjects(campaign.id)} disabled={generatingSubjects === campaign.id} className="flex items-center gap-1 rounded-lg bg-secondary px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground">
-                    {generatingSubjects === campaign.id ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />} Subject Variations
-                  </button>
                 </div>
+                <button onClick={() => deleteAudienceList(l.id)} className="text-xs text-muted-foreground hover:text-red-400"><Trash2 size={14} /></button>
               </div>
             ))}
+            {audienceLists.length === 0 && <p className="text-sm text-muted-foreground py-6 text-center">No audience lists yet.</p>}
           </div>
-          <div className="flex gap-3"><button onClick={() => setDemoStep(3)} className="btn-outline-glow text-sm">Back</button><button onClick={() => setDemoStep(5)} className="btn-glow text-sm">View Performance</button></div>
         </motion.div>
       )}
 
-      {demoStep === 5 && (
+      {/* Insights */}
+      {tab === 6 && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
-          <h3 className="font-display text-lg font-semibold text-foreground">Step 5: Review Performance</h3>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <h3 className="font-display text-lg font-semibold text-foreground">Campaign Insights</h3>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {[
-              { label: "Campaigns", value: String(state.emailCampaigns.length), icon: PenLine },
-              { label: "Scheduled", value: String(state.emailCampaigns.filter(c => c.status === "scheduled" || c.status === "approved").length), icon: Send },
-              { label: "Open Rate", value: "24.3%", icon: Eye },
-              { label: "Click Rate", value: "3.8%", icon: BarChart3 },
-            ].map((stat) => (
-              <div key={stat.label} className="rounded-xl border border-border/50 bg-card p-4">
-                <stat.icon size={18} className="text-primary mb-2" /><p className="font-display text-2xl font-bold text-foreground">{stat.value}</p><p className="text-xs text-muted-foreground">{stat.label}</p>
+              { label: "Campaigns", value: String(campaigns.length), icon: FileText, color: "text-primary" },
+              { label: "Drafts", value: String(drafts.length), icon: PenLine, color: "text-primary" },
+              { label: "Scheduled", value: String(drafts.filter((d) => d.status === "scheduled").length), icon: Calendar, color: "text-yellow-400" },
+              { label: "Sent", value: String(drafts.filter((d) => d.status === "sent").length), icon: Send, color: "text-emerald-400" },
+            ].map((s) => (
+              <div key={s.label} className="rounded-xl border border-border/50 bg-card p-4">
+                <s.icon size={18} className={`${s.color} mb-2`} />
+                <p className="font-display text-2xl font-bold text-foreground">{s.value}</p>
+                <p className="text-xs text-muted-foreground">{s.label}</p>
               </div>
             ))}
           </div>
-          <button onClick={() => setDemoStep(0)} className="btn-outline-glow text-sm">Back to Foundation</button>
+          {campaigns.length > 0 && (
+            <div className="rounded-xl border border-border/50 bg-card p-4">
+              <h4 className="text-sm font-semibold text-foreground mb-3">Top Campaign Types</h4>
+              <div className="space-y-2">
+                {Object.entries(campaigns.reduce((acc, c) => { acc[c.campaign_type] = (acc[c.campaign_type] || 0) + 1; return acc; }, {} as Record<string, number>))
+                  .sort((a, b) => b[1] - a[1])
+                  .map(([type, count]) => (
+                    <div key={type} className="flex items-center justify-between text-sm">
+                      <span className="text-foreground capitalize">{type}</span>
+                      <span className="text-muted-foreground">{count}</span>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          )}
         </motion.div>
       )}
 
-      <ConnectPlatformModal open={!!connectModal} onClose={() => setConnectModal(null)} platformName={connectModal || ""}
-        onConnect={(accountName) => { if (connectModal) { addConnection({ platform: connectModal, accountName, connectedAt: new Date().toISOString() }); toast({ title: "Connected", description: `${connectModal} linked.` }); } setConnectModal(null); }} />
+      {/* Activity */}
+      {tab === 7 && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+          <h3 className="font-display text-lg font-semibold text-foreground">Recent Activity</h3>
+          {activities.length > 0 ? (
+            <div className="space-y-2">
+              {activities.map((a) => (
+                <div key={a.id} className="flex items-center gap-3 rounded-lg bg-secondary p-3">
+                  <div className="h-1.5 w-1.5 rounded-full bg-primary shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-foreground truncate">{a.message}</p>
+                    <p className="text-xs text-muted-foreground">{new Date(a.created_at).toLocaleString()}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground py-6 text-center">No activity yet.</p>
+          )}
+        </motion.div>
+      )}
+
+      {/* Schedule Modal */}
+      {scheduleModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="rounded-xl border border-border bg-card p-6 w-full max-w-sm space-y-4">
+            <h3 className="font-display text-lg font-semibold text-foreground">Schedule Email</h3>
+            <input type="datetime-local" value={scheduleDate} onChange={(e) => setScheduleDate(e.target.value)}
+              className="w-full rounded-lg border border-border bg-secondary px-4 py-2.5 text-sm text-foreground focus:border-primary/50 focus:outline-none" />
+            <div className="flex gap-2">
+              <button onClick={handleSchedule} className="btn-glow text-sm">Schedule</button>
+              <button onClick={() => setScheduleModal(null)} className="btn-outline-glow text-sm">Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <ConnectPlatformModal
+        open={!!connectModal}
+        onClose={() => setConnectModal(null)}
+        platformName={connectModal || ""}
+        onConnect={(accountName) => {
+          if (connectModal) connectSender(connectModal, accountName);
+          setConnectModal(null);
+        }}
+      />
     </>
   );
 };

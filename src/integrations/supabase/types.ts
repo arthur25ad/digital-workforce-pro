@@ -105,6 +105,207 @@ export type Database = {
           },
         ]
       }
+      email_audience_lists: {
+        Row: {
+          audience_type: string | null
+          created_at: string
+          estimated_size: number | null
+          id: string
+          list_name: string
+          status: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          audience_type?: string | null
+          created_at?: string
+          estimated_size?: number | null
+          id?: string
+          list_name?: string
+          status?: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          audience_type?: string | null
+          created_at?: string
+          estimated_size?: number | null
+          id?: string
+          list_name?: string
+          status?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_audience_lists_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      email_brand_profiles: {
+        Row: {
+          approval_required: boolean
+          audience_description: string | null
+          brand_voice: string | null
+          business_overview: string | null
+          campaign_goals: string | null
+          created_at: string
+          frequency_preference: string | null
+          id: string
+          keywords: string | null
+          offer_summary: string | null
+          preferred_email_style: string | null
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          approval_required?: boolean
+          audience_description?: string | null
+          brand_voice?: string | null
+          business_overview?: string | null
+          campaign_goals?: string | null
+          created_at?: string
+          frequency_preference?: string | null
+          id?: string
+          keywords?: string | null
+          offer_summary?: string | null
+          preferred_email_style?: string | null
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          approval_required?: boolean
+          audience_description?: string | null
+          brand_voice?: string | null
+          business_overview?: string | null
+          campaign_goals?: string | null
+          created_at?: string
+          frequency_preference?: string | null
+          id?: string
+          keywords?: string | null
+          offer_summary?: string | null
+          preferred_email_style?: string | null
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_brand_profiles_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      email_campaigns: {
+        Row: {
+          campaign_type: string
+          created_at: string
+          id: string
+          name: string
+          objective: string | null
+          status: string
+          target_audience: string | null
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          campaign_type?: string
+          created_at?: string
+          id?: string
+          name?: string
+          objective?: string | null
+          status?: string
+          target_audience?: string | null
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          campaign_type?: string
+          created_at?: string
+          id?: string
+          name?: string
+          objective?: string | null
+          status?: string
+          target_audience?: string | null
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_campaigns_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      email_drafts: {
+        Row: {
+          body_copy: string | null
+          call_to_action: string | null
+          campaign_id: string | null
+          created_at: string
+          email_type: string | null
+          id: string
+          preview_text: string | null
+          scheduled_date: string | null
+          status: string
+          subject_line: string | null
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          body_copy?: string | null
+          call_to_action?: string | null
+          campaign_id?: string | null
+          created_at?: string
+          email_type?: string | null
+          id?: string
+          preview_text?: string | null
+          scheduled_date?: string | null
+          status?: string
+          subject_line?: string | null
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          body_copy?: string | null
+          call_to_action?: string | null
+          campaign_id?: string | null
+          created_at?: string
+          email_type?: string | null
+          id?: string
+          preview_text?: string | null
+          scheduled_date?: string | null
+          status?: string
+          subject_line?: string | null
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_drafts_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "email_campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "email_drafts_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       platform_connections: {
         Row: {
           account_name: string | null
