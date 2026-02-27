@@ -30,7 +30,7 @@ const Footer = () => {
             <span className="text-primary">VAN</span>TORY
           </Link>
           <p className="mt-3 max-w-sm text-sm text-muted-foreground">
-            Your first digital workers team that never sleep. Built for small businesses that need real help.
+            AI Employees that work while you sleep. Built for small businesses that need real help.
           </p>
         </div>
         {footerLinks.map((group) => (
