@@ -46,6 +46,62 @@ export type Database = {
           },
         ]
       }
+      appointments: {
+        Row: {
+          client_name: string
+          created_at: string
+          duration_minutes: number | null
+          id: string
+          notes: string | null
+          recurrence_pattern: string | null
+          recurring: boolean
+          reminder_sent: boolean
+          scheduled_date: string | null
+          service_type: string | null
+          status: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          client_name?: string
+          created_at?: string
+          duration_minutes?: number | null
+          id?: string
+          notes?: string | null
+          recurrence_pattern?: string | null
+          recurring?: boolean
+          reminder_sent?: boolean
+          scheduled_date?: string | null
+          service_type?: string | null
+          status?: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          client_name?: string
+          created_at?: string
+          duration_minutes?: number | null
+          id?: string
+          notes?: string | null
+          recurrence_pattern?: string | null
+          recurring?: boolean
+          reminder_sent?: boolean
+          scheduled_date?: string | null
+          service_type?: string | null
+          status?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointments_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       assistant_drafts: {
         Row: {
           created_at: string
@@ -246,6 +302,56 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "assistant_tasks_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      booking_requests: {
+        Row: {
+          client_name: string
+          created_at: string
+          id: string
+          notes: string | null
+          preferred_time_slot: string | null
+          requested_date: string | null
+          requested_service: string | null
+          source: string | null
+          status: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          client_name?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          preferred_time_slot?: string | null
+          requested_date?: string | null
+          requested_service?: string | null
+          source?: string | null
+          status?: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          client_name?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          preferred_time_slot?: string | null
+          requested_date?: string | null
+          requested_service?: string | null
+          source?: string | null
+          status?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "booking_requests_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
@@ -866,6 +972,50 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      scheduling_insights: {
+        Row: {
+          client_name: string | null
+          confidence: number
+          created_at: string
+          description: string
+          id: string
+          insight_type: string
+          is_active: boolean
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          client_name?: string | null
+          confidence?: number
+          created_at?: string
+          description?: string
+          id?: string
+          insight_type?: string
+          is_active?: boolean
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          client_name?: string | null
+          confidence?: number
+          created_at?: string
+          description?: string
+          id?: string
+          insight_type?: string
+          is_active?: boolean
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scheduling_insights_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       social_drafts: {
         Row: {

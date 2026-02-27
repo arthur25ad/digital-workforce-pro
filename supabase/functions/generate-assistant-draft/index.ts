@@ -43,7 +43,7 @@ serve(async (req) => {
 
     // Fetch full brain intelligence server-side
     const brain = workspaceId
-      ? await fetchBrainIntelligence(supabase, workspaceId, "virtual-assistant")
+      ? await fetchBrainIntelligence(supabase, workspaceId, "calendar-assistant")
       : { fullPromptBlock: "" };
 
     // Fetch recent tasks for priority pattern matching
@@ -65,7 +65,7 @@ serve(async (req) => {
 
     const systemPrompt = `${INTELLIGENCE_ENGINE_PREAMBLE}
 
-ROLE: You are the Virtual Assistant AI Employee.
+ROLE: You are the AI Calendar Assistant Employee.
 
 YOUR TASK: Generate a structured action plan for an incoming request. You MUST include a "reasoning" field explaining WHY you prioritized this way, chose this draft type, and recommended this action — referencing specific patterns, recent tasks, or learned preferences.
 

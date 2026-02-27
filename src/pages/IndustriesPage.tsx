@@ -9,12 +9,12 @@ const industries: { icon: typeof Building2; name: string; useCase: string; roles
   {
     icon: Building2, name: "Cleaning Companies", accent: "teal",
     useCase: "Automate lead follow-up, social posting, and scheduling.",
-    roles: ["Social Media Manager", "Customer Support", "Virtual Assistant"],
+    roles: ["Social Media Manager", "Customer Support", "AI Calendar Assistant"],
   },
   {
     icon: Wrench, name: "Home Services", accent: "teal",
     useCase: "Fast lead response, organized scheduling, and email campaigns.",
-    roles: ["Customer Support", "Virtual Assistant", "Email Marketer"],
+    roles: ["Customer Support", "AI Calendar Assistant", "Email Marketer"],
   },
   {
     icon: Sparkles, name: "Med Spas", accent: "violet",
@@ -24,32 +24,32 @@ const industries: { icon: typeof Building2; name: string; useCase: string; roles
   {
     icon: Scissors, name: "Salons", accent: "violet",
     useCase: "Automate booking reminders, reviews, and social posts.",
-    roles: ["Social Media Manager", "Virtual Assistant", "Customer Support"],
+    roles: ["Social Media Manager", "AI Calendar Assistant", "Customer Support"],
   },
   {
     icon: Home, name: "Realtors", accent: "amber",
     useCase: "Manage follow-ups, email sequences, and client coordination.",
-    roles: ["Email Marketer", "Social Media Manager", "Virtual Assistant"],
+    roles: ["Email Marketer", "Social Media Manager", "AI Calendar Assistant"],
   },
   {
     icon: Briefcase, name: "Consultants", accent: "amber",
     useCase: "Offload admin, follow-ups, and newsletter creation.",
-    roles: ["Virtual Assistant", "Email Marketer", "Social Media Manager"],
+    roles: ["AI Calendar Assistant", "Email Marketer", "Social Media Manager"],
   },
   {
     icon: Paintbrush, name: "Local Agencies", accent: "amber",
     useCase: "Scale multi-client content, campaigns, and communication.",
-    roles: ["Social Media Manager", "Email Marketer", "Virtual Assistant"],
+    roles: ["Social Media Manager", "Email Marketer", "AI Calendar Assistant"],
   },
   {
     icon: Stethoscope, name: "Dental Practices", accent: "violet",
     useCase: "Appointment reminders, patient follow-ups, and review requests.",
-    roles: ["Virtual Assistant", "Customer Support", "Email Marketer"],
+    roles: ["AI Calendar Assistant", "Customer Support", "Email Marketer"],
   },
   {
     icon: Scale, name: "Law Firms", accent: "amber",
     useCase: "Client intake follow-ups, scheduling, and email outreach.",
-    roles: ["Virtual Assistant", "Email Marketer", "Customer Support"],
+    roles: ["AI Calendar Assistant", "Email Marketer", "Customer Support"],
   },
 ];
 

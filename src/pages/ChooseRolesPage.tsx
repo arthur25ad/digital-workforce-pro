@@ -17,7 +17,7 @@ const ROLE_ICONS: Record<RoleSlug, any> = {
   "social-media-manager": Share2,
   "customer-support": Headphones,
   "email-marketer": Mail,
-  "virtual-assistant": CalendarCheck,
+  "calendar-assistant": CalendarCheck,
 };
 
 const ChooseRolesPage = () => {

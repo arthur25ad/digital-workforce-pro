@@ -16,19 +16,22 @@ import ConnectionCard from "@/components/workspace/ConnectionCard";
 import {
   Check, Loader2, Sparkles, Plus, Calendar, FileText, Clock,
   Inbox, ListChecks, PenLine, Bell, Slack, HardDrive, Play, Pause, Archive,
-  TrendingUp, Zap, Shield,
+  TrendingUp, Zap, Shield, CalendarCheck, CalendarDays, CalendarClock, Users,
 } from "lucide-react";
 
 const toolPlatforms = [
-  { name: "Gmail", icon: FileText }, { name: "Google Calendar", icon: Calendar },
-  { name: "Slack", icon: Slack }, { name: "Website Contact Form", icon: Inbox },
+  { name: "Google Calendar", icon: Calendar },
+  { name: "Outlook Calendar", icon: CalendarDays },
+  { name: "Gmail", icon: FileText },
+  { name: "Slack", icon: Slack },
+  { name: "Website Booking Form", icon: Inbox },
   { name: "Google Drive", icon: HardDrive },
 ];
 
 const VirtualAssistantDemo = () => {
   const { session, workspace } = useAuth();
   const { recordInteraction } = useVantaBrainActions();
-  const { suggestions: brainSuggestions, loading: suggestionsLoading, sendFeedback } = useVantaBrainSuggestions("virtual-assistant");
+  const { suggestions: brainSuggestions, loading: suggestionsLoading, sendFeedback } = useVantaBrainSuggestions("calendar-assistant");
   const {
     profile, tasks, requests, drafts, connections, activities, loading,
     updateProfile, addRequest, updateRequestStatus,
@@ -46,13 +49,21 @@ const VirtualAssistantDemo = () => {
   const [editingDraft, setEditingDraft] = useState<string | null>(null);
   const [editContent, setEditContent] = useState("");
 
+  // Appointments state (local demo data until types regenerate)
+  const [appointments, setAppointments] = useState<any[]>([]);
+  const [bookingRequests, setBookingRequests] = useState<any[]>([]);
+  const [apptForm, setApptForm] = useState({ client_name: "", service_type: "", scheduled_date: "", duration_minutes: "60", notes: "" });
+  const [bookingForm, setBookingForm] = useState({ client_name: "", requested_service: "", preferred_time_slot: "", notes: "" });
+
   const tabs = [
     { label: "Foundation", icon: <Shield size={14} /> },
+    { label: "Appointments", icon: <CalendarCheck size={14} /> },
+    { label: "Bookings", icon: <CalendarClock size={14} /> },
     { label: "Requests", icon: <Inbox size={14} /> },
     { label: "Tasks", icon: <ListChecks size={14} /> },
     { label: "Drafts", icon: <FileText size={14} /> },
     { label: "Tools", icon: <Zap size={14} /> },
-    { label: "Today", icon: <Calendar size={14} /> },
+    { label: "Scheduling", icon: <CalendarDays size={14} /> },
     { label: "Insights", icon: <TrendingUp size={14} /> },
     { label: "Activity", icon: <Clock size={14} /> },
   ];
@@ -84,27 +95,28 @@ const VirtualAssistantDemo = () => {
     <>
       <WorkspaceShell tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab}>
         <SmartSuggestions suggestions={brainSuggestions} loading={suggestionsLoading} onFeedback={sendFeedback} />
+
         {/* Foundation */}
         {activeTab === 0 && (
           <div className="space-y-5">
-            <FormFieldGroup title="Business Context" description="Help your AI understand how your business operates" icon={<Shield size={16} />}
+            <FormFieldGroup title="Business Context" description="Help your AI Calendar Assistant understand your business" icon={<Shield size={16} />}
               fields={[
                 { key: "business_overview", label: "Business Overview", type: "textarea" as const },
-                { key: "main_responsibilities", label: "Main Responsibilities", type: "textarea" as const },
+                { key: "main_responsibilities", label: "Services You Offer", type: "textarea" as const },
               ]}
               values={Object.fromEntries(["business_overview", "main_responsibilities"].map(k => [k, foundationForm[k] ?? (profile as any)?.[k] ?? ""]))}
               onChange={(k, v) => { setFoundationForm(p => ({...p, [k]: v})); setFoundationSaved(false); }} />
-            <FormFieldGroup title="Communication & Priorities" description="Set preferences for how the AI works" icon={<Zap size={16} />}
+            <FormFieldGroup title="Scheduling Preferences" description="Set how your calendar assistant should handle bookings" icon={<CalendarCheck size={16} />}
               fields={[
-                { key: "preferred_tone", label: "Preferred Tone" },
-                { key: "priority_rules", label: "Priority Rules" },
-                { key: "recurring_tasks", label: "Recurring Tasks" },
-                { key: "communication_preferences", label: "Communication Preferences" },
+                { key: "preferred_tone", label: "Communication Tone" },
+                { key: "priority_rules", label: "Scheduling Rules (e.g., no bookings before 9 AM)" },
+                { key: "recurring_tasks", label: "Recurring Appointments" },
+                { key: "communication_preferences", label: "Reminder Preferences (e.g., 24hr before)" },
               ]}
               values={Object.fromEntries(["preferred_tone", "priority_rules", "recurring_tasks", "communication_preferences"].map(k => [k, foundationForm[k] ?? (profile as any)?.[k] ?? ""]))}
               onChange={(k, v) => { setFoundationForm(p => ({...p, [k]: v})); setFoundationSaved(false); }} />
             <FormFieldGroup title="Additional Notes" icon={<FileText size={16} />}
-              fields={[{ key: "important_notes", label: "Important Notes", type: "textarea" as const }]}
+              fields={[{ key: "important_notes", label: "Important Notes (cancellation policies, blackout dates, etc.)", type: "textarea" as const }]}
               values={{ important_notes: foundationForm["important_notes"] ?? profile?.important_notes ?? "" }}
               onChange={(k, v) => { setFoundationForm(p => ({...p, [k]: v})); setFoundationSaved(false); }} />
             <div className="rounded-xl border border-border/50 bg-card p-5">
@@ -112,7 +124,7 @@ const VirtualAssistantDemo = () => {
                 <input type="checkbox" checked={foundationForm.approval_required !== undefined ? foundationForm.approval_required === "true" : profile?.approval_required ?? true}
                   onChange={e => setFoundationForm(p => ({...p, approval_required: String(e.target.checked)}))}
                   className="rounded border-border accent-primary" />
-                Approval required before completing actions
+                Require approval before confirming bookings
               </label>
             </div>
             <button onClick={async () => {
@@ -125,17 +137,122 @@ const VirtualAssistantDemo = () => {
           </div>
         )}
 
-        {/* Requests */}
+        {/* Appointments */}
         {activeTab === 1 && (
+          <div className="space-y-6">
+            <WorkspaceSection title="Upcoming Appointments" description="Manage your scheduled appointments and bookings.">
+              <div className="rounded-xl border border-border/50 bg-card p-5 space-y-4">
+                <h4 className="text-sm font-semibold text-foreground">Add Appointment</h4>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div><label className="mb-1.5 block text-xs font-medium text-muted-foreground">Client Name</label><input value={apptForm.client_name} onChange={e => setApptForm(p => ({...p, client_name: e.target.value}))} placeholder="Jane Smith" className="w-full rounded-lg border border-border bg-secondary/50 px-3.5 py-2.5 text-sm text-foreground focus:border-primary/50 focus:outline-none" /></div>
+                  <div><label className="mb-1.5 block text-xs font-medium text-muted-foreground">Service</label><input value={apptForm.service_type} onChange={e => setApptForm(p => ({...p, service_type: e.target.value}))} placeholder="Deep Clean, Consultation..." className="w-full rounded-lg border border-border bg-secondary/50 px-3.5 py-2.5 text-sm text-foreground focus:border-primary/50 focus:outline-none" /></div>
+                  <div><label className="mb-1.5 block text-xs font-medium text-muted-foreground">Date & Time</label><input type="datetime-local" value={apptForm.scheduled_date} onChange={e => setApptForm(p => ({...p, scheduled_date: e.target.value}))} className="w-full rounded-lg border border-border bg-secondary/50 px-3.5 py-2.5 text-sm text-foreground focus:border-primary/50 focus:outline-none" /></div>
+                  <div><label className="mb-1.5 block text-xs font-medium text-muted-foreground">Duration (min)</label><input type="number" value={apptForm.duration_minutes} onChange={e => setApptForm(p => ({...p, duration_minutes: e.target.value}))} className="w-full rounded-lg border border-border bg-secondary/50 px-3.5 py-2.5 text-sm text-foreground focus:border-primary/50 focus:outline-none" /></div>
+                </div>
+                <div><label className="mb-1.5 block text-xs font-medium text-muted-foreground">Notes</label><textarea value={apptForm.notes} onChange={e => setApptForm(p => ({...p, notes: e.target.value}))} rows={2} placeholder="Additional details..." className="w-full rounded-lg border border-border bg-secondary/50 px-3.5 py-2.5 text-sm text-foreground focus:border-primary/50 focus:outline-none resize-none" /></div>
+                <button onClick={async () => {
+                  if (!apptForm.client_name.trim()) { toast({ title: "Please enter a client name" }); return; }
+                  const newAppt = { id: crypto.randomUUID(), ...apptForm, status: "scheduled", created_at: new Date().toISOString() };
+                  setAppointments(prev => [newAppt, ...prev]);
+                  await logActivity("appointment_created", `Appointment: ${apptForm.client_name} - ${apptForm.service_type}`);
+                  setApptForm({ client_name: "", service_type: "", scheduled_date: "", duration_minutes: "60", notes: "" });
+                  toast({ title: "Appointment added" });
+                }} className="btn-glow text-sm"><Plus size={14} className="mr-1" /> Add Appointment</button>
+              </div>
+            </WorkspaceSection>
+
+            {appointments.length > 0 ? (
+              <div className="space-y-3">
+                {appointments.map(a => (
+                  <div key={a.id} className={`rounded-xl border p-4 transition-all ${a.status === "completed" ? "border-emerald-500/30 bg-emerald-500/5" : "border-border/50 bg-card"}`}>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-medium text-foreground">{a.client_name}</span>
+                      <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${a.status === "completed" ? "bg-emerald-500/10 text-emerald-400" : a.status === "cancelled" ? "bg-red-500/10 text-red-400" : "bg-amber-500/10 text-amber-400"}`}>{a.status}</span>
+                    </div>
+                    <div className="flex items-center gap-3 text-xs text-muted-foreground mb-3">
+                      <span>{a.service_type}</span>
+                      {a.scheduled_date && <span>{new Date(a.scheduled_date).toLocaleString()}</span>}
+                      <span>{a.duration_minutes} min</span>
+                    </div>
+                    {a.status === "scheduled" && (
+                      <div className="flex gap-2 flex-wrap">
+                        <button onClick={() => setAppointments(prev => prev.map(ap => ap.id === a.id ? {...ap, status: "completed"} : ap))} className="flex items-center gap-1 rounded-lg bg-emerald-500/10 px-3 py-1.5 text-xs font-medium text-emerald-400 hover:bg-emerald-500/20"><Check size={12} /> Complete</button>
+                        <button onClick={() => setAppointments(prev => prev.map(ap => ap.id === a.id ? {...ap, status: "cancelled"} : ap))} className="flex items-center gap-1 rounded-lg bg-red-500/10 px-3 py-1.5 text-xs font-medium text-red-400 hover:bg-red-500/20">Cancel</button>
+                        <button onClick={() => { toast({ title: "Reminder sent", description: `Reminder sent to ${a.client_name}` }); }} className="flex items-center gap-1 rounded-lg bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary hover:bg-primary/20"><Bell size={12} /> Send Reminder</button>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : <EmptyState icon={<CalendarCheck size={20} />} message="No appointments yet. Add your first appointment above." />}
+          </div>
+        )}
+
+        {/* Booking Requests */}
+        {activeTab === 2 && (
+          <div className="space-y-6">
+            <WorkspaceSection title="Booking Requests" description="Review incoming booking requests from clients.">
+              <div className="rounded-xl border border-border/50 bg-card p-5 space-y-4">
+                <h4 className="text-sm font-semibold text-foreground">Add Booking Request</h4>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div><label className="mb-1.5 block text-xs font-medium text-muted-foreground">Client Name</label><input value={bookingForm.client_name} onChange={e => setBookingForm(p => ({...p, client_name: e.target.value}))} placeholder="Client name" className="w-full rounded-lg border border-border bg-secondary/50 px-3.5 py-2.5 text-sm text-foreground focus:border-primary/50 focus:outline-none" /></div>
+                  <div><label className="mb-1.5 block text-xs font-medium text-muted-foreground">Requested Service</label><input value={bookingForm.requested_service} onChange={e => setBookingForm(p => ({...p, requested_service: e.target.value}))} placeholder="Haircut, Cleaning..." className="w-full rounded-lg border border-border bg-secondary/50 px-3.5 py-2.5 text-sm text-foreground focus:border-primary/50 focus:outline-none" /></div>
+                  <div><label className="mb-1.5 block text-xs font-medium text-muted-foreground">Preferred Time</label><input value={bookingForm.preferred_time_slot} onChange={e => setBookingForm(p => ({...p, preferred_time_slot: e.target.value}))} placeholder="Morning, 2-4 PM..." className="w-full rounded-lg border border-border bg-secondary/50 px-3.5 py-2.5 text-sm text-foreground focus:border-primary/50 focus:outline-none" /></div>
+                </div>
+                <div><label className="mb-1.5 block text-xs font-medium text-muted-foreground">Notes</label><textarea value={bookingForm.notes} onChange={e => setBookingForm(p => ({...p, notes: e.target.value}))} rows={2} placeholder="Additional details..." className="w-full rounded-lg border border-border bg-secondary/50 px-3.5 py-2.5 text-sm text-foreground focus:border-primary/50 focus:outline-none resize-none" /></div>
+                <button onClick={async () => {
+                  if (!bookingForm.client_name.trim()) { toast({ title: "Please enter a client name" }); return; }
+                  const newReq = { id: crypto.randomUUID(), ...bookingForm, status: "pending", created_at: new Date().toISOString() };
+                  setBookingRequests(prev => [newReq, ...prev]);
+                  await logActivity("booking_request", `Booking request from ${bookingForm.client_name}`);
+                  setBookingForm({ client_name: "", requested_service: "", preferred_time_slot: "", notes: "" });
+                  toast({ title: "Booking request added" });
+                }} className="btn-glow text-sm"><Plus size={14} className="mr-1" /> Add Request</button>
+              </div>
+            </WorkspaceSection>
+
+            {bookingRequests.length > 0 ? (
+              <div className="space-y-3">
+                {bookingRequests.map(b => (
+                  <div key={b.id} className={`rounded-xl border p-4 transition-all ${b.status === "confirmed" ? "border-emerald-500/30 bg-emerald-500/5" : "border-border/50 bg-card"}`}>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-medium text-foreground">{b.client_name}</span>
+                      <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${b.status === "confirmed" ? "bg-emerald-500/10 text-emerald-400" : b.status === "declined" ? "bg-red-500/10 text-red-400" : "bg-amber-500/10 text-amber-400"}`}>{b.status}</span>
+                    </div>
+                    <div className="flex items-center gap-3 text-xs text-muted-foreground mb-3">
+                      <span>{b.requested_service}</span>
+                      <span>Preferred: {b.preferred_time_slot || "Any"}</span>
+                    </div>
+                    {b.status === "pending" && (
+                      <div className="flex gap-2 flex-wrap">
+                        <button onClick={() => {
+                          setBookingRequests(prev => prev.map(br => br.id === b.id ? {...br, status: "confirmed"} : br));
+                          const newAppt = { id: crypto.randomUUID(), client_name: b.client_name, service_type: b.requested_service, scheduled_date: "", duration_minutes: "60", notes: b.notes, status: "scheduled", created_at: new Date().toISOString() };
+                          setAppointments(prev => [newAppt, ...prev]);
+                          toast({ title: "Booking confirmed & appointment created" });
+                        }} className="flex items-center gap-1 rounded-lg bg-emerald-500/10 px-3 py-1.5 text-xs font-medium text-emerald-400 hover:bg-emerald-500/20"><Check size={12} /> Confirm</button>
+                        <button onClick={() => setBookingRequests(prev => prev.map(br => br.id === b.id ? {...br, status: "declined"} : br))} className="flex items-center gap-1 rounded-lg bg-red-500/10 px-3 py-1.5 text-xs font-medium text-red-400 hover:bg-red-500/20">Decline</button>
+                        <button onClick={() => toast({ title: "Suggested time sent to client" })} className="flex items-center gap-1 rounded-lg bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary hover:bg-primary/20"><Sparkles size={12} /> Suggest Time</button>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : <EmptyState icon={<CalendarClock size={20} />} message="No booking requests yet." />}
+          </div>
+        )}
+
+        {/* Requests (existing) */}
+        {activeTab === 3 && (
           <div className="space-y-6">
             <WorkspaceSection title="Incoming Requests" description="Add requests and let AI generate drafts & tasks.">
               <div className="rounded-xl border border-border/50 bg-card p-5 space-y-4">
                 <h4 className="text-sm font-semibold text-foreground">Add New Request</h4>
                 <div className="grid gap-3 sm:grid-cols-2">
-                  {[{ key: "requester_name", label: "Requester Name", placeholder: "Jane Smith" }, { key: "request_summary", label: "Request Summary", placeholder: "Follow up with client" }].map(f => (
+                  {[{ key: "requester_name", label: "Requester Name", placeholder: "Jane Smith" }, { key: "request_summary", label: "Request Summary", placeholder: "Reschedule appointment" }].map(f => (
                     <div key={f.key}><label className="mb-1.5 block text-xs font-medium text-muted-foreground">{f.label}</label><input value={(reqForm as any)[f.key]} onChange={e => setReqForm(p => ({...p, [f.key]: e.target.value}))} placeholder={f.placeholder} className="w-full rounded-lg border border-border bg-secondary/50 px-3.5 py-2.5 text-sm text-foreground focus:border-primary/50 focus:outline-none transition-colors" /></div>
                   ))}
-                  <div><label className="mb-1.5 block text-xs font-medium text-muted-foreground">Source</label><select value={reqForm.source} onChange={e => setReqForm(p => ({...p, source: e.target.value}))} className="w-full rounded-lg border border-border bg-secondary/50 px-3.5 py-2.5 text-sm text-foreground focus:outline-none">{["manual","email","phone","chat","form"].map(s => <option key={s} value={s}>{s}</option>)}</select></div>
+                  <div><label className="mb-1.5 block text-xs font-medium text-muted-foreground">Source</label><select value={reqForm.source} onChange={e => setReqForm(p => ({...p, source: e.target.value}))} className="w-full rounded-lg border border-border bg-secondary/50 px-3.5 py-2.5 text-sm text-foreground focus:outline-none">{["manual","email","phone","chat","booking_form"].map(s => <option key={s} value={s}>{s}</option>)}</select></div>
                   <div><label className="mb-1.5 block text-xs font-medium text-muted-foreground">Urgency</label><select value={reqForm.urgency} onChange={e => setReqForm(p => ({...p, urgency: e.target.value}))} className="w-full rounded-lg border border-border bg-secondary/50 px-3.5 py-2.5 text-sm text-foreground focus:outline-none">{["low","medium","high"].map(u => <option key={u} value={u}>{u}</option>)}</select></div>
                 </div>
                 <div><label className="mb-1.5 block text-xs font-medium text-muted-foreground">Details</label><textarea value={reqForm.request_details} onChange={e => setReqForm(p => ({...p, request_details: e.target.value}))} rows={2} placeholder="Additional context..." className="w-full rounded-lg border border-border bg-secondary/50 px-3.5 py-2.5 text-sm text-foreground focus:border-primary/50 focus:outline-none resize-none transition-colors" /></div>
@@ -170,7 +287,7 @@ const VirtualAssistantDemo = () => {
         )}
 
         {/* Tasks */}
-        {activeTab === 2 && (
+        {activeTab === 4 && (
           <WorkspaceSection title="Tasks" description="Manage your work items."
             action={<button onClick={async () => { const title = prompt("Task title:"); if (title) await addTask({ title, priority: "medium" }); }} className="btn-outline-glow text-sm"><Plus size={14} className="mr-1" /> Add Task</button>}>
             {tasks.filter(t => t.status !== "archived").length === 0 ? <EmptyState icon={<ListChecks size={20} />} message="No tasks yet. Add a request and generate AI tasks, or create one manually." /> : (
@@ -202,7 +319,7 @@ const VirtualAssistantDemo = () => {
         )}
 
         {/* Drafts */}
-        {activeTab === 3 && (
+        {activeTab === 5 && (
           <WorkspaceSection title="Drafts" description="Review and manage AI-generated responses.">
             {drafts.length === 0 ? <EmptyState icon={<FileText size={20} />} message="No drafts yet. Generate one from the Requests tab using AI." /> : (
               <div className="space-y-4">
@@ -234,20 +351,20 @@ const VirtualAssistantDemo = () => {
         )}
 
         {/* Tools */}
-        {activeTab === 4 && (
-          <WorkspaceSection title="Connected Tools" description="Link calendars, communication tools, and task systems.">
+        {activeTab === 6 && (
+          <WorkspaceSection title="Connected Tools" description="Link calendars, booking platforms, and communication tools.">
             <div className="space-y-3">{toolPlatforms.map(p => { const conn = getToolConnection(p.name); return <ConnectionCard key={p.name} name={p.name} icon={<p.icon size={20} />} connected={isToolConnected(p.name)} accountName={conn?.account_name} connectedAt={conn?.connected_at} onConnect={() => setConnectModal(p.name)} onDisconnect={() => disconnectTool(p.name)} />; })}</div>
           </WorkspaceSection>
         )}
 
-        {/* Today */}
-        {activeTab === 5 && (
-          <WorkspaceSection title="Today's Work" description="Your daily overview at a glance.">
+        {/* Scheduling Overview */}
+        {activeTab === 7 && (
+          <WorkspaceSection title="Scheduling Overview" description="Your daily scheduling at a glance.">
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              <StatCard label="Upcoming Appointments" value={appointments.filter(a => a.status === "scheduled").length} icon={<CalendarCheck size={18} />} />
+              <StatCard label="Pending Bookings" value={bookingRequests.filter(b => b.status === "pending").length} icon={<CalendarClock size={18} />} accent="text-amber-400" />
               <StatCard label="Open Requests" value={openRequests.length} icon={<Inbox size={18} />} />
               <StatCard label="Active Tasks" value={activeTasks.length} icon={<ListChecks size={18} />} />
-              <StatCard label="Awaiting Approval" value={tasks.filter(t => t.status === "awaiting_approval").length} icon={<Bell size={18} />} accent="text-yellow-400" />
-              <StatCard label="Completed" value={tasks.filter(t => t.status === "completed").length} icon={<Check size={18} />} accent="text-emerald-400" />
             </div>
             {activeTasks.length > 0 && (
               <div className="mt-5 rounded-xl border border-border/50 bg-card p-5">
@@ -262,26 +379,47 @@ const VirtualAssistantDemo = () => {
                 </div>
               </div>
             )}
+
+            {/* Smart scheduling suggestions */}
+            <div className="mt-5 rounded-xl border border-amber-500/20 bg-amber-500/5 p-5">
+              <div className="flex items-center gap-2 mb-3">
+                <Sparkles size={14} className="text-amber-400" />
+                <h4 className="text-sm font-semibold text-foreground">Smart Scheduling Suggestions</h4>
+              </div>
+              <div className="space-y-2">
+                {[
+                  "You usually book deep cleans in the afternoon — want to use 3 PM for the next one?",
+                  "This client typically prefers mornings. Consider offering a 10 AM slot.",
+                  "You normally send reminders 24 hours before. Tomorrow has 3 appointments.",
+                  "This week is filling up. Consider moving overflow to next Monday.",
+                ].map((s, i) => (
+                  <div key={i} className="flex items-start gap-2 rounded-lg bg-secondary/30 px-3 py-2">
+                    <CalendarCheck size={12} className="mt-0.5 shrink-0 text-amber-400" />
+                    <span className="text-xs text-muted-foreground">{s}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
           </WorkspaceSection>
         )}
 
         {/* Insights */}
-        {activeTab === 6 && (
-          <WorkspaceSection title="Assistant Insights" description="Track your productivity.">
+        {activeTab === 8 && (
+          <WorkspaceSection title="Calendar Insights" description="Track your scheduling productivity.">
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <StatCard label="Total Appointments" value={appointments.length} icon={<CalendarCheck size={18} />} />
+              <StatCard label="Completed" value={appointments.filter(a => a.status === "completed").length} icon={<Check size={18} />} accent="text-emerald-400" />
+              <StatCard label="Booking Requests" value={bookingRequests.length} icon={<CalendarClock size={18} />} />
               <StatCard label="Tasks Created" value={tasks.length} icon={<ListChecks size={18} />} />
-              <StatCard label="Tasks Completed" value={tasks.filter(t => t.status === "completed").length} icon={<Check size={18} />} accent="text-emerald-400" />
-              <StatCard label="Requests Received" value={requests.length} icon={<Inbox size={18} />} />
               <StatCard label="Drafts Created" value={drafts.length} icon={<FileText size={18} />} />
-              <StatCard label="High Priority" value={tasks.filter(t => t.priority === "high" && t.status !== "completed").length} icon={<Bell size={18} />} accent="text-orange-400" />
               <StatCard label="Connected Tools" value={connections.filter(c => c.connected).length} icon={<Zap size={18} />} />
             </div>
           </WorkspaceSection>
         )}
 
         {/* Activity */}
-        {activeTab === 7 && (
-          <WorkspaceSection title="Recent Activity" description="Your assistant history.">
+        {activeTab === 9 && (
+          <WorkspaceSection title="Recent Activity" description="Your calendar assistant history.">
             <ActivityFeed activities={activities} emptyMessage="No activity yet." />
           </WorkspaceSection>
         )}
