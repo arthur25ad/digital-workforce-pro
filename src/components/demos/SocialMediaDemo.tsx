@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import { useVantaBrainActions, useVantaBrainSuggestions } from "@/hooks/useVantaBrain";
 import SmartSuggestions from "@/components/SmartSuggestions";
 import { useAuth } from "@/hooks/useAuth";

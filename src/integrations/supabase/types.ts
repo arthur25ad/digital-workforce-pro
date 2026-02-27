@@ -400,6 +400,50 @@ export type Database = {
           },
         ]
       }
+      brain_settings: {
+        Row: {
+          created_at: string
+          id: string
+          learn_from_approvals: boolean
+          learn_from_edits: boolean
+          learn_timing_suggestions: boolean
+          learning_paused: boolean
+          require_approval: boolean
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          learn_from_approvals?: boolean
+          learn_from_edits?: boolean
+          learn_timing_suggestions?: boolean
+          learning_paused?: boolean
+          require_approval?: boolean
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          learn_from_approvals?: boolean
+          learn_from_edits?: boolean
+          learn_timing_suggestions?: boolean
+          learning_paused?: boolean
+          require_approval?: boolean
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brain_settings_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: true
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       brand_profiles: {
         Row: {
           approval_required: boolean
