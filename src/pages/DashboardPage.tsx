@@ -112,7 +112,7 @@ const DashboardPage = () => {
                 : "Welcome back"}
             </h1>
             <p className="mt-2 text-muted-foreground">
-              <span className="text-foreground font-medium">{packageLabel}</span> plan · {unlockedRoles.length} AI Employee{unlockedRoles.length !== 1 ? "s" : ""} active
+              <span className="text-foreground font-medium uppercase">{packageLabel}</span> PLAN · {unlockedRoles.length} AI EMPLOYEE{unlockedRoles.length !== 1 ? "S" : ""} ACTIVE
             </p>
           </motion.div>
 
