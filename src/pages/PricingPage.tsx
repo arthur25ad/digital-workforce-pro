@@ -53,7 +53,7 @@ const PricingPage = () => {
   };
 
   const plans = PACKAGE_ORDER.map((key) => PACKAGES[key]);
-  const activePromo = appliedPromo || topPromo;
+  const activePromo = appliedPromo;
 
   return (
     <PageLayout>

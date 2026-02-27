@@ -78,15 +78,14 @@ const PromoCodeInput = ({ onApply, onClear, appliedPromo }: PromoCodeInputProps)
           placeholder="Promo code"
           value={code}
           onChange={(e) => { setCode(e.target.value.toUpperCase()); setError(""); }}
-          className="font-mono text-sm h-9"
+          className="font-mono text-sm h-9 border-emerald-500/40 bg-emerald-500/5 placeholder:text-emerald-400/40 focus-visible:ring-emerald-500/50"
           onKeyDown={(e) => e.key === "Enter" && handleApply()}
         />
         <Button
           size="sm"
-          variant="outline"
           onClick={handleApply}
           disabled={loading || !code.trim()}
-          className="h-9 px-4 text-xs"
+          className="h-9 px-4 text-xs bg-emerald-600 hover:bg-emerald-500 text-white border-0"
         >
           {loading ? <Loader2 size={14} className="animate-spin" /> : "Apply"}
         </Button>
