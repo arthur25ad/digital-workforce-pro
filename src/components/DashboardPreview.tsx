@@ -15,7 +15,7 @@ const activityRows = [
   { icon: Clock4, role: "social", roleIcon: Share2, text: "Before & after photo post ready for approval", status: "Needs Review", statusColor: "text-blue-400", statusBg: "bg-blue-500/10", time: "18 min ago" },
   { icon: CheckCircle2, role: "assistant", roleIcon: CalendarCheck, text: "Rescheduled 2 client appointments & notified them", status: "Done", statusColor: "text-emerald-400", statusBg: "bg-emerald-500/10", time: "25 min ago" },
   { icon: Clock4, role: "email", roleIcon: Mail, text: "Holiday promo email draft awaiting your review", status: "Needs Review", statusColor: "text-amber-400", statusBg: "bg-amber-500/10", time: "40 min ago" },
-  { icon: ArrowRight, role: "social", roleIcon: Share2, text: "5-star review response posted to Google Business", status: "Done", statusColor: "text-emerald-400", statusBg: "bg-emerald-500/10", time: "1h ago" },
+  { icon: ArrowRight, role: "social", roleIcon: Share2, text: "Facebook ad campaign launched for weekend promo", status: "Done", statusColor: "text-emerald-400", statusBg: "bg-emerald-500/10", time: "1h ago" },
 ];
 
 const roleDetails = [
