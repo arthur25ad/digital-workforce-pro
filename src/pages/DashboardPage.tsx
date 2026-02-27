@@ -5,10 +5,11 @@ import { useAuth } from "@/hooks/useAuth";
 import { useWorkspaceData } from "@/hooks/useWorkspaceData";
 import { useCustomerSupportData } from "@/hooks/useCustomerSupportData";
 import { useEmailMarketingData } from "@/hooks/useEmailMarketingData";
+import { useVirtualAssistantData } from "@/hooks/useVirtualAssistantData";
 import {
   Share2, Headphones, Mail, CalendarCheck, Check, Clock, AlertCircle,
   FileText, MessageSquare, PenLine, Eye, ThumbsUp, Bell, Send, Calendar,
-  AlertTriangle,
+  AlertTriangle, Inbox, ListChecks,
 } from "lucide-react";
 
 const DashboardPage = () => {
@@ -22,6 +23,10 @@ const DashboardPage = () => {
     campaigns: emailCampaigns, drafts: emailDrafts, connections: emailConnections,
     activities: emailActivities,
   } = useEmailMarketingData();
+  const {
+    tasks: vaTasks, requests: vaRequests, drafts: vaDrafts, connections: vaConnections,
+    activities: vaActivities,
+  } = useVirtualAssistantData();
 
   const approved = drafts.filter(d => d.status === "approved").length;
   const pending = drafts.filter(d => d.status === "pending" || d.status === "draft").length;
@@ -32,6 +37,7 @@ const DashboardPage = () => {
   const hasSocial = profile?.unlocked_roles.includes("social-media-manager");
   const hasSupport = profile?.unlocked_roles.includes("customer-support");
   const hasEmail = profile?.unlocked_roles.includes("email-marketer");
+  const hasVA = profile?.unlocked_roles.includes("virtual-assistant");
 
   // Support stats
   const openTickets = supportTickets.filter(t => t.status === "new" || t.status === "drafting").length;
@@ -47,8 +53,15 @@ const DashboardPage = () => {
   const emailSenders = emailConnections.filter((c: any) => c.connected);
   const nextEmailScheduled = emailDrafts.find(d => d.status === "scheduled" && d.scheduled_date);
 
+  // VA stats
+  const vaOpenRequests = vaRequests.filter(r => r.status !== "completed").length;
+  const vaActiveTasks = vaTasks.filter(t => ["new", "pending", "in_progress"].includes(t.status)).length;
+  const vaAwaitingApproval = vaTasks.filter(t => t.status === "awaiting_approval").length;
+  const vaCompleted = vaTasks.filter(t => t.status === "completed").length;
+  const vaTools = vaConnections.filter((c: any) => c.connected);
+
   // Merge activities from all roles
-  const allActivities = [...activities, ...supportActivities, ...emailActivities]
+  const allActivities = [...activities, ...supportActivities, ...emailActivities, ...vaActivities]
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
     .slice(0, 10);
 
@@ -63,13 +76,14 @@ const DashboardPage = () => {
                   {workspace?.business_name ? `${workspace.business_name} Dashboard` : "Your Dashboard"}
                 </h1>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  {profile?.active_package ? `${profile.active_package} plan` : ""} · {connectedPlatforms.length + connectedChannels.length + emailSenders.length} connections
+                  {profile?.active_package ? `${profile.active_package} plan` : ""} · {connectedPlatforms.length + connectedChannels.length + emailSenders.length + vaTools.length} connections
                 </p>
               </div>
               <div className="flex gap-3 flex-wrap">
                 {hasSocial && <Link to="/ai-employees/social-media-manager" className="btn-outline-glow text-sm">Open Social Manager</Link>}
                 {hasSupport && <Link to="/ai-employees/customer-support" className="btn-outline-glow text-sm">Open Support Manager</Link>}
                 {hasEmail && <Link to="/ai-employees/email-marketer" className="btn-outline-glow text-sm">Open Email Marketer</Link>}
+                {hasVA && <Link to="/ai-employees/virtual-assistant" className="btn-outline-glow text-sm">Open Virtual Assistant</Link>}
               </div>
             </div>
           </motion.div>
@@ -149,12 +163,37 @@ const DashboardPage = () => {
             </div>
           )}
 
+          {/* Virtual Assistant Stats */}
+          {hasVA && (
+            <div className="mb-8">
+              <div className="flex items-center gap-2 mb-4">
+                <CalendarCheck size={18} className="text-primary" />
+                <h2 className="font-display text-lg font-semibold text-foreground">Virtual Assistant</h2>
+                <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] text-emerald-400 font-medium">Active</span>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+                {[
+                  { label: "Open Requests", value: String(vaOpenRequests), icon: Inbox, color: "text-primary" },
+                  { label: "Active Tasks", value: String(vaActiveTasks), icon: ListChecks, color: "text-primary" },
+                  { label: "Awaiting Approval", value: String(vaAwaitingApproval), icon: Bell, color: "text-yellow-400" },
+                  { label: "Completed", value: String(vaCompleted), icon: Check, color: "text-emerald-400" },
+                  { label: "Tools", value: String(vaTools.length), icon: CalendarCheck, color: "text-primary" },
+                ].map((s) => (
+                  <div key={s.label} className="rounded-xl border border-border/50 bg-card p-4">
+                    <div className="flex items-center justify-between"><s.icon size={16} className={s.color} /><span className="font-display text-2xl font-bold text-foreground">{s.value}</span></div>
+                    <p className="mt-1 text-xs text-muted-foreground">{s.label}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Connected Platforms */}
-          {(connectedPlatforms.length > 0 || connectedChannels.length > 0 || emailSenders.length > 0) && (
+          {(connectedPlatforms.length > 0 || connectedChannels.length > 0 || emailSenders.length > 0 || vaTools.length > 0) && (
             <div className="mb-8 rounded-xl border border-border/50 bg-card p-5">
               <h3 className="mb-3 font-display text-sm font-semibold text-foreground">Connected Platforms & Channels</h3>
               <div className="flex flex-wrap gap-3">
-                {[...connectedPlatforms, ...connectedChannels, ...emailSenders].map((c: any) => (
+                {[...connectedPlatforms, ...connectedChannels, ...emailSenders, ...vaTools].map((c: any) => (
                   <div key={c.id} className="flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1.5">
                     <div className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
                     <span className="text-xs font-medium text-primary">{c.platform}</span>
@@ -221,6 +260,29 @@ const DashboardPage = () => {
                       t.status === "escalated" ? "bg-orange-500/10 text-orange-400" :
                       "bg-primary/10 text-primary"
                     }`}>{t.status}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Recent VA Tasks */}
+          {vaTasks.length > 0 && hasVA && (
+            <div className="mb-8 rounded-xl border border-border/50 bg-card p-5">
+              <h3 className="mb-3 font-display text-sm font-semibold text-foreground">Recent Assistant Tasks</h3>
+              <div className="space-y-2">
+                {vaTasks.slice(0, 5).map((t) => (
+                  <div key={t.id} className="flex items-center justify-between rounded-lg bg-secondary p-3">
+                    <div>
+                      <p className="text-sm font-medium text-foreground truncate max-w-[300px]">{t.title}</p>
+                      <p className="text-xs text-muted-foreground">{t.priority} · {t.category}</p>
+                    </div>
+                    <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${
+                      t.status === "completed" ? "bg-emerald-500/10 text-emerald-400" :
+                      t.status === "in_progress" ? "bg-primary/10 text-primary" :
+                      t.status === "awaiting_approval" ? "bg-yellow-500/10 text-yellow-400" :
+                      "bg-secondary text-muted-foreground border border-border"
+                    }`}>{t.status.replace("_", " ")}</span>
                   </div>
                 ))}
               </div>
