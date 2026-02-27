@@ -46,6 +46,213 @@ export type Database = {
           },
         ]
       }
+      assistant_drafts: {
+        Row: {
+          created_at: string
+          draft_content: string | null
+          draft_type: string | null
+          id: string
+          next_step: string | null
+          request_id: string | null
+          status: string
+          subject: string | null
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          draft_content?: string | null
+          draft_type?: string | null
+          id?: string
+          next_step?: string | null
+          request_id?: string | null
+          status?: string
+          subject?: string | null
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          draft_content?: string | null
+          draft_type?: string | null
+          id?: string
+          next_step?: string | null
+          request_id?: string | null
+          status?: string
+          subject?: string | null
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assistant_drafts_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "assistant_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "assistant_drafts_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      assistant_profiles: {
+        Row: {
+          approval_required: boolean
+          business_overview: string | null
+          communication_preferences: string | null
+          created_at: string
+          id: string
+          important_notes: string | null
+          main_responsibilities: string | null
+          preferred_tone: string | null
+          priority_rules: string | null
+          recurring_tasks: string | null
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          approval_required?: boolean
+          business_overview?: string | null
+          communication_preferences?: string | null
+          created_at?: string
+          id?: string
+          important_notes?: string | null
+          main_responsibilities?: string | null
+          preferred_tone?: string | null
+          priority_rules?: string | null
+          recurring_tasks?: string | null
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          approval_required?: boolean
+          business_overview?: string | null
+          communication_preferences?: string | null
+          created_at?: string
+          id?: string
+          important_notes?: string | null
+          main_responsibilities?: string | null
+          preferred_tone?: string | null
+          priority_rules?: string | null
+          recurring_tasks?: string | null
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assistant_profiles_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      assistant_requests: {
+        Row: {
+          created_at: string
+          id: string
+          recommended_action: string | null
+          request_details: string | null
+          request_summary: string | null
+          requester_name: string | null
+          source: string | null
+          status: string
+          updated_at: string
+          urgency: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          recommended_action?: string | null
+          request_details?: string | null
+          request_summary?: string | null
+          requester_name?: string | null
+          source?: string | null
+          status?: string
+          updated_at?: string
+          urgency?: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          recommended_action?: string | null
+          request_details?: string | null
+          request_summary?: string | null
+          requester_name?: string | null
+          source?: string | null
+          status?: string
+          updated_at?: string
+          urgency?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assistant_requests_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      assistant_tasks: {
+        Row: {
+          assigned_type: string | null
+          category: string | null
+          created_at: string
+          description: string | null
+          due_date: string | null
+          id: string
+          priority: string
+          status: string
+          title: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          assigned_type?: string | null
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          priority?: string
+          status?: string
+          title?: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          assigned_type?: string | null
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          priority?: string
+          status?: string
+          title?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assistant_tasks_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       brand_profiles: {
         Row: {
           approval_required: boolean
