@@ -247,6 +247,210 @@ export type Database = {
           },
         ]
       }
+      support_drafts: {
+        Row: {
+          confidence_level: string | null
+          created_at: string
+          escalation_flag: boolean
+          id: string
+          issue_summary: string | null
+          referenced_policy: string | null
+          status: string
+          suggested_reply: string | null
+          ticket_id: string | null
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          confidence_level?: string | null
+          created_at?: string
+          escalation_flag?: boolean
+          id?: string
+          issue_summary?: string | null
+          referenced_policy?: string | null
+          status?: string
+          suggested_reply?: string | null
+          ticket_id?: string | null
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          confidence_level?: string | null
+          created_at?: string
+          escalation_flag?: boolean
+          id?: string
+          issue_summary?: string | null
+          referenced_policy?: string | null
+          status?: string
+          suggested_reply?: string | null
+          ticket_id?: string | null
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_drafts_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "support_tickets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "support_drafts_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      support_knowledge_bases: {
+        Row: {
+          brand_tone: string | null
+          business_overview: string | null
+          created_at: string
+          custom_policies: string | null
+          escalation_rules: string | null
+          example_responses: string | null
+          id: string
+          products_services: string | null
+          refund_policy: string | null
+          shipping_policy: string | null
+          sop_notes: string | null
+          support_hours: string | null
+          support_principles: string | null
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          brand_tone?: string | null
+          business_overview?: string | null
+          created_at?: string
+          custom_policies?: string | null
+          escalation_rules?: string | null
+          example_responses?: string | null
+          id?: string
+          products_services?: string | null
+          refund_policy?: string | null
+          shipping_policy?: string | null
+          sop_notes?: string | null
+          support_hours?: string | null
+          support_principles?: string | null
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          brand_tone?: string | null
+          business_overview?: string | null
+          created_at?: string
+          custom_policies?: string | null
+          escalation_rules?: string | null
+          example_responses?: string | null
+          id?: string
+          products_services?: string | null
+          refund_policy?: string | null
+          shipping_policy?: string | null
+          sop_notes?: string | null
+          support_hours?: string | null
+          support_principles?: string | null
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_knowledge_bases_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      support_knowledge_items: {
+        Row: {
+          content: string | null
+          created_at: string
+          id: string
+          item_type: string
+          title: string
+          workspace_id: string
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string
+          id?: string
+          item_type?: string
+          title: string
+          workspace_id: string
+        }
+        Update: {
+          content?: string | null
+          created_at?: string
+          id?: string
+          item_type?: string
+          title?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_knowledge_items_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      support_tickets: {
+        Row: {
+          channel: string
+          created_at: string
+          customer_message: string
+          customer_name: string
+          id: string
+          issue_type: string | null
+          sentiment: string | null
+          status: string
+          updated_at: string
+          urgency: string
+          workspace_id: string
+        }
+        Insert: {
+          channel?: string
+          created_at?: string
+          customer_message?: string
+          customer_name?: string
+          id?: string
+          issue_type?: string | null
+          sentiment?: string | null
+          status?: string
+          updated_at?: string
+          urgency?: string
+          workspace_id: string
+        }
+        Update: {
+          channel?: string
+          created_at?: string
+          customer_message?: string
+          customer_name?: string
+          id?: string
+          issue_type?: string | null
+          sentiment?: string | null
+          status?: string
+          updated_at?: string
+          urgency?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_tickets_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workspaces: {
         Row: {
           audience: string | null
