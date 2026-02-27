@@ -97,14 +97,77 @@ const PublicView = () => (
           >
             Get Started <ArrowRight size={16} />
           </Link>
-          <Link to="/how-it-works" className="btn-outline-glow inline-flex items-center gap-2 text-sm uppercase tracking-wide">
+          <a href="#how-vantabrain-works" className="btn-outline-glow inline-flex items-center gap-2 text-sm uppercase tracking-wide">
             How It Works
-          </Link>
+          </a>
         </motion.div>
       </div>
     </section>
 
-    {/* ── Single condensed "What it does" section ── */}
+    {/* ── How VantaBrain Works ── */}
+    <section id="how-vantabrain-works" className="px-6 pb-20 md:px-12 lg:px-16 scroll-mt-24">
+      <div className="mx-auto max-w-[1000px]">
+        <motion.div {...fadeUp}>
+          <h2 className="font-display text-center text-3xl font-bold text-foreground md:text-4xl mb-4">
+            How <span style={{ color: PURPLE }}>VANTABRAIN</span> Works
+          </h2>
+          <p className="text-center text-muted-foreground text-sm md:text-base max-w-xl mx-auto mb-12">
+            VANTABRAIN is the shared intelligence layer behind every AI Employee. Here's how it makes your entire team smarter over time.
+          </p>
+        </motion.div>
+
+        <div className="space-y-6">
+          {[
+            {
+              step: "1",
+              title: "You Use Your AI Employees",
+              desc: "Every time you approve a draft, edit a suggestion, or reject an output — VANTABRAIN is quietly watching. It tracks your preferences across Social Media, Email, Support, and your Virtual Assistant.",
+              icon: Eye,
+            },
+            {
+              step: "2",
+              title: "It Learns Your Patterns",
+              desc: "Over time, VANTABRAIN turns repeated behaviors into persistent memory. Your preferred tone, timing, formatting style, and priorities become part of its understanding of your business.",
+              icon: Brain,
+            },
+            {
+              step: "3",
+              title: "Your AI Team Gets Smarter",
+              desc: "Before generating any draft, reply, or suggestion, each AI Employee checks VANTABRAIN first. This means outputs feel more like you — without you having to repeat yourself.",
+              icon: Sparkles,
+            },
+            {
+              step: "4",
+              title: "Knowledge Flows Across Roles",
+              desc: "What your Email Marketer learns about your brand voice also helps your Social Media Manager. Shared context means every role benefits from every interaction.",
+              icon: Network,
+            },
+          ].map((s, i) => (
+            <motion.div
+              key={s.step}
+              {...fadeUp}
+              transition={{ delay: 0.06 * i }}
+              className="flex gap-5 items-start rounded-2xl border border-border/40 bg-card p-5 md:p-6"
+            >
+              <div className="flex-shrink-0 flex h-12 w-12 items-center justify-center rounded-xl border border-border/40 bg-background" style={{
+                boxShadow: `0 0 20px hsl(280 70% 65% / 0.1)`
+              }}>
+                <s.icon size={22} style={{ color: PURPLE }} />
+              </div>
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-xs font-bold uppercase tracking-widest" style={{ color: "hsl(280 70% 65% / 0.5)" }}>Step {s.step}</span>
+                </div>
+                <h3 className="font-display text-base font-semibold text-foreground md:text-lg">{s.title}</h3>
+                <p className="mt-1 text-sm text-muted-foreground leading-relaxed">{s.desc}</p>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    {/* ── What it does (capabilities) ── */}
     <section className="px-6 pb-24 md:px-12 lg:px-16">
       <div className="mx-auto max-w-[1400px]">
         {/* 3-Step Process — compact horizontal */}
