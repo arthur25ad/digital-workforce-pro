@@ -37,7 +37,7 @@ const Navbar = () => {
           }}>VANTORY</span>
         </Link>
 
-        <div className="hidden items-center gap-8 md:flex">
+        <div className="hidden items-center gap-8 lg:flex">
           {navLinks.map((link) => (
             <Link
               key={link.href}
@@ -72,7 +72,7 @@ const Navbar = () => {
           )}
         </div>
 
-        <button className="text-foreground md:hidden" onClick={() => setOpen(!open)} aria-label="Toggle menu">
+        <button className="text-foreground lg:hidden" onClick={() => setOpen(!open)} aria-label="Toggle menu">
           {open ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
@@ -80,7 +80,7 @@ const Navbar = () => {
       <AnimatePresence>
         {open && (
           <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}
-            className="overflow-hidden border-t border-border/50 bg-background/95 backdrop-blur-xl md:hidden">
+            className="overflow-hidden border-t border-border/50 bg-background/95 backdrop-blur-xl lg:hidden">
             <div className="flex flex-col gap-4 px-4 py-6">
               {navLinks.map((link) => (
                 <Link
