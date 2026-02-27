@@ -51,7 +51,7 @@ function AnimatedCounter({ target, duration = 2 }: { target: number; duration?: 
 
 const DashboardPreview = () => {
   return (
-    <section className="relative overflow-hidden pb-24 pt-10 md:pb-32 md:pt-14">
+    <section className="relative overflow-hidden pb-24 pt-4 md:pb-32 md:pt-8">
       {/* Ambient background effects */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute left-1/4 top-0 h-[600px] w-[600px] rounded-full opacity-20 blur-[120px]" style={{ background: "radial-gradient(circle, hsl(217 91% 60% / 0.3), transparent 70%)" }} />
@@ -60,22 +60,13 @@ const DashboardPreview = () => {
       </div>
 
       <div className="relative mx-auto max-w-[1400px] px-6 md:px-12 lg:px-16">
-        {/* Header with sparkle */}
+        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           className="mb-16 text-center"
         >
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            className="mb-5 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-xs font-medium text-primary"
-          >
-            <Sparkles size={14} className="animate-pulse" />
-            Live Dashboard Preview
-          </motion.div>
           <h2 className="font-display text-4xl font-bold text-foreground md:text-5xl lg:text-6xl">
             Your AI Team{" "}
             <span className="relative">
@@ -86,6 +77,15 @@ const DashboardPreview = () => {
           <p className="mx-auto mt-5 max-w-2xl text-lg text-muted-foreground">
             While you sleep, your AI employees handle social media, customer support, email marketing, and admin — here's what a typical day looks like.
           </p>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            className="mt-5 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-xs font-medium text-primary"
+          >
+            <Sparkles size={14} className="animate-pulse" />
+            Live Dashboard Preview
+          </motion.div>
         </motion.div>
 
         {/* Big stat cards with animated counters */}
