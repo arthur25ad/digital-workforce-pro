@@ -34,7 +34,7 @@ const Footer = () => {
               backgroundClip: "text",
             }}>VANTORY</span>
           </Link>
-          <p className="mt-3 max-w-sm text-sm text-muted-foreground">
+          <p className="mt-3 max-w-sm text-sm text-white">
             AI Employees that work while you sleep. Built for small businesses that need real help.
           </p>
         </div>
