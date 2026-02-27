@@ -175,15 +175,16 @@ const DashboardPage = () => {
           >
             <Link
               to="/vantabrain"
-              className="group flex items-center gap-4 rounded-2xl border border-primary/20 bg-gradient-to-r from-primary/5 to-transparent p-5 transition-all duration-300 hover:border-primary/40"
+              className="group flex items-center gap-4 rounded-2xl border p-5 transition-all duration-300 hover:border-[hsl(280_70%_65%)/0.4]"
+              style={{ borderColor: "hsl(280 70% 65% / 0.2)", backgroundImage: "linear-gradient(to right, hsl(280 70% 65% / 0.05), transparent)" }}
             >
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl" style={{ backgroundColor: "hsl(280 70% 65% / 0.1)", color: "hsl(280 70% 65%)" }}>
                 <Brain size={20} />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <h3 className="font-display text-sm font-semibold" style={{ color: "hsl(280 70% 65%)" }}>VANTABRAIN</h3>
-                  <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary">Intelligence</span>
+                  <span className="rounded-full px-2 py-0.5 text-[10px] font-medium" style={{ backgroundColor: "hsl(280 70% 65% / 0.1)", color: "hsl(280 70% 65%)" }}>Intelligence</span>
                 </div>
                 <p className="mt-1 text-xs text-muted-foreground">
                   {brainStats.totalMemories > 0
