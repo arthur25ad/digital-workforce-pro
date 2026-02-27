@@ -44,7 +44,7 @@ const FAQSection = () => {
           className="mb-14 text-center"
         >
           <h2 className="font-display text-3xl font-bold text-foreground md:text-4xl">
-            Questions, Answered
+            FAQ
           </h2>
         </motion.div>
 
