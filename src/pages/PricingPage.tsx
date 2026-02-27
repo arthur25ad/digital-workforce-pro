@@ -4,24 +4,9 @@ import { Check } from "lucide-react";
 import PageLayout from "@/components/PageLayout";
 
 const plans = [
-  {
-    name: "Starter", price: "$97", period: "/mo",
-    description: "Good for solo operators",
-    features: ["1 AI employee", "Basic workflows", "Email support", "Standard setup"],
-    popular: false,
-  },
-  {
-    name: "Growth", price: "$247", period: "/mo",
-    description: "Best for growing businesses",
-    features: ["3 AI employees", "Multi-role support", "Priority setup", "Custom workflows", "Platform integrations"],
-    popular: true,
-  },
-  {
-    name: "Team", price: "$497", period: "/mo",
-    description: "Best for operational scale",
-    features: ["Full AI team", "Cross-functional workflows", "Dedicated support", "Advanced integrations", "Custom reporting"],
-    popular: false,
-  },
+  { name: "Starter", price: "$97", period: "/mo", key: "Starter", description: "Good for solo operators", features: ["1 AI employee", "Basic workflows", "Email support", "Standard setup"], popular: false },
+  { name: "Growth", price: "$247", period: "/mo", key: "Growth", description: "Best for growing businesses", features: ["3 AI employees", "Multi-role support", "Priority setup", "Custom workflows", "Platform integrations"], popular: true },
+  { name: "Team", price: "$497", period: "/mo", key: "Team", description: "Best for operational scale", features: ["Full AI team", "Cross-functional workflows", "Dedicated support", "Advanced integrations", "Custom reporting"], popular: false },
 ];
 
 const PricingPage = () => (
@@ -48,9 +33,7 @@ const PricingPage = () => (
               style={plan.popular ? { boxShadow: "0 0 40px hsl(217 91% 60% / 0.1)" } : {}}
             >
               {plan.popular && (
-                <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-primary px-4 py-1 text-xs font-semibold text-primary-foreground">
-                  Most Popular
-                </span>
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-primary px-4 py-1 text-xs font-semibold text-primary-foreground">Most Popular</span>
               )}
               <h3 className="font-display text-lg font-semibold text-foreground">{plan.name}</h3>
               <p className="mt-1 text-sm text-muted-foreground">{plan.description}</p>
@@ -60,17 +43,13 @@ const PricingPage = () => (
               </div>
               <ul className="mt-6 space-y-3">
                 {plan.features.map((f) => (
-                  <li key={f} className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Check size={16} className="text-primary" /> {f}
-                  </li>
+                  <li key={f} className="flex items-center gap-2 text-sm text-muted-foreground"><Check size={16} className="text-primary" /> {f}</li>
                 ))}
               </ul>
-              <Link
-                to="/get-started"
+              <Link to={`/get-started?plan=${plan.key}`}
                 className={`mt-6 block w-full rounded-lg py-3 text-center text-sm font-semibold transition-all duration-300 ${
                   plan.popular ? "btn-glow" : "btn-outline-glow"
-                }`}
-              >
+                }`}>
                 Get Started
               </Link>
             </motion.div>
