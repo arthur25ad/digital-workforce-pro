@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
+import VantaBrainAssistant from "@/components/VantaBrainAssistant";
 
 const PURPLE = "hsl(280 70% 65%)";
 
@@ -464,6 +465,11 @@ const AuthenticatedView = () => {
                 </div>
               </div>
             </div>
+          </motion.div>
+
+          {/* ── VANTABRAIN AI Assistant ── */}
+          <motion.div {...fadeUp} transition={{ delay: 0.2 }} className="mb-6">
+            <VantaBrainAssistant />
           </motion.div>
 
           {/* ── Bottom row: Connected Context + Learning Controls + Recent Activity ── */}
