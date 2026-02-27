@@ -7,7 +7,7 @@ import BookDemoModal from "./BookDemoModal";
 const summaryItems = [
   { icon: Headphones, text: "Refund request resolved — customer rated 5★", color: "text-violet-400", bg: "bg-violet-500/10", status: "Resolved" },
   { icon: Mail, text: "Appointment reminder emails sent to 41 clients", color: "text-emerald-400", bg: "bg-emerald-500/10", status: "Sent" },
-  { icon: Share2, text: "Google Business post published for weekend promo", color: "text-blue-400", bg: "bg-blue-500/10", status: "Live" },
+  { icon: Share2, text: "Instagram ad campaign launched for weekend promo", color: "text-blue-400", bg: "bg-blue-500/10", status: "Live" },
   { icon: CalendarCheck, text: "3 client follow-ups sent before deadline", color: "text-amber-400", bg: "bg-amber-500/10", status: "Done" },
   { icon: Headphones, text: "Late cancellation policy reply drafted for 4 clients", color: "text-violet-400", bg: "bg-violet-500/10", status: "Review" },
 ];
