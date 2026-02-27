@@ -1,6 +1,9 @@
 import { motion } from "framer-motion";
+import { useAuth } from "@/hooks/useAuth";
 
 const BrandDivider = () => {
+  const { user } = useAuth();
+  if (!user) return null;
   return (
     <div className="relative py-8 overflow-hidden">
       {/* Subtle gradient line above */}
