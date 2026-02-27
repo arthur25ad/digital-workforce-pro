@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
-import { useVantaBrainActions } from "@/hooks/useVantaBrain";
+import { useVantaBrainActions, useVantaBrainSuggestions } from "@/hooks/useVantaBrain";
+import SmartSuggestions from "@/components/SmartSuggestions";
 import { useAuth } from "@/hooks/useAuth";
 import { useWorkspaceData, SocialDraft } from "@/hooks/useWorkspaceData";
 import ConnectPlatformModal from "@/components/ConnectPlatformModal";
@@ -30,6 +31,7 @@ const SocialMediaDemo = () => {
   const { drafts, isConnected, getConnection, connectPlatform, disconnectPlatform, addDraft, updateDraftStatus, updateDraftSchedule, logActivity, activities } = useWorkspaceData();
   const [connectModal, setConnectModal] = useState<string | null>(null);
   const { getContext, recordInteraction } = useVantaBrainActions();
+  const { suggestions: brainSuggestions, loading: suggestionsLoading, sendFeedback } = useVantaBrainSuggestions("social-media-manager");
   const [activeTab, setActiveTab] = useState(0);
   const [generating, setGenerating] = useState(false);
   const [ideas, setIdeas] = useState<GeneratedIdea[]>([]);
@@ -102,6 +104,8 @@ const SocialMediaDemo = () => {
   return (
     <>
       <WorkspaceShell tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab}>
+        {/* VANTABRAIN Suggestions */}
+        <SmartSuggestions suggestions={brainSuggestions} loading={suggestionsLoading} onFeedback={sendFeedback} />
         {/* Business Brain */}
         {activeTab === 0 && (
           <div className="space-y-5">

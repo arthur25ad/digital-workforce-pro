@@ -8,6 +8,7 @@ import {
   Lightbulb, Clock, Shield, Zap, Database,
   Activity, Network, BarChart3, Layers, ArrowRight,
   CheckCircle2, Globe, Lock, Cpu, Workflow,
+  RefreshCw, Target,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -140,6 +141,65 @@ const PublicView = () => (
               icon: Lock,
               title: "Private & Secure",
               desc: "Your brain is yours alone. Completely isolated per workspace. No data leaks across accounts — ever.",
+            },
+          ].map((f, i) => (
+            <motion.div
+              key={f.title}
+              {...fadeUp}
+              transition={{ delay: 0.05 * i }}
+              className="group rounded-2xl border border-border/40 bg-card p-6 transition-all duration-300 hover:border-border/60"
+              style={{ boxShadow: "0 0 0 0 transparent" }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLDivElement).style.boxShadow = "0 0 40px hsl(280 70% 65% / 0.08)";
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLDivElement).style.boxShadow = "0 0 0 0 transparent";
+              }}
+            >
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-border/40 bg-background mb-4">
+                <f.icon size={20} style={{ color: "hsl(280 70% 65%)" }} />
+              </div>
+              <h3 className="font-display text-base font-semibold text-foreground">{f.title}</h3>
+              <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{f.desc}</p>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    {/* ── Adaptive Learning ── */}
+    <section className="px-4 pb-24 md:px-8">
+      <div className="mx-auto max-w-5xl">
+        <motion.div {...fadeUp} transition={{ delay: 0.1 }} className="text-center mb-12">
+          <h2 className="font-display text-3xl font-bold text-foreground md:text-4xl">
+            <span style={{ color: "hsl(280 70% 65%)" }}>Adaptive</span> Learning
+          </h2>
+          <p className="mx-auto mt-4 max-w-xl text-muted-foreground text-base md:text-lg">
+            VANTABRAIN detects repeated behaviors and converts them into smart, personalized suggestions — getting smarter with every interaction.
+          </p>
+        </motion.div>
+
+        <div className="grid md:grid-cols-2 gap-5">
+          {[
+            {
+              icon: Target,
+              title: "Pattern Detection",
+              desc: "Tracks repeated approvals, edits, scheduling choices, and preferred wording across all your AI Employees.",
+            },
+            {
+              icon: RefreshCw,
+              title: "Gradual Learning",
+              desc: "Preferences are only learned after multiple consistent signals — never from a single action. Reliable, not jumpy.",
+            },
+            {
+              icon: Sparkles,
+              title: "Smart Suggestions",
+              desc: "When patterns are strong enough, VANTABRAIN proactively suggests next steps — like preferred posting times or reply styles.",
+            },
+            {
+              icon: Shield,
+              title: "You Stay in Control",
+              desc: "Accept, reject, edit, or dismiss any suggestion. Your feedback strengthens or weakens learned patterns over time.",
             },
           ].map((f, i) => (
             <motion.div

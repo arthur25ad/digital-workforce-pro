@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
-import { useVantaBrainActions } from "@/hooks/useVantaBrain";
+import { useVantaBrainActions, useVantaBrainSuggestions } from "@/hooks/useVantaBrain";
+import SmartSuggestions from "@/components/SmartSuggestions";
 import { useAuth } from "@/hooks/useAuth";
 import { useCustomerSupportData, SupportTicket, SupportDraft } from "@/hooks/useCustomerSupportData";
 import ConnectPlatformModal from "@/components/ConnectPlatformModal";
@@ -27,6 +28,7 @@ const supportChannels = [
 const CustomerSupportDemo = () => {
   const { workspace } = useAuth();
   const { getContext, recordInteraction } = useVantaBrainActions();
+  const { suggestions: brainSuggestions, loading: suggestionsLoading, sendFeedback } = useVantaBrainSuggestions("customer-support");
   const {
     knowledgeBase, knowledgeItems, tickets, drafts, connections, activities, loading,
     updateKnowledgeBase, addKnowledgeItem, removeKnowledgeItem,
@@ -116,6 +118,7 @@ const CustomerSupportDemo = () => {
   return (
     <>
       <WorkspaceShell tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab}>
+        <SmartSuggestions suggestions={brainSuggestions} loading={suggestionsLoading} onFeedback={sendFeedback} />
         {/* Foundation */}
         {activeTab === 0 && (
           <div className="space-y-5">
