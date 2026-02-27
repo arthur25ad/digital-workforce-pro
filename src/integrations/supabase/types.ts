@@ -980,10 +980,20 @@ export type Database = {
           description: string | null
           discount_type: string
           discount_value: number
+          end_date: string | null
           expires_at: string | null
+          first_billing_cycle_only: boolean | null
+          growth_discount: number | null
           id: string
           is_active: boolean
+          is_private: boolean | null
+          is_visible_on_homepage: boolean | null
+          is_visible_on_pricing: boolean | null
+          label: string | null
           max_uses: number | null
+          start_date: string | null
+          starter_discount: number | null
+          team_discount: number | null
           updated_at: string
           usage_count: number
         }
@@ -993,10 +1003,20 @@ export type Database = {
           description?: string | null
           discount_type?: string
           discount_value?: number
+          end_date?: string | null
           expires_at?: string | null
+          first_billing_cycle_only?: boolean | null
+          growth_discount?: number | null
           id?: string
           is_active?: boolean
+          is_private?: boolean | null
+          is_visible_on_homepage?: boolean | null
+          is_visible_on_pricing?: boolean | null
+          label?: string | null
           max_uses?: number | null
+          start_date?: string | null
+          starter_discount?: number | null
+          team_discount?: number | null
           updated_at?: string
           usage_count?: number
         }
@@ -1006,10 +1026,20 @@ export type Database = {
           description?: string | null
           discount_type?: string
           discount_value?: number
+          end_date?: string | null
           expires_at?: string | null
+          first_billing_cycle_only?: boolean | null
+          growth_discount?: number | null
           id?: string
           is_active?: boolean
+          is_private?: boolean | null
+          is_visible_on_homepage?: boolean | null
+          is_visible_on_pricing?: boolean | null
+          label?: string | null
           max_uses?: number | null
+          start_date?: string | null
+          starter_discount?: number | null
+          team_discount?: number | null
           updated_at?: string
           usage_count?: number
         }
