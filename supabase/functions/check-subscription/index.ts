@@ -65,27 +65,29 @@ serve(async (req) => {
     }
 
     const customerId = customers.data[0].id;
+    // Check for both active and trialing subscriptions (trials auto-bill after)
     const subscriptions = await stripe.subscriptions.list({
       customer: customerId,
-      status: "active",
-      limit: 1,
+      limit: 5,
     });
 
-    const hasActiveSub = subscriptions.data.length > 0;
+    const activeSub = subscriptions.data.find(
+      (s) => s.status === "active" || s.status === "trialing"
+    );
+
     let productId = null;
     let priceId = null;
     let subscriptionEnd = null;
 
-    if (hasActiveSub) {
-      const subscription = subscriptions.data[0];
-      subscriptionEnd = new Date(subscription.current_period_end * 1000).toISOString();
-      productId = subscription.items.data[0].price.product;
-      priceId = subscription.items.data[0].price.id;
-      logStep("Active subscription found", { productId, priceId });
+    if (activeSub) {
+      subscriptionEnd = new Date(activeSub.current_period_end * 1000).toISOString();
+      productId = activeSub.items.data[0].price.product;
+      priceId = activeSub.items.data[0].price.id;
+      logStep("Active/trialing subscription found", { productId, priceId, status: activeSub.status });
     }
 
     return new Response(JSON.stringify({
-      subscribed: hasActiveSub,
+      subscribed: !!activeSub,
       product_id: productId,
       price_id: priceId,
       subscription_end: subscriptionEnd,

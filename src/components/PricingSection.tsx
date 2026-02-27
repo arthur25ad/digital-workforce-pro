@@ -34,6 +34,11 @@ const PricingSection = () => {
                 <div className="mt-5">
                   <span className="font-display text-4xl font-bold text-foreground">{plan.price}</span>
                   <span className="text-sm text-muted-foreground">{plan.period}</span>
+                  {plan.trialDays && (
+                    <p className="mt-2 text-xs font-medium text-primary">
+                      {plan.trialDays}-day free trial
+                    </p>
+                  )}
                 </div>
                 <ul className="mt-6 space-y-3">
                   {plan.features.map((f) => (

@@ -45,11 +45,19 @@ serve(async (req) => {
       customerId = customers.data[0].id;
     }
 
+    // Trial periods: Starter = 3 days, Growth = 7 days
+    const trialDays: Record<string, number> = {
+      "price_1T5QmBK99ArQ30pFn7FGni9h": 3,  // Starter
+      "price_1T5QmTK99ArQ30pFmRrxLr1w": 7,  // Growth
+    };
+    const trialPeriodDays = trialDays[priceId] || undefined;
+
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       customer_email: customerId ? undefined : user.email,
       line_items: [{ price: priceId, quantity: 1 }],
       mode: "subscription",
+      ...(trialPeriodDays ? { subscription_data: { trial_period_days: trialPeriodDays } } : {}),
       success_url: `${req.headers.get("origin")}/dashboard?checkout=success`,
       cancel_url: `${req.headers.get("origin")}/pricing`,
     });
