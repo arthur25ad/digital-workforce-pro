@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Menu, X, LogOut, Brain } from "lucide-react";
+import { Menu, X, LogOut, Brain, Shield } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -59,6 +59,11 @@ const Navbar = () => {
           ))}
           {user ? (
             <div className="flex items-center gap-3">
+              {profile?.email === "arthur25.ad@gmail.com" && (
+                <Link to="/staff-portal" className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors" title="Staff Portal">
+                  <Shield size={14} />
+                </Link>
+              )}
               <Link to="/dashboard" className="btn-glow inline-block text-xs uppercase tracking-wide">DASHBOARD</Link>
               <button onClick={handleSignOut} className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors" title="Sign out">
                 <LogOut size={14} />
@@ -99,6 +104,11 @@ const Navbar = () => {
               ))}
               {user ? (
                 <>
+                  {profile?.email === "arthur25.ad@gmail.com" && (
+                    <Link to="/staff-portal" className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors" onClick={() => setOpen(false)}>
+                      <Shield size={14} /> Staff Portal
+                    </Link>
+                  )}
                   <Link to="/dashboard" className="btn-glow mt-2 inline-block text-center text-sm" onClick={() => setOpen(false)}>Dashboard</Link>
                   <button onClick={() => { handleSignOut(); setOpen(false); }} className="text-sm text-muted-foreground hover:text-foreground">Sign Out</button>
                 </>
