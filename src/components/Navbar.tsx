@@ -1,40 +1,44 @@
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Link, useLocation } from "react-router-dom";
 
 const navLinks = [
-  { label: "Features", href: "#features" },
-  { label: "AI Employees", href: "#team" },
-  { label: "How It Works", href: "#how-it-works" },
-  { label: "Industries", href: "#industries" },
-  { label: "Pricing", href: "#pricing" },
-  { label: "FAQ", href: "#faq" },
+  { label: "Features", href: "/features" },
+  { label: "AI Employees", href: "/ai-employees" },
+  { label: "How It Works", href: "/how-it-works" },
+  { label: "Industries", href: "/industries" },
+  { label: "Pricing", href: "/pricing" },
+  { label: "FAQ", href: "/faq" },
 ];
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
+  const location = useLocation();
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 md:px-8">
-        <a href="#" className="font-display text-xl font-bold tracking-tight text-foreground">
-          <span className="text-primary">AI</span>Employees
-        </a>
+        <Link to="/" className="font-display text-xl font-bold tracking-tight text-foreground">
+          <span className="text-primary">Van</span>tory
+        </Link>
 
         {/* Desktop */}
         <div className="hidden items-center gap-8 md:flex">
           {navLinks.map((link) => (
-            <a
+            <Link
               key={link.href}
-              href={link.href}
-              className="text-sm text-muted-foreground transition-colors duration-200 hover:text-foreground"
+              to={link.href}
+              className={`text-sm transition-colors duration-200 hover:text-foreground ${
+                location.pathname === link.href ? "text-foreground" : "text-muted-foreground"
+              }`}
             >
               {link.label}
-            </a>
+            </Link>
           ))}
-          <a href="#cta" className="btn-glow inline-block text-sm">
+          <Link to="/get-started" className="btn-glow inline-block text-sm">
             Get Started
-          </a>
+          </Link>
         </div>
 
         {/* Mobile toggle */}
@@ -58,18 +62,18 @@ const Navbar = () => {
           >
             <div className="flex flex-col gap-4 px-4 py-6">
               {navLinks.map((link) => (
-                <a
+                <Link
                   key={link.href}
-                  href={link.href}
+                  to={link.href}
                   className="text-sm text-muted-foreground transition-colors hover:text-foreground"
                   onClick={() => setOpen(false)}
                 >
                   {link.label}
-                </a>
+                </Link>
               ))}
-              <a href="#cta" className="btn-glow mt-2 inline-block text-center text-sm" onClick={() => setOpen(false)}>
+              <Link to="/get-started" className="btn-glow mt-2 inline-block text-center text-sm" onClick={() => setOpen(false)}>
                 Get Started
-              </a>
+              </Link>
             </div>
           </motion.div>
         )}
