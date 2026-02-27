@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { Loader2, Mail, Lock, User } from "lucide-react";
+import { Loader2, Mail, Lock, User, ArrowLeft } from "lucide-react";
 
 const AuthPage = () => {
   const [mode, setMode] = useState<"login" | "signup" | "forgot">("login");
@@ -86,9 +86,18 @@ const AuthPage = () => {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
+        <div className="mb-4">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+          >
+            <ArrowLeft size={14} />
+            Back to Home
+          </Link>
+        </div>
         <div className="text-center mb-8">
           <h1 className="font-display text-3xl font-bold text-foreground">
-            <span className="text-primary">Van</span>tory
+            <span className="text-primary">VAN</span>TORY
           </h1>
           <p className="mt-2 text-muted-foreground">
             {mode === "login" ? "Welcome back to your workspace" : mode === "signup" ? "Create your AI workforce account" : "Reset your password"}

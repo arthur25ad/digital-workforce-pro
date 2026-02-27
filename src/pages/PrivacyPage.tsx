@@ -32,7 +32,7 @@ const PrivacyPage = () => (
             </div>
             <div>
               <h2 className="font-display text-lg font-semibold text-foreground mb-3">6. Contact</h2>
-              <p>For questions about this policy, please reach out to privacy@vantory.com.</p>
+              <p>For questions about this policy, please reach out to privacy@VANTORY.com.</p>
             </div>
           </div>
         </motion.div>

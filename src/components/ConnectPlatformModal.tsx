@@ -72,7 +72,7 @@ const ConnectPlatformModal = ({ open, onClose, platformName, onConnect }: Connec
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="rounded-lg border border-border/50 bg-secondary/50 p-3">
                   <p className="text-xs text-muted-foreground">
-                    Vantory will request read & write access to your {platformName} account for content management and scheduling.
+                    VANTORY will request read & write access to your {platformName} account for content management and scheduling.
                   </p>
                 </div>
                 <div>

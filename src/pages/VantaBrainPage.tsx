@@ -81,7 +81,7 @@ const PublicView = () => (
           className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground md:text-xl lg:text-2xl leading-relaxed"
         >
           The intelligence layer that makes your entire AI team smarter.
-          VantaBrain learns how your business works — and remembers everything.
+          VANTABRAIN learns how your business works — and remembers everything.
         </motion.p>
 
         {/* CTA */}
@@ -104,7 +104,7 @@ const PublicView = () => (
             Your AI Team's <span style={{ color: "hsl(280 70% 65%)" }}>Shared Brain</span>
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-muted-foreground text-base md:text-lg">
-            Every approval, edit, and decision trains VantaBrain. It becomes the memory that powers smarter outputs across all your AI Employees.
+            Every approval, edit, and decision trains VANTABRAIN. It becomes the memory that powers smarter outputs across all your AI Employees.
           </p>
         </motion.div>
 
@@ -114,7 +114,7 @@ const PublicView = () => (
             {
               icon: Database,
               title: "Persistent Memory",
-              desc: "VantaBrain remembers your brand voice, preferences, and patterns across every session. It never forgets.",
+              desc: "VANTABRAIN remembers your brand voice, preferences, and patterns across every session. It never forgets.",
             },
             {
               icon: Activity,
@@ -129,12 +129,12 @@ const PublicView = () => (
             {
               icon: Shield,
               title: "Human-Controlled",
-              desc: "VantaBrain suggests — you decide. Every high-impact action still requires your approval. Always.",
+              desc: "VANTABRAIN suggests — you decide. Every high-impact action still requires your approval. Always.",
             },
             {
               icon: Cpu,
               title: "Gets Smarter Over Time",
-              desc: "The more you use Vantory, the better it gets. VantaBrain compounds your team's intelligence with every interaction.",
+              desc: "The more you use VANTORY, the better it gets. VANTABRAIN compounds your team's intelligence with every interaction.",
             },
             {
               icon: Lock,
@@ -177,9 +177,9 @@ const PublicView = () => (
           </div>
           <div className="grid md:grid-cols-3 gap-6">
             {[
-              { step: "01", title: "Observe", desc: "Every time you approve a draft, edit a reply, or schedule a post — VantaBrain is watching and learning.", icon: Eye },
+              { step: "01", title: "Observe", desc: "Every time you approve a draft, edit a reply, or schedule a post — VANTABRAIN is watching and learning.", icon: Eye },
               { step: "02", title: "Learn", desc: "Patterns and preferences are extracted into persistent memory — your brand voice, timing, style, and more.", icon: Brain },
-              { step: "03", title: "Improve", desc: "Your AI Employees pull from VantaBrain before every action, delivering outputs that feel like you wrote them.", icon: Sparkles },
+              { step: "03", title: "Improve", desc: "Your AI Employees pull from VANTABRAIN before every action, delivering outputs that feel like you wrote them.", icon: Sparkles },
             ].map((s) => (
               <div key={s.step} className="text-center">
                 <span className="font-display text-5xl font-black tracking-tighter" style={{ color: "hsl(280 70% 65% / 0.2)" }}>{s.step}</span>
@@ -206,7 +206,7 @@ const PublicView = () => (
             Ready to build your AI's memory?
           </h2>
           <p className="mx-auto mt-3 max-w-md text-muted-foreground">
-            Start using Vantory and VantaBrain starts learning from day one. The longer you use it, the smarter it gets.
+            Start using VANTORY and VANTABRAIN starts learning from day one. The longer you use it, the smarter it gets.
           </p>
           <div className="mt-8">
             <Link to="/auth" className="btn-glow inline-flex items-center gap-2 text-sm uppercase tracking-wide">
@@ -314,7 +314,7 @@ const AuthenticatedView = () => {
             <div className="rounded-2xl border border-border/40 bg-card p-6">
               <div className="flex items-center gap-2 mb-4">
                 <Layers size={16} style={{ color: "hsl(280 70% 65%)" }} />
-                <h2 className="font-display text-base font-semibold text-foreground">How VantaBrain Works</h2>
+                <h2 className="font-display text-base font-semibold text-foreground">How VANTABRAIN Works</h2>
               </div>
               <div className="grid md:grid-cols-3 gap-4">
                 {[
@@ -356,7 +356,7 @@ const AuthenticatedView = () => {
                   <div className="rounded-xl border border-dashed border-border/40 p-10 text-center">
                     <Brain size={36} className="mx-auto mb-3 text-muted-foreground/30" />
                     <p className="text-sm font-medium text-muted-foreground">No memories yet</p>
-                    <p className="text-xs text-muted-foreground/60 mt-1">As you use your AI Employees, VantaBrain will learn your preferences.</p>
+                    <p className="text-xs text-muted-foreground/60 mt-1">As you use your AI Employees, VANTABRAIN will learn your preferences.</p>
                   </div>
                 ) : (
                   <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1">
