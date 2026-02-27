@@ -30,6 +30,22 @@ interface BrainPattern {
   created_at: string;
 }
 
+export interface BrainSettings {
+  learn_from_approvals: boolean;
+  learn_from_edits: boolean;
+  learn_timing_suggestions: boolean;
+  require_approval: boolean;
+  learning_paused: boolean;
+}
+
+const DEFAULT_SETTINGS: BrainSettings = {
+  learn_from_approvals: true,
+  learn_from_edits: true,
+  learn_timing_suggestions: true,
+  require_approval: true,
+  learning_paused: false,
+};
+
 export function useVantaBrainStats() {
   const { workspace } = useAuth();
   const [stats, setStats] = useState<BrainStats>({ totalMemories: 0, totalPatterns: 0, totalInteractions: 0 });
@@ -98,6 +114,7 @@ export interface BrainSuggestion {
   confidence: number;
   source_pattern_type: string;
   actionable_value: string;
+  reasoning?: string;
 }
 
 export function useVantaBrainSuggestions(roleScope: string) {
@@ -148,6 +165,37 @@ export function useVantaBrainSuggestions(roleScope: string) {
   return { suggestions: visibleSuggestions, loading, refresh: fetchSuggestions, sendFeedback };
 }
 
+export function useVantaBrainSettings() {
+  const { workspace } = useAuth();
+  const [settings, setSettings] = useState<BrainSettings>(DEFAULT_SETTINGS);
+  const [loading, setLoading] = useState(true);
+
+  const fetchSettings = useCallback(async () => {
+    if (!workspace?.id) return;
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("vantabrain", {
+        body: { action: "get-settings", workspaceId: workspace.id },
+      });
+      if (!error && data) setSettings(data);
+    } catch { /* silent */ }
+    setLoading(false);
+  }, [workspace?.id]);
+
+  useEffect(() => { fetchSettings(); }, [fetchSettings]);
+
+  const updateSettings = useCallback(async (updates: Partial<BrainSettings>) => {
+    if (!workspace?.id) return;
+    const newSettings = { ...settings, ...updates };
+    setSettings(newSettings);
+    await supabase.functions.invoke("vantabrain", {
+      body: { action: "update-settings", workspaceId: workspace.id, settings: newSettings },
+    });
+  }, [workspace?.id, settings]);
+
+  return { settings, loading, updateSettings, refresh: fetchSettings };
+}
+
 export function useVantaBrainActions() {
   const { workspace } = useAuth();
 
@@ -195,5 +243,19 @@ export function useVantaBrainActions() {
     await supabase.from("brain_patterns").update({ is_active: false }).eq("id", patternId);
   }, []);
 
-  return { recordInteraction, triggerLearn, getContext, deleteMemory, deletePattern };
+  const clearRoleMemory = useCallback(async (roleScope: string) => {
+    if (!workspace?.id) return;
+    await supabase.functions.invoke("vantabrain", {
+      body: { action: "clear-role-memory", workspaceId: workspace.id, roleScope },
+    });
+  }, [workspace?.id]);
+
+  const clearAllMemory = useCallback(async () => {
+    if (!workspace?.id) return;
+    await supabase.functions.invoke("vantabrain", {
+      body: { action: "clear-all-memory", workspaceId: workspace.id },
+    });
+  }, [workspace?.id]);
+
+  return { recordInteraction, triggerLearn, getContext, deleteMemory, deletePattern, clearRoleMemory, clearAllMemory };
 }
