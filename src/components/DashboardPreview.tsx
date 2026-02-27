@@ -29,7 +29,7 @@ const roleDetails = [
       { icon: BarChart2, text: "Tracks performance & suggests improvements" },
       { icon: Target, text: "Generates content ideas from your niche" },
     ],
-    bottomNote: "Works 24/7 so your brand never goes quiet — even when you're off the clock.",
+    workflow: ["Content Ideas", "Draft & Edit", "Schedule", "Publish", "Analyze"],
   },
   {
     icon: Mail, label: "Email Marketing", ...roleColors.email, stat: "8", unit: "campaigns active", trend: "+15%",
@@ -41,7 +41,7 @@ const roleDetails = [
       { icon: Send, text: "Sends at optimal open-rate times" },
       { icon: Megaphone, text: "Creates promo & nurture sequences" },
     ],
-    bottomNote: "Turns your email list into a revenue engine — without you writing a single word.",
+    workflow: ["Audience Segment", "Draft Copy", "A/B Test", "Send", "Report"],
   },
   {
     icon: Headphones, label: "Customer Support", ...roleColors.support, stat: "47", unit: "replies drafted", trend: "+32%",
@@ -53,7 +53,7 @@ const roleDetails = [
       { icon: FileText, text: "References your policies & FAQs" },
       { icon: Bell, text: "Escalates critical issues to you" },
     ],
-    bottomNote: "Every customer feels heard — instantly — while you focus on growing your business.",
+    workflow: ["Ticket Received", "Classify", "Draft Reply", "Review", "Resolve"],
   },
   {
     icon: CalendarCheck, label: "Calendar Assistant", ...roleColors.assistant, stat: "23", unit: "appointments managed", trend: "+18%",
@@ -65,7 +65,7 @@ const roleDetails = [
       { icon: RefreshCw, text: "Handles reschedules & cancellations" },
       { icon: Clock, text: "Detects scheduling conflicts" },
     ],
-    bottomNote: "No more double-bookings or missed appointments — your calendar runs itself.",
+    workflow: ["Request In", "Check Slots", "Confirm", "Remind", "Follow Up"],
   },
 ];
 
@@ -247,11 +247,27 @@ const DashboardPreview = () => {
                         ))}
                       </div>
 
-                      {/* Bottom note */}
+                      {/* Workflow pipeline */}
                       <div className="relative mt-6 rounded-xl border border-border/20 bg-background/20 px-4 py-3">
-                        <p className="text-xs text-muted-foreground italic leading-relaxed text-center">
-                          "{role.bottomNote}"
-                        </p>
+                        <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/50 mb-2">Workflow</p>
+                        <div className="flex items-center gap-1">
+                          {role.workflow.map((step, si) => (
+                            <motion.div
+                              key={si}
+                              initial={{ opacity: 0, x: -8 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ delay: 0.2 + si * 0.1 }}
+                              className="flex items-center gap-1 flex-1 min-w-0"
+                            >
+                              <div className={`flex-1 rounded-md border ${role.border} bg-background/30 px-2 py-1.5 text-center`}>
+                                <span className="text-[10px] font-medium text-foreground/70 leading-tight block truncate">{step}</span>
+                              </div>
+                              {si < role.workflow.length - 1 && (
+                                <ArrowRight size={10} className="shrink-0 text-muted-foreground/30" />
+                              )}
+                            </motion.div>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   );
