@@ -1,33 +1,52 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { Link, useNavigate } from "react-router-dom";
-import { Check } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Check, Loader2 } from "lucide-react";
 import PageLayout from "@/components/PageLayout";
 import { useAuth } from "@/hooks/useAuth";
-import { PACKAGES, PACKAGE_ORDER, packageNeedsRoleSelection } from "@/lib/packages";
+import { PACKAGES, PACKAGE_ORDER } from "@/lib/packages";
 import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const PricingPage = () => {
-  const { user, profile, updateProfile } = useAuth();
-  const navigate = useNavigate();
+  const { user, profile } = useAuth();
+  const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
 
   const handleSelectPlan = async (planKey: string) => {
-    if (!user || !profile) return;
+    if (!user) return;
 
     const pkg = PACKAGES[planKey];
     if (!pkg) return;
 
-    // Update the package on the account
-    await updateProfile({ active_package: planKey });
+    setLoadingPlan(planKey);
+    try {
+      const { data, error } = await supabase.functions.invoke("create-checkout", {
+        body: { priceId: pkg.stripePriceId },
+      });
 
-    if (pkg.autoUnlockAll) {
-      // Team: auto-unlock all roles
-      await updateProfile({ unlocked_roles: [...pkg.defaultRoles] });
-      toast({ title: `Upgraded to ${pkg.name}!`, description: "All AI Employees unlocked." });
-      navigate("/dashboard");
-    } else {
-      // Starter / Growth: needs role selection
-      toast({ title: `${pkg.name} plan activated`, description: "Now choose your AI Employees." });
-      navigate("/choose-roles");
+      if (error) throw error;
+      if (data?.url) {
+        window.open(data.url, "_blank");
+      }
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message || "Failed to start checkout", variant: "destructive" });
+    } finally {
+      setLoadingPlan(null);
+    }
+  };
+
+  const handleManageSubscription = async () => {
+    setLoadingPlan("manage");
+    try {
+      const { data, error } = await supabase.functions.invoke("customer-portal");
+      if (error) throw error;
+      if (data?.url) {
+        window.open(data.url, "_blank");
+      }
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message || "Failed to open billing portal", variant: "destructive" });
+    } finally {
+      setLoadingPlan(null);
     }
   };
 
@@ -52,8 +71,8 @@ const PricingPage = () => {
         <div className="mx-auto max-w-[1200px]">
           <div className="grid gap-8 md:grid-cols-3">
             {plans.map((plan, i) => {
-              const isCurrentPlan = profile?.active_package === plan.key;
               const isPopular = plan.key === "growth";
+              const isLoading = loadingPlan === plan.key;
               return (
                 <motion.div
                   key={plan.name}
@@ -69,9 +88,6 @@ const PricingPage = () => {
                   {isPopular && (
                     <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-primary px-4 py-1 text-xs font-semibold text-primary-foreground">Most Popular</span>
                   )}
-                  {isCurrentPlan && (
-                    <span className="absolute -top-3 right-4 rounded-full bg-emerald-500 px-3 py-1 text-xs font-semibold text-white">Current Plan</span>
-                  )}
                   <h3 className="font-display text-lg font-semibold text-foreground">{plan.name}</h3>
                   <p className="mt-1 text-sm text-muted-foreground">{plan.description}</p>
                   <div className="mt-6">
@@ -84,19 +100,14 @@ const PricingPage = () => {
                     ))}
                   </ul>
                   {user ? (
-                    isCurrentPlan ? (
-                      <div className="mt-8 block w-full rounded-lg py-3 text-center text-sm font-semibold bg-secondary text-muted-foreground">
-                        Current Plan
-                      </div>
-                    ) : (
-                      <button
-                        onClick={() => handleSelectPlan(plan.key)}
-                        className={`mt-8 block w-full rounded-lg py-3 text-center text-sm font-semibold transition-all duration-300 ${
-                          isPopular ? "btn-glow" : "btn-outline-glow"
-                        }`}>
-                        {profile && PACKAGE_ORDER.indexOf(profile.active_package) < PACKAGE_ORDER.indexOf(plan.key) ? "Upgrade" : "Switch Plan"}
-                      </button>
-                    )
+                    <button
+                      onClick={() => handleSelectPlan(plan.key)}
+                      disabled={isLoading}
+                      className={`mt-8 block w-full rounded-lg py-3 text-center text-sm font-semibold transition-all duration-300 disabled:opacity-50 ${
+                        isPopular ? "btn-glow" : "btn-outline-glow"
+                      }`}>
+                      {isLoading ? <Loader2 className="mx-auto h-4 w-4 animate-spin" /> : "Subscribe"}
+                    </button>
                   ) : (
                     <Link to="/auth"
                       className={`mt-8 block w-full rounded-lg py-3 text-center text-sm font-semibold transition-all duration-300 ${
@@ -109,6 +120,19 @@ const PricingPage = () => {
               );
             })}
           </div>
+
+          {user && (
+            <div className="mt-8 text-center">
+              <button
+                onClick={handleManageSubscription}
+                disabled={loadingPlan === "manage"}
+                className="text-sm text-primary hover:underline disabled:opacity-50"
+              >
+                {loadingPlan === "manage" ? "Opening..." : "Manage existing subscription →"}
+              </button>
+            </div>
+          )}
+
           <p className="mt-12 text-center text-sm text-muted-foreground/60">
             Need a custom setup? <Link to="/auth" className="text-primary hover:underline">Contact us</Link> for a tailored implementation plan.
           </p>

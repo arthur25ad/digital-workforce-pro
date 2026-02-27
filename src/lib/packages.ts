@@ -17,6 +17,8 @@ export interface PackageConfig {
   autoUnlockAll: boolean;
   defaultRoles: RoleSlug[];
   features: string[];
+  stripePriceId: string;
+  stripeProductId: string;
 }
 
 export const PACKAGES: Record<string, PackageConfig> = {
@@ -29,6 +31,8 @@ export const PACKAGES: Record<string, PackageConfig> = {
     maxRoles: 1,
     autoUnlockAll: false,
     defaultRoles: [],
+    stripePriceId: "price_1T5QmBK99ArQ30pFn7FGni9h",
+    stripeProductId: "prod_U3XrEJudX0PqCB",
     features: [
       "1 AI employee of your choice",
       "Basic workflows",
@@ -45,6 +49,8 @@ export const PACKAGES: Record<string, PackageConfig> = {
     maxRoles: 3,
     autoUnlockAll: false,
     defaultRoles: [],
+    stripePriceId: "price_1T5QmTK99ArQ30pFmRrxLr1w",
+    stripeProductId: "prod_U3XsKaIFk0TD7K",
     features: [
       "Choose 3 AI employees",
       "Multi-role support",
@@ -62,6 +68,8 @@ export const PACKAGES: Record<string, PackageConfig> = {
     maxRoles: 4,
     autoUnlockAll: true,
     defaultRoles: [...ALL_ROLE_SLUGS],
+    stripePriceId: "price_1T5QmlK99ArQ30pFRKx2fT3z",
+    stripeProductId: "prod_U3XsrY4UZCviPK",
     features: [
       "Full AI team (4 roles)",
       "Cross-functional workflows",
