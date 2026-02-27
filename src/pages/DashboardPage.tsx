@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import PageLayout from "@/components/PageLayout";
 import { useAuth } from "@/hooks/useAuth";
 import { useWorkspaceData } from "@/hooks/useWorkspaceData";
@@ -7,8 +7,11 @@ import { useCustomerSupportData } from "@/hooks/useCustomerSupportData";
 import { useEmailMarketingData } from "@/hooks/useEmailMarketingData";
 import { useVirtualAssistantData } from "@/hooks/useVirtualAssistantData";
 import { useVantaBrainStats } from "@/hooks/useVantaBrain";
-import { useState } from "react";
+import { useSubscriptionSync } from "@/hooks/useSubscriptionSync";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "@/hooks/use-toast";
+import { packageNeedsRoleSelection } from "@/lib/packages";
 import {
   Share2, Headphones, Mail, CalendarCheck, Lock,
   ArrowRight, Sparkles, CheckCircle2, Brain,
@@ -79,19 +82,48 @@ function timeAgo(dateStr: string) {
 }
 
 const DashboardPage = () => {
-  const { profile, workspace } = useAuth();
+  const { profile, workspace, refreshProfile } = useAuth();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const unlockedRoles = profile?.unlocked_roles ?? [];
   const summaries = useRoleSummary();
   const recentActivity = useMergedActivity();
   const { stats: brainStats } = useVantaBrainStats();
+  const { syncSubscription } = useSubscriptionSync();
   const [askInput, setAskInput] = useState("");
+
+  // Sync subscription after checkout or on first load
+  useEffect(() => {
+    const isCheckoutSuccess = searchParams.get("checkout") === "success";
+    
+    const doSync = async () => {
+      const result = await syncSubscription();
+      await refreshProfile();
+      
+      if (isCheckoutSuccess && result.subscribed && result.packageKey) {
+        // Clear the query param
+        setSearchParams({}, { replace: true });
+        
+        if (packageNeedsRoleSelection(result.packageKey)) {
+          toast({ title: "Payment successful!", description: "Now choose your AI Employees." });
+          navigate("/choose-roles", { replace: true });
+        } else {
+          toast({ title: "Payment successful!", description: "All AI Employees unlocked!" });
+        }
+      }
+    };
+    
+    if (profile) {
+      doSync();
+    }
+  }, [profile?.id]);
 
   const packageLabel = profile?.active_package
     ? profile.active_package.charAt(0).toUpperCase() + profile.active_package.slice(1)
     : "Free";
 
   const totalTasks = Object.values(summaries).reduce((acc, s) => acc + s.count, 0);
+
 
   return (
     <PageLayout>
