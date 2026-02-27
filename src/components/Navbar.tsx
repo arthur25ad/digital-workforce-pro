@@ -39,10 +39,10 @@ const Navbar = () => {
               to={link.href}
               className={
                 link.isBrain
-                  ? `text-sm font-bold tracking-widest transition-colors duration-200 hover:text-foreground ${
+                  ? `text-xs font-bold tracking-widest transition-colors duration-200 hover:text-foreground ${
                       location.pathname === link.href ? "text-foreground" : ""
                     }`
-                  : `text-sm transition-colors duration-200 hover:text-foreground ${
+                  : `text-xs transition-colors duration-200 hover:text-foreground ${
                       location.pathname === link.href ? "text-foreground" : "text-muted-foreground"
                     }`
               }
@@ -53,15 +53,15 @@ const Navbar = () => {
           ))}
           {user ? (
             <div className="flex items-center gap-3">
-              <Link to="/dashboard" className="btn-glow inline-block text-sm">Dashboard</Link>
+              <Link to="/dashboard" className="btn-glow inline-block text-xs uppercase tracking-wide">DASHBOARD</Link>
               <button onClick={handleSignOut} className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors" title="Sign out">
                 <LogOut size={14} />
               </button>
             </div>
           ) : (
             <div className="flex items-center gap-3">
-              <Link to="/auth" className="rounded-md border border-primary/40 px-4 py-1.5 text-sm font-medium text-primary transition-all duration-200 hover:border-primary hover:bg-primary/10">Log In</Link>
-              <Link to="/auth" className="btn-glow inline-block text-sm">Get Started</Link>
+              <Link to="/auth" className="rounded-md border border-primary/40 px-4 py-1.5 text-xs uppercase tracking-wide font-medium text-primary transition-all duration-200 hover:border-primary hover:bg-primary/10">LOG IN</Link>
+              <Link to="/auth" className="btn-glow inline-block text-xs uppercase tracking-wide">GET STARTED</Link>
             </div>
           )}
         </div>
