@@ -255,7 +255,7 @@ const AuthenticatedView = ({ initialQuestion }: { initialQuestion?: string }) =>
         <div className="mx-auto max-w-[1600px] relative text-center">
           <motion.h1
             {...fadeUp}
-            className="font-display text-5xl font-black tracking-tight md:text-7xl lg:text-8xl"
+            className="font-display text-4xl font-black tracking-tight md:text-6xl lg:text-7xl"
             style={{
               backgroundImage: "linear-gradient(135deg, hsl(280 70% 80%), hsl(280 70% 60%), hsl(0 0% 100% / 0.9), hsl(280 60% 55%))",
               WebkitBackgroundClip: "text",
@@ -264,6 +264,14 @@ const AuthenticatedView = ({ initialQuestion }: { initialQuestion?: string }) =>
             }}
           >
             VANTABRAIN
+            <span className="block text-2xl md:text-4xl lg:text-5xl mt-1 tracking-wide" style={{
+              backgroundImage: "linear-gradient(135deg, hsl(280 70% 75% / 0.7), hsl(0 0% 100% / 0.5))",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+            }}>
+              INTELLIGENCE CENTER
+            </span>
           </motion.h1>
 
           <motion.p {...fadeUp} transition={{ delay: 0.06 }} className="mx-auto mt-3 max-w-lg text-muted-foreground text-sm md:text-base">
