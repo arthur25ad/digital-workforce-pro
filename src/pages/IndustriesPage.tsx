@@ -1,102 +1,96 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import PageLayout from "@/components/PageLayout";
-import { Sparkles, Home, Scissors, Building2, Briefcase, Wrench, Paintbrush } from "lucide-react";
+import { Sparkles, Home, Scissors, Building2, Briefcase, Wrench, Paintbrush, Stethoscope, Scale } from "lucide-react";
 
 const industries = [
   {
-    icon: Building2, name: "Cleaning Companies", slug: "cleaning-companies",
-    why: "Cleaning companies handle high volumes of leads, scheduling, and follow-ups. AI employees keep operations running smoothly without extra hires.",
+    icon: Building2, name: "Cleaning Companies",
+    useCase: "Automate lead follow-up, social posting, and scheduling.",
     roles: ["Social Media Manager", "Customer Support", "Virtual Assistant"],
-    useCases: ["Lead follow-up", "Social posting", "Scheduling support", "Review request help"],
   },
   {
-    icon: Home, name: "Realtors", slug: "realtors",
-    why: "Real estate professionals juggle client communication, listings, and follow-ups. AI employees handle the repetitive work so you can close deals.",
+    icon: Home, name: "Realtors",
+    useCase: "Manage follow-ups, email sequences, and client coordination.",
     roles: ["Email Marketer", "Social Media Manager", "Virtual Assistant"],
-    useCases: ["Follow-up messaging", "Email sequences", "Social content support", "Client coordination"],
   },
   {
-    icon: Sparkles, name: "Med Spas", slug: "med-spas",
-    why: "Med spas need consistent social presence, fast client responses, and organized communications. AI handles it all 24/7.",
+    icon: Sparkles, name: "Med Spas",
+    useCase: "Keep social content flowing and appointment reminders on time.",
     roles: ["Social Media Manager", "Customer Support", "Email Marketer"],
-    useCases: ["Social content", "Support questions", "Appointment reminders", "Email promotions"],
   },
   {
-    icon: Scissors, name: "Salons", slug: "salons",
-    why: "Salons benefit from automated appointment reminders, social content, and client follow-ups without adding staff.",
+    icon: Scissors, name: "Salons",
+    useCase: "Automate booking reminders, reviews, and social posts.",
     roles: ["Social Media Manager", "Virtual Assistant", "Customer Support"],
-    useCases: ["Booking reminders", "Social posts", "Client follow-ups", "Review requests"],
   },
   {
-    icon: Wrench, name: "Home Services", slug: "home-services",
-    why: "Home service businesses need fast lead response and organized scheduling. AI employees keep your pipeline moving.",
+    icon: Wrench, name: "Home Services",
+    useCase: "Fast lead response, organized scheduling, and email campaigns.",
     roles: ["Customer Support", "Virtual Assistant", "Email Marketer"],
-    useCases: ["Lead response", "Scheduling", "Follow-ups", "Email campaigns"],
   },
   {
-    icon: Paintbrush, name: "Local Agencies", slug: "local-agencies",
-    why: "Agencies managing multiple clients can deploy AI employees to handle content, communication, and coordination across accounts.",
+    icon: Paintbrush, name: "Local Agencies",
+    useCase: "Scale multi-client content, campaigns, and communication.",
     roles: ["Social Media Manager", "Email Marketer", "Virtual Assistant"],
-    useCases: ["Multi-client content", "Campaign management", "Client communication", "Reporting"],
   },
   {
-    icon: Briefcase, name: "Consultants", slug: "consultants",
-    why: "Consultants can offload admin work, client follow-ups, and content creation to focus on delivering value.",
+    icon: Briefcase, name: "Consultants",
+    useCase: "Offload admin, follow-ups, and newsletter creation.",
     roles: ["Virtual Assistant", "Email Marketer", "Social Media Manager"],
-    useCases: ["Client follow-ups", "Meeting prep", "Newsletter creation", "Social presence"],
+  },
+  {
+    icon: Stethoscope, name: "Dental Practices",
+    useCase: "Appointment reminders, patient follow-ups, and review requests.",
+    roles: ["Virtual Assistant", "Customer Support", "Email Marketer"],
+  },
+  {
+    icon: Scale, name: "Law Firms",
+    useCase: "Client intake follow-ups, scheduling, and email outreach.",
+    roles: ["Virtual Assistant", "Email Marketer", "Customer Support"],
   },
 ];
 
 const IndustriesPage = () => (
   <PageLayout>
-    <section className="section-padding blue-ambient">
+    <section className="section-padding blue-ambient pb-12 md:pb-16">
       <div className="mx-auto max-w-7xl">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-16 text-center">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center">
           <h1 className="font-display text-4xl font-bold text-foreground md:text-5xl">
             Built for Businesses That Need <span className="gradient-text">More Output</span>
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-lg text-muted-foreground">Without more headcount.</p>
         </motion.div>
+      </div>
+    </section>
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+    <section className="px-4 pb-24 md:px-8 md:pb-32">
+      <div className="mx-auto max-w-6xl">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {industries.map((ind, i) => (
             <motion.div
-              key={ind.slug}
+              key={ind.name}
               initial={{ opacity: 0, y: 25 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: i * 0.05 }}
+              transition={{ duration: 0.4, delay: i * 0.04 }}
               className="card-glass rounded-xl p-6"
             >
               <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                <ind.icon size={22} />
+                <ind.icon size={20} />
               </div>
-              <h3 className="font-display text-lg font-semibold text-foreground">{ind.name}</h3>
-              <p className="mt-2 text-sm text-muted-foreground">{ind.why}</p>
-
-              <div className="mt-4">
-                <span className="text-xs font-semibold text-primary/60">Best AI Roles</span>
-                <div className="mt-2 flex flex-wrap gap-1.5">
-                  {ind.roles.map((r) => (
-                    <span key={r} className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs text-primary">{r}</span>
-                  ))}
-                </div>
-              </div>
-
-              <div className="mt-4">
-                <span className="text-xs font-semibold text-primary/60">Common Use Cases</span>
-                <ul className="mt-2 space-y-1">
-                  {ind.useCases.map((uc) => (
-                    <li key={uc} className="text-xs text-muted-foreground">• {uc}</li>
-                  ))}
-                </ul>
+              <h3 className="font-display text-base font-semibold text-foreground">{ind.name}</h3>
+              <p className="mt-2 text-sm text-muted-foreground">{ind.useCase}</p>
+              <div className="mt-4 flex flex-wrap gap-1.5">
+                {ind.roles.map((r) => (
+                  <span key={r} className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-medium text-primary/80">{r}</span>
+                ))}
               </div>
             </motion.div>
           ))}
         </div>
 
-        <div className="mt-16 text-center">
+        <div className="mt-20 text-center">
           <Link to="/get-started" className="btn-glow text-base">Get Started</Link>
         </div>
       </div>

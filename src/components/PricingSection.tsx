@@ -3,9 +3,9 @@ import { Check } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const plans = [
-  { name: "Starter", price: "$97", period: "/mo", description: "Good for solo businesses", features: ["1 AI employee", "Basic workflows", "Email support", "Standard setup"], popular: false },
-  { name: "Growth", price: "$247", period: "/mo", description: "Better for growing teams", features: ["3 AI employees", "Multi-role support", "Priority setup", "Custom workflows"], popular: true },
-  { name: "Team", price: "$497", period: "/mo", description: "Best for businesses scaling operations", features: ["Full AI workforce", "Cross-functional workflows", "Dedicated support", "Advanced integrations"], popular: false },
+  { name: "Starter", price: "$49", period: "/mo", description: "Good for solo businesses", features: ["1 AI employee", "Basic workflows", "Email support", "Standard setup"], popular: false },
+  { name: "Growth", price: "$129", period: "/mo", description: "Better for growing teams", features: ["3 AI employees", "Multi-role support", "Priority setup", "Custom workflows"], popular: true },
+  { name: "Team", price: "$299", period: "/mo", description: "Best for businesses scaling operations", features: ["Full AI workforce", "Cross-functional workflows", "Dedicated support", "Advanced integrations"], popular: false },
 ];
 
 const PricingSection = () => (
