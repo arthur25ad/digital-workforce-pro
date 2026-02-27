@@ -32,8 +32,8 @@ const HowItWorksPage = () => (
           </p>
         </motion.div>
 
-        <div className="relative grid gap-12 md:grid-cols-4 md:gap-8">
-          <div className="absolute left-0 right-0 top-12 hidden h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent md:block" />
+        <div className="relative grid gap-12 lg:grid-cols-4 lg:gap-8">
+          <div className="absolute left-0 right-0 top-12 hidden h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent lg:block" />
           {steps.map((step, i) => (
             <motion.div
               key={step.number}
