@@ -14,7 +14,11 @@ const QUICK_PROMPTS = [
   "What is still not set up?",
 ];
 
-export default function VantaBrainAssistant() {
+interface VantaBrainAssistantProps {
+  initialQuestion?: string;
+}
+
+export default function VantaBrainAssistant({ initialQuestion }: VantaBrainAssistantProps) {
   const {
     conversations,
     activeConversationId,
@@ -31,6 +35,14 @@ export default function VantaBrainAssistant() {
   const [showHistory, setShowHistory] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  // Auto-send initial question from dashboard
+  const [initialSent, setInitialSent] = useState(false);
+  useEffect(() => {
+    if (initialQuestion && !initialSent && !isStreaming && messages.length === 0) {
+      setInitialSent(true);
+      sendMessage(initialQuestion);
+    }
+  }, [initialQuestion, initialSent, isStreaming, messages.length, sendMessage]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
