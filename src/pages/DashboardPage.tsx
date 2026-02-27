@@ -7,10 +7,53 @@ import { useCustomerSupportData } from "@/hooks/useCustomerSupportData";
 import { useEmailMarketingData } from "@/hooks/useEmailMarketingData";
 import { useVirtualAssistantData } from "@/hooks/useVirtualAssistantData";
 import {
-  Share2, Headphones, Mail, CalendarCheck, Check, Clock, AlertCircle,
-  FileText, MessageSquare, PenLine, Eye, ThumbsUp, Bell, Send, Calendar,
+  Share2, Headphones, Mail, CalendarCheck, Check, Lock,
+  FileText, MessageSquare, PenLine, ThumbsUp, Bell, Send, Calendar,
   AlertTriangle, Inbox, ListChecks,
 } from "lucide-react";
+
+const allRoles = [
+  { icon: Share2, label: "Social Media Manager", slug: "social-media-manager" },
+  { icon: Headphones, label: "Customer Support", slug: "customer-support" },
+  { icon: Mail, label: "Email Marketer", slug: "email-marketer" },
+  { icon: CalendarCheck, label: "Virtual Assistant", slug: "virtual-assistant" },
+];
+
+const StatGrid = ({ stats }: { stats: { label: string; value: string; icon: any; color: string }[] }) => (
+  <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+    {stats.map((s) => (
+      <div key={s.label} className="rounded-xl border border-border/50 bg-card p-4">
+        <div className="flex items-center justify-between">
+          <s.icon size={16} className={s.color} />
+          <span className="font-display text-2xl font-bold text-foreground">{s.value}</span>
+        </div>
+        <p className="mt-1 text-xs text-muted-foreground">{s.label}</p>
+      </div>
+    ))}
+  </div>
+);
+
+const RoleHeader = ({ icon: Icon, label }: { icon: any; label: string }) => (
+  <div className="flex items-center gap-2 mb-4">
+    <Icon size={18} className="text-primary" />
+    <h2 className="font-display text-lg font-semibold text-foreground">{label}</h2>
+    <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] text-emerald-400 font-medium">Active</span>
+  </div>
+);
+
+const LockedRoleCard = ({ icon: Icon, label, slug }: { icon: any; label: string; slug: string }) => (
+  <Link to={`/ai-employees/${slug}`} className="rounded-xl border border-border/50 bg-card p-5 transition-all hover:border-primary/30 group">
+    <div className="flex items-center gap-3 mb-2">
+      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted/50">
+        <Icon size={18} className="text-muted-foreground" />
+      </div>
+      <Lock size={14} className="text-muted-foreground" />
+    </div>
+    <p className="text-sm font-medium text-foreground">{label}</p>
+    <p className="text-xs text-muted-foreground mt-1">Not included in your current package</p>
+    <span className="mt-3 inline-block text-xs text-primary group-hover:underline">View Plans →</span>
+  </Link>
+);
 
 const DashboardPage = () => {
   const { profile, workspace } = useAuth();
@@ -24,46 +67,26 @@ const DashboardPage = () => {
     activities: emailActivities,
   } = useEmailMarketingData();
   const {
-    tasks: vaTasks, requests: vaRequests, drafts: vaDrafts, connections: vaConnections,
+    tasks: vaTasks, requests: vaRequests, connections: vaConnections,
     activities: vaActivities,
   } = useVirtualAssistantData();
-
-  const approved = drafts.filter(d => d.status === "approved").length;
-  const pending = drafts.filter(d => d.status === "pending" || d.status === "draft").length;
-  const scheduled = drafts.filter(d => d.status === "scheduled").length;
-  const connectedPlatforms = connections.filter(c => c.connected);
-  const nextScheduled = drafts.find(d => d.status === "scheduled" && d.scheduled_date);
 
   const hasSocial = profile?.unlocked_roles.includes("social-media-manager");
   const hasSupport = profile?.unlocked_roles.includes("customer-support");
   const hasEmail = profile?.unlocked_roles.includes("email-marketer");
   const hasVA = profile?.unlocked_roles.includes("virtual-assistant");
 
-  // Support stats
-  const openTickets = supportTickets.filter(t => t.status === "new" || t.status === "drafting").length;
-  const pendingDrafts = supportDrafts.filter(d => d.status === "draft" || d.status === "edited").length;
-  const escalatedTickets = supportTickets.filter(t => t.status === "escalated").length;
-  const resolvedTickets = supportTickets.filter(t => t.status === "resolved").length;
+  const connectedPlatforms = connections.filter(c => c.connected);
   const connectedChannels = supportConnections.filter((c: any) => c.connected);
-
-  // Email stats
-  const emailDraftsPending = emailDrafts.filter(d => d.status === "draft" || d.status === "pending").length;
-  const emailScheduled = emailDrafts.filter(d => d.status === "scheduled").length;
-  const emailSent = emailDrafts.filter(d => d.status === "sent").length;
   const emailSenders = emailConnections.filter((c: any) => c.connected);
-  const nextEmailScheduled = emailDrafts.find(d => d.status === "scheduled" && d.scheduled_date);
-
-  // VA stats
-  const vaOpenRequests = vaRequests.filter(r => r.status !== "completed").length;
-  const vaActiveTasks = vaTasks.filter(t => ["new", "pending", "in_progress"].includes(t.status)).length;
-  const vaAwaitingApproval = vaTasks.filter(t => t.status === "awaiting_approval").length;
-  const vaCompleted = vaTasks.filter(t => t.status === "completed").length;
   const vaTools = vaConnections.filter((c: any) => c.connected);
+  const allConnected = [...connectedPlatforms, ...connectedChannels, ...emailSenders, ...vaTools];
 
-  // Merge activities from all roles
   const allActivities = [...activities, ...supportActivities, ...emailActivities, ...vaActivities]
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
     .slice(0, 10);
+
+  const lockedRoles = allRoles.filter(r => !profile?.unlocked_roles.includes(r.slug));
 
   return (
     <PageLayout>
@@ -76,7 +99,7 @@ const DashboardPage = () => {
                   {workspace?.business_name ? `${workspace.business_name} Dashboard` : "Your Dashboard"}
                 </h1>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  {profile?.active_package ? `${profile.active_package} plan` : ""} · {connectedPlatforms.length + connectedChannels.length + emailSenders.length + vaTools.length} connections
+                  {profile?.active_package ? `${profile.active_package.charAt(0).toUpperCase() + profile.active_package.slice(1)} plan` : ""} · {allConnected.length} connection{allConnected.length !== 1 ? "s" : ""}
                 </p>
               </div>
               <div className="flex gap-3 flex-wrap">
@@ -88,233 +111,75 @@ const DashboardPage = () => {
             </div>
           </motion.div>
 
-          {/* Social Media Manager Stats */}
           {hasSocial && (
             <div className="mb-8">
-              <div className="flex items-center gap-2 mb-4">
-                <Share2 size={18} className="text-primary" />
-                <h2 className="font-display text-lg font-semibold text-foreground">Social Media Manager</h2>
-                <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] text-emerald-400 font-medium">Active</span>
-              </div>
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-                {[
-                  { label: "Total Drafts", value: String(drafts.length), icon: PenLine, color: "text-primary" },
-                  { label: "Pending Review", value: String(pending), icon: Eye, color: "text-yellow-400" },
-                  { label: "Approved", value: String(approved), icon: ThumbsUp, color: "text-emerald-400" },
-                  { label: "Scheduled", value: String(scheduled), icon: Calendar, color: "text-primary" },
-                  { label: "Platforms", value: String(connectedPlatforms.length), icon: Share2, color: "text-primary" },
-                ].map((s) => (
-                  <div key={s.label} className="rounded-xl border border-border/50 bg-card p-4">
-                    <div className="flex items-center justify-between"><s.icon size={16} className={s.color} /><span className="font-display text-2xl font-bold text-foreground">{s.value}</span></div>
-                    <p className="mt-1 text-xs text-muted-foreground">{s.label}</p>
-                  </div>
-                ))}
-              </div>
+              <RoleHeader icon={Share2} label="Social Media Manager" />
+              <StatGrid stats={[
+                { label: "Total Drafts", value: String(drafts.length), icon: PenLine, color: "text-primary" },
+                { label: "Pending Review", value: String(drafts.filter(d => d.status === "pending" || d.status === "draft").length), icon: ThumbsUp, color: "text-yellow-400" },
+                { label: "Approved", value: String(drafts.filter(d => d.status === "approved").length), icon: Check, color: "text-emerald-400" },
+                { label: "Scheduled", value: String(drafts.filter(d => d.status === "scheduled").length), icon: Calendar, color: "text-primary" },
+                { label: "Platforms", value: String(connectedPlatforms.length), icon: Share2, color: "text-primary" },
+              ]} />
             </div>
           )}
 
-          {/* Customer Support Stats */}
           {hasSupport && (
             <div className="mb-8">
-              <div className="flex items-center gap-2 mb-4">
-                <Headphones size={18} className="text-primary" />
-                <h2 className="font-display text-lg font-semibold text-foreground">Customer Support</h2>
-                <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] text-emerald-400 font-medium">Active</span>
-              </div>
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-                {[
-                  { label: "Open Tickets", value: String(openTickets), icon: MessageSquare, color: "text-primary" },
-                  { label: "Drafts Pending", value: String(pendingDrafts), icon: PenLine, color: "text-yellow-400" },
-                  { label: "Escalated", value: String(escalatedTickets), icon: AlertTriangle, color: "text-orange-400" },
-                  { label: "Resolved", value: String(resolvedTickets), icon: Check, color: "text-emerald-400" },
-                  { label: "Channels", value: String(connectedChannels.length), icon: Headphones, color: "text-primary" },
-                ].map((s) => (
-                  <div key={s.label} className="rounded-xl border border-border/50 bg-card p-4">
-                    <div className="flex items-center justify-between"><s.icon size={16} className={s.color} /><span className="font-display text-2xl font-bold text-foreground">{s.value}</span></div>
-                    <p className="mt-1 text-xs text-muted-foreground">{s.label}</p>
-                  </div>
-                ))}
-              </div>
+              <RoleHeader icon={Headphones} label="Customer Support" />
+              <StatGrid stats={[
+                { label: "Open Tickets", value: String(supportTickets.filter(t => t.status === "new" || t.status === "drafting").length), icon: MessageSquare, color: "text-primary" },
+                { label: "Drafts Pending", value: String(supportDrafts.filter(d => d.status === "draft" || d.status === "edited").length), icon: PenLine, color: "text-yellow-400" },
+                { label: "Escalated", value: String(supportTickets.filter(t => t.status === "escalated").length), icon: AlertTriangle, color: "text-orange-400" },
+                { label: "Resolved", value: String(supportTickets.filter(t => t.status === "resolved").length), icon: Check, color: "text-emerald-400" },
+                { label: "Channels", value: String(connectedChannels.length), icon: Headphones, color: "text-primary" },
+              ]} />
             </div>
           )}
 
-          {/* Email Marketer Stats */}
           {hasEmail && (
             <div className="mb-8">
-              <div className="flex items-center gap-2 mb-4">
-                <Mail size={18} className="text-primary" />
-                <h2 className="font-display text-lg font-semibold text-foreground">Email Marketer</h2>
-                <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] text-emerald-400 font-medium">Active</span>
-              </div>
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-                {[
-                  { label: "Campaigns", value: String(emailCampaigns.length), icon: FileText, color: "text-primary" },
-                  { label: "Drafts Pending", value: String(emailDraftsPending), icon: PenLine, color: "text-yellow-400" },
-                  { label: "Scheduled", value: String(emailScheduled), icon: Calendar, color: "text-primary" },
-                  { label: "Sent", value: String(emailSent), icon: Send, color: "text-emerald-400" },
-                  { label: "Senders", value: String(emailSenders.length), icon: Mail, color: "text-primary" },
-                ].map((s) => (
-                  <div key={s.label} className="rounded-xl border border-border/50 bg-card p-4">
-                    <div className="flex items-center justify-between"><s.icon size={16} className={s.color} /><span className="font-display text-2xl font-bold text-foreground">{s.value}</span></div>
-                    <p className="mt-1 text-xs text-muted-foreground">{s.label}</p>
-                  </div>
-                ))}
-              </div>
+              <RoleHeader icon={Mail} label="Email Marketer" />
+              <StatGrid stats={[
+                { label: "Campaigns", value: String(emailCampaigns.length), icon: FileText, color: "text-primary" },
+                { label: "Drafts Pending", value: String(emailDrafts.filter(d => d.status === "draft" || d.status === "pending").length), icon: PenLine, color: "text-yellow-400" },
+                { label: "Scheduled", value: String(emailDrafts.filter(d => d.status === "scheduled").length), icon: Calendar, color: "text-primary" },
+                { label: "Sent", value: String(emailDrafts.filter(d => d.status === "sent").length), icon: Send, color: "text-emerald-400" },
+                { label: "Senders", value: String(emailSenders.length), icon: Mail, color: "text-primary" },
+              ]} />
             </div>
           )}
 
-          {/* Virtual Assistant Stats */}
           {hasVA && (
             <div className="mb-8">
-              <div className="flex items-center gap-2 mb-4">
-                <CalendarCheck size={18} className="text-primary" />
-                <h2 className="font-display text-lg font-semibold text-foreground">Virtual Assistant</h2>
-                <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] text-emerald-400 font-medium">Active</span>
-              </div>
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-                {[
-                  { label: "Open Requests", value: String(vaOpenRequests), icon: Inbox, color: "text-primary" },
-                  { label: "Active Tasks", value: String(vaActiveTasks), icon: ListChecks, color: "text-primary" },
-                  { label: "Awaiting Approval", value: String(vaAwaitingApproval), icon: Bell, color: "text-yellow-400" },
-                  { label: "Completed", value: String(vaCompleted), icon: Check, color: "text-emerald-400" },
-                  { label: "Tools", value: String(vaTools.length), icon: CalendarCheck, color: "text-primary" },
-                ].map((s) => (
-                  <div key={s.label} className="rounded-xl border border-border/50 bg-card p-4">
-                    <div className="flex items-center justify-between"><s.icon size={16} className={s.color} /><span className="font-display text-2xl font-bold text-foreground">{s.value}</span></div>
-                    <p className="mt-1 text-xs text-muted-foreground">{s.label}</p>
-                  </div>
-                ))}
-              </div>
+              <RoleHeader icon={CalendarCheck} label="Virtual Assistant" />
+              <StatGrid stats={[
+                { label: "Open Requests", value: String(vaRequests.filter(r => r.status !== "completed").length), icon: Inbox, color: "text-primary" },
+                { label: "Active Tasks", value: String(vaTasks.filter(t => ["new", "pending", "in_progress"].includes(t.status)).length), icon: ListChecks, color: "text-primary" },
+                { label: "Awaiting Approval", value: String(vaTasks.filter(t => t.status === "awaiting_approval").length), icon: Bell, color: "text-yellow-400" },
+                { label: "Completed", value: String(vaTasks.filter(t => t.status === "completed").length), icon: Check, color: "text-emerald-400" },
+                { label: "Tools", value: String(vaTools.length), icon: CalendarCheck, color: "text-primary" },
+              ]} />
             </div>
           )}
 
-          {/* Connected Platforms */}
-          {(connectedPlatforms.length > 0 || connectedChannels.length > 0 || emailSenders.length > 0 || vaTools.length > 0) && (
+          {allConnected.length > 0 && (
             <div className="mb-8 rounded-xl border border-border/50 bg-card p-5">
               <h3 className="mb-3 font-display text-sm font-semibold text-foreground">Connected Platforms & Channels</h3>
               <div className="flex flex-wrap gap-3">
-                {[...connectedPlatforms, ...connectedChannels, ...emailSenders, ...vaTools].map((c: any) => (
+                {allConnected.map((c: any) => (
                   <div key={c.id} className="flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1.5">
                     <div className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
                     <span className="text-xs font-medium text-primary">{c.platform}</span>
-                    <span className="text-xs text-muted-foreground">{c.account_name}</span>
+                    {c.account_name && <span className="text-xs text-muted-foreground">{c.account_name}</span>}
                   </div>
                 ))}
               </div>
             </div>
           )}
 
-          {/* Next Scheduled */}
-          {nextScheduled && (
-            <div className="mb-8 rounded-xl border border-primary/20 bg-primary/5 p-5">
-              <h3 className="mb-2 font-display text-sm font-semibold text-foreground">Next Scheduled Post</h3>
-              <p className="text-sm text-foreground">{nextScheduled.idea_title}</p>
-              <p className="text-xs text-muted-foreground">{nextScheduled.platform} · {new Date(nextScheduled.scheduled_date!).toLocaleDateString()}</p>
-            </div>
-          )}
-
-          {nextEmailScheduled && (
-            <div className="mb-8 rounded-xl border border-primary/20 bg-primary/5 p-5">
-              <h3 className="mb-2 font-display text-sm font-semibold text-foreground">Next Scheduled Email</h3>
-              <p className="text-sm text-foreground">{nextEmailScheduled.subject_line}</p>
-              <p className="text-xs text-muted-foreground">{new Date(nextEmailScheduled.scheduled_date!).toLocaleDateString()}</p>
-            </div>
-          )}
-
-          {/* Recent Drafts */}
-          {drafts.length > 0 && (
-            <div className="mb-8 rounded-xl border border-border/50 bg-card p-5">
-              <h3 className="mb-3 font-display text-sm font-semibold text-foreground">Recent Social Drafts</h3>
-              <div className="space-y-2">
-                {drafts.slice(0, 5).map((d) => (
-                  <div key={d.id} className="flex items-center justify-between rounded-lg bg-secondary p-3">
-                    <div>
-                      <p className="text-sm font-medium text-foreground truncate max-w-[300px]">{d.idea_title}</p>
-                      <p className="text-xs text-muted-foreground">{d.platform}</p>
-                    </div>
-                    <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${
-                      d.status === "approved" ? "bg-emerald-500/10 text-emerald-400" :
-                      d.status === "scheduled" ? "bg-primary/10 text-primary" :
-                      d.status === "pending" || d.status === "draft" ? "bg-yellow-500/10 text-yellow-400" :
-                      "bg-secondary text-muted-foreground border border-border"
-                    }`}>{d.status}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Recent Support Tickets */}
-          {supportTickets.length > 0 && hasSupport && (
-            <div className="mb-8 rounded-xl border border-border/50 bg-card p-5">
-              <h3 className="mb-3 font-display text-sm font-semibold text-foreground">Recent Support Tickets</h3>
-              <div className="space-y-2">
-                {supportTickets.slice(0, 5).map((t) => (
-                  <div key={t.id} className="flex items-center justify-between rounded-lg bg-secondary p-3">
-                    <div>
-                      <p className="text-sm font-medium text-foreground truncate max-w-[300px]">{t.customer_name}</p>
-                      <p className="text-xs text-muted-foreground">{t.channel} · {t.issue_type || "General"}</p>
-                    </div>
-                    <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${
-                      t.status === "resolved" ? "bg-emerald-500/10 text-emerald-400" :
-                      t.status === "escalated" ? "bg-orange-500/10 text-orange-400" :
-                      "bg-primary/10 text-primary"
-                    }`}>{t.status}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Recent VA Tasks */}
-          {vaTasks.length > 0 && hasVA && (
-            <div className="mb-8 rounded-xl border border-border/50 bg-card p-5">
-              <h3 className="mb-3 font-display text-sm font-semibold text-foreground">Recent Assistant Tasks</h3>
-              <div className="space-y-2">
-                {vaTasks.slice(0, 5).map((t) => (
-                  <div key={t.id} className="flex items-center justify-between rounded-lg bg-secondary p-3">
-                    <div>
-                      <p className="text-sm font-medium text-foreground truncate max-w-[300px]">{t.title}</p>
-                      <p className="text-xs text-muted-foreground">{t.priority} · {t.category}</p>
-                    </div>
-                    <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${
-                      t.status === "completed" ? "bg-emerald-500/10 text-emerald-400" :
-                      t.status === "in_progress" ? "bg-primary/10 text-primary" :
-                      t.status === "awaiting_approval" ? "bg-yellow-500/10 text-yellow-400" :
-                      "bg-secondary text-muted-foreground border border-border"
-                    }`}>{t.status.replace("_", " ")}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Recent Email Drafts */}
-          {emailDrafts.length > 0 && hasEmail && (
-            <div className="mb-8 rounded-xl border border-border/50 bg-card p-5">
-              <h3 className="mb-3 font-display text-sm font-semibold text-foreground">Recent Email Drafts</h3>
-              <div className="space-y-2">
-                {emailDrafts.slice(0, 5).map((d) => (
-                  <div key={d.id} className="flex items-center justify-between rounded-lg bg-secondary p-3">
-                    <div>
-                      <p className="text-sm font-medium text-foreground truncate max-w-[300px]">{d.subject_line || "Untitled"}</p>
-                      <p className="text-xs text-muted-foreground">{d.email_type}</p>
-                    </div>
-                    <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${
-                      d.status === "approved" ? "bg-emerald-500/10 text-emerald-400" :
-                      d.status === "scheduled" ? "bg-primary/10 text-primary" :
-                      d.status === "sent" ? "bg-muted text-muted-foreground" :
-                      "bg-yellow-500/10 text-yellow-400"
-                    }`}>{d.status}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Recent Activity */}
           {allActivities.length > 0 && (
-            <div className="rounded-xl border border-border/50 bg-card p-5">
+            <div className="mb-8 rounded-xl border border-border/50 bg-card p-5">
               <h3 className="mb-3 font-display text-sm font-semibold text-foreground">Recent Activity</h3>
               <div className="space-y-2">
                 {allActivities.map((a) => (
@@ -330,27 +195,17 @@ const DashboardPage = () => {
             </div>
           )}
 
-          {/* Other roles locked preview */}
-          <div className="mt-12">
-            <h2 className="font-display text-lg font-semibold text-foreground mb-4">Other AI Employees</h2>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {[
-                { icon: Share2, label: "Social Media Manager", slug: "social-media-manager" },
-                { icon: Headphones, label: "Customer Support", slug: "customer-support" },
-                { icon: Mail, label: "Email Marketer", slug: "email-marketer" },
-                { icon: CalendarCheck, label: "Virtual Assistant", slug: "virtual-assistant" },
-              ].filter((r) => !profile?.unlocked_roles.includes(r.slug)).map((r) => {
-                return (
-                  <Link key={r.slug} to={`/ai-employees/${r.slug}`}
-                    className="rounded-xl border border-border/50 bg-card p-5 transition-all hover:border-primary/30">
-                    <r.icon size={20} className="text-muted-foreground mb-2" />
-                    <p className="text-sm font-medium text-foreground">{r.label}</p>
-                    <p className="text-xs text-muted-foreground mt-1">Locked — upgrade to access</p>
-                  </Link>
-                );
-              })}
+          {lockedRoles.length > 0 && (
+            <div className="mt-12">
+              <h2 className="font-display text-lg font-semibold text-foreground mb-4">Available AI Employees</h2>
+              <p className="text-sm text-muted-foreground mb-6">These roles are not included in your current package. Upgrade to unlock them.</p>
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                {lockedRoles.map((r) => (
+                  <LockedRoleCard key={r.slug} icon={r.icon} label={r.label} slug={r.slug} />
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </section>
     </PageLayout>
