@@ -87,7 +87,7 @@ serve(async (req) => {
       }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    // Promo code CRUD
+    // Promo code CRUD — now supports new billing control fields
     if (action === "create-promo") {
       const body = await req.json();
       const { data, error } = await supabaseAdmin.from("promo_codes").insert({
@@ -107,6 +107,13 @@ serve(async (req) => {
         first_billing_cycle_only: body.first_billing_cycle_only || false,
         start_date: body.start_date || null,
         end_date: body.end_date || null,
+        // New billing control fields
+        trial_days: body.trial_days || null,
+        remove_trial: body.remove_trial || false,
+        billing_delay_days: body.billing_delay_days || null,
+        discount_duration_months: body.discount_duration_months || null,
+        recurring_discount: body.recurring_discount || false,
+        new_customers_only: body.new_customers_only || false,
       }).select().single();
       if (error) throw new Error(error.message);
       return new Response(JSON.stringify(data), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
@@ -115,21 +122,18 @@ serve(async (req) => {
     if (action === "update-promo") {
       const body = await req.json();
       const updateFields: any = {};
-      if (body.label !== undefined) updateFields.label = body.label;
-      if (body.discount_type !== undefined) updateFields.discount_type = body.discount_type;
-      if (body.discount_value !== undefined) updateFields.discount_value = body.discount_value;
-      if (body.description !== undefined) updateFields.description = body.description;
-      if (body.max_uses !== undefined) updateFields.max_uses = body.max_uses;
-      if (body.is_active !== undefined) updateFields.is_active = body.is_active;
-      if (body.is_visible_on_homepage !== undefined) updateFields.is_visible_on_homepage = body.is_visible_on_homepage;
-      if (body.is_visible_on_pricing !== undefined) updateFields.is_visible_on_pricing = body.is_visible_on_pricing;
-      if (body.is_private !== undefined) updateFields.is_private = body.is_private;
-      if (body.starter_discount !== undefined) updateFields.starter_discount = body.starter_discount;
-      if (body.growth_discount !== undefined) updateFields.growth_discount = body.growth_discount;
-      if (body.team_discount !== undefined) updateFields.team_discount = body.team_discount;
-      if (body.first_billing_cycle_only !== undefined) updateFields.first_billing_cycle_only = body.first_billing_cycle_only;
-      if (body.start_date !== undefined) updateFields.start_date = body.start_date;
-      if (body.end_date !== undefined) updateFields.end_date = body.end_date;
+      const fields = [
+        "label", "discount_type", "discount_value", "description", "max_uses",
+        "is_active", "is_visible_on_homepage", "is_visible_on_pricing", "is_private",
+        "starter_discount", "growth_discount", "team_discount", "first_billing_cycle_only",
+        "start_date", "end_date",
+        // New fields
+        "trial_days", "remove_trial", "billing_delay_days",
+        "discount_duration_months", "recurring_discount", "new_customers_only",
+      ];
+      for (const f of fields) {
+        if (body[f] !== undefined) updateFields[f] = body[f];
+      }
 
       const { data, error } = await supabaseAdmin.from("promo_codes").update(updateFields).eq("id", body.id).select().single();
       if (error) throw new Error(error.message);
