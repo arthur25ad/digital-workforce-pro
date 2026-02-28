@@ -8,19 +8,25 @@ const PromoBanner = () => {
 
   return (
     <div className="w-full bg-emerald-600 text-white py-2 px-4 text-center text-xs md:text-sm font-medium">
-      <div className="flex items-center justify-center gap-1.5 md:gap-2 flex-wrap">
-        <Tag size={12} className="shrink-0 md:w-[14px] md:h-[14px]" />
-        <span>{homepagePromo.label || "Limited time offer"}</span>
-        <span className="mx-0.5 md:mx-1">—</span>
-        <span>
-          Code "<span className="font-bold font-mono tracking-wide text-sm md:text-base">{homepagePromo.code}</span>" saves
+      <div className="flex items-center justify-center gap-1.5 md:gap-2">
+        <Tag size={12} className="shrink-0 hidden md:block" />
+        {/* Mobile: ultra-compact single line */}
+        <span className="md:hidden">
+          Code "<span className="font-bold font-mono text-sm">{homepagePromo.code}</span>" saves
           {homepagePromo.discount_type === "percentage"
             ? ` ${homepagePromo.discount_value}%`
             : ` $${homepagePromo.discount_value}`}
+          {homepagePromo.first_billing_cycle_only && <span className="text-emerald-200 text-[10px] ml-1">(first month)</span>}
         </span>
-        {homepagePromo.first_billing_cycle_only && (
-          <span className="text-emerald-200 text-[10px] md:text-xs">(first month)</span>
-        )}
+        {/* Desktop: full message */}
+        <span className="hidden md:inline">
+          <Tag size={14} className="inline -mt-0.5 mr-1" />
+          {homepagePromo.label || "Limited time offer"} — Code "<span className="font-bold font-mono text-base">{homepagePromo.code}</span>" saves
+          {homepagePromo.discount_type === "percentage"
+            ? ` ${homepagePromo.discount_value}%`
+            : ` $${homepagePromo.discount_value}`}
+          {homepagePromo.first_billing_cycle_only && <span className="text-emerald-200 text-xs ml-1">(first month)</span>}
+        </span>
       </div>
     </div>
   );
