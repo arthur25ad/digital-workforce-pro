@@ -15,23 +15,23 @@ const PricingSection = () => {
 
   return (
     <section id="pricing" className="section-padding">
-      <div className="mx-auto max-w-[1600px] px-0 md:px-12 lg:px-16">
+      <div className="mx-auto max-w-[1600px] px-5 md:px-12 lg:px-16">
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-8 md:mb-14 text-center">
           <h2 className="font-display text-2xl font-bold text-foreground md:text-4xl">Simple Pricing for Your First AI Team</h2>
           {topPromo && (
-            <div className="mt-3 md:mt-4 inline-flex items-center gap-2 rounded-full bg-emerald-500/10 border border-emerald-500/30 px-3 md:px-4 py-1.5 text-xs md:text-sm text-emerald-400">
-              <Tag size={14} />
-              Use code "<span className="font-mono font-bold text-base">{topPromo.code}</span>" at checkout to save
+             <div className="mt-3 inline-flex items-center gap-1.5 md:gap-2 rounded-full bg-emerald-500/10 border border-emerald-500/30 px-3 py-1.5 text-xs md:text-sm text-emerald-400">
+              <Tag size={12} className="md:w-[14px] md:h-[14px]" />
+              Code "<span className="font-mono font-bold text-sm md:text-base">{topPromo.code}</span>" saves
               {topPromo.discount_type === "percentage"
                 ? ` ${topPromo.discount_value}%`
                 : ` $${topPromo.discount_value}`}
-              {topPromo.first_billing_cycle_only && <span className="text-emerald-400/70 text-xs ml-1">(first month only)</span>}
+              {topPromo.first_billing_cycle_only && <span className="text-emerald-400/70 text-[10px] md:text-xs ml-1">(first month)</span>}
             </div>
           )}
         </motion.div>
 
         {/* Promo code input */}
-        <div className="mx-auto max-w-xs mb-6 md:mb-8">
+        <div className="mx-auto max-w-xs mb-5 md:mb-8">
           <PromoCodeInput
             onApply={setAppliedPromo}
             onClear={() => setAppliedPromo(null)}
@@ -39,7 +39,7 @@ const PricingSection = () => {
           />
         </div>
 
-        <div className="grid gap-4 md:gap-6 md:grid-cols-3">
+        <div className="grid gap-3 md:gap-6 md:grid-cols-3">
           {plans.map((plan, i) => {
             const isPopular = plan.key === "growth";
             const priceNum = parseInt(plan.price.replace("$", ""));
