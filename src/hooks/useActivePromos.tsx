@@ -22,12 +22,22 @@ export interface PromoCode {
   usage_count: number;
 }
 
+/** Check if a promo is currently eligible for display */
+function isPromoEligible(p: PromoCode): boolean {
+  const now = new Date();
+  if (p.start_date && new Date(p.start_date) > now) return false;
+  if (p.end_date && new Date(p.end_date) < now) return false;
+  if (p.max_uses && p.usage_count >= p.max_uses) return false;
+  return true;
+}
+
 export function useActivePromos() {
   const [promos, setPromos] = useState<PromoCode[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetch = async () => {
+      // RLS now only returns non-private, publicly visible, active promos
       const { data } = await supabase
         .from("promo_codes")
         .select("*")
@@ -38,14 +48,17 @@ export function useActivePromos() {
     fetch();
   }, []);
 
-  const homepagePromo = promos.find(
+  // Further filter by date/usage eligibility on the client for display
+  const eligible = promos.filter(isPromoEligible);
+
+  const homepagePromo = eligible.find(
     (p) => p.is_visible_on_homepage && !p.is_private
   );
-  const pricingPromos = promos.filter(
+  const pricingPromos = eligible.filter(
     (p) => p.is_visible_on_pricing && !p.is_private
   );
 
-  return { promos, homepagePromo, pricingPromos, loading };
+  return { promos: eligible, homepagePromo, pricingPromos, loading };
 }
 
 export function getDiscountForPlan(
