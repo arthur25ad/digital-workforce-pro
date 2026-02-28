@@ -66,93 +66,57 @@ serve(async (req) => {
     };
     const planKey = priceToKey[priceId] || "";
 
-    // Handle promo code -> Stripe coupon (FULL SERVER-SIDE VALIDATION)
+    // Handle promo code -> Stripe coupon
     let discounts: any[] | undefined;
-    let validatedPromoId: string | null = null;
 
     if (promoCode) {
-      // Use service role to read promo (bypasses RLS so private codes work for manual entry)
-      const { data: promoData, error: promoError } = await supabaseAdmin
+      const { data: promoData } = await supabaseAdmin
         .from("promo_codes")
         .select("*")
         .eq("code", promoCode.toUpperCase())
         .eq("is_active", true)
         .maybeSingle();
 
-      if (promoError || !promoData) {
-        return new Response(JSON.stringify({ error: "Invalid or inactive promo code." }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-          status: 400,
-        });
+      if (promoData) {
+        // Determine the discount amount for this plan
+        let discountVal = promoData.discount_value || 0;
+        const planSpecific = planKey === "starter" ? promoData.starter_discount
+          : planKey === "growth" ? promoData.growth_discount
+          : planKey === "team" ? promoData.team_discount : 0;
+        if (planSpecific > 0) discountVal = planSpecific;
+
+        if (discountVal > 0) {
+          // Create a Stripe coupon dynamically
+          const couponParams: any = {
+            name: `Promo ${promoData.code}`,
+          };
+
+          if (promoData.first_billing_cycle_only) {
+            // "once" means it applies to the first PAID invoice only
+            // Stripe automatically skips the $0 trial invoice and applies
+            // the coupon to the first real invoice after the trial ends
+            couponParams.duration = "once";
+          } else {
+            couponParams.duration = "forever";
+          }
+
+          if (promoData.discount_type === "percentage") {
+            couponParams.percent_off = discountVal;
+          } else {
+            couponParams.amount_off = Math.round(discountVal * 100); // cents
+            couponParams.currency = "usd";
+          }
+
+          const coupon = await stripe.coupons.create(couponParams);
+          discounts = [{ coupon: coupon.id }];
+
+          // Increment usage count
+          await supabaseAdmin
+            .from("promo_codes")
+            .update({ usage_count: (promoData.usage_count || 0) + 1 })
+            .eq("id", promoData.id);
+        }
       }
-
-      // Validate date window
-      const now = new Date();
-      if (promoData.start_date && new Date(promoData.start_date) > now) {
-        return new Response(JSON.stringify({ error: "This promo code is not yet active." }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-          status: 400,
-        });
-      }
-      if (promoData.end_date && new Date(promoData.end_date) < now) {
-        return new Response(JSON.stringify({ error: "This promo code has expired." }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-          status: 400,
-        });
-      }
-      if (promoData.expires_at && new Date(promoData.expires_at) < now) {
-        return new Response(JSON.stringify({ error: "This promo code has expired." }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-          status: 400,
-        });
-      }
-
-      // Validate usage limit
-      if (promoData.max_uses && promoData.usage_count >= promoData.max_uses) {
-        return new Response(JSON.stringify({ error: "This promo code has reached its usage limit." }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-          status: 400,
-        });
-      }
-
-      // Determine the discount amount for this plan
-      let discountVal = promoData.discount_value || 0;
-      const planSpecific = planKey === "starter" ? promoData.starter_discount
-        : planKey === "growth" ? promoData.growth_discount
-        : planKey === "team" ? promoData.team_discount : 0;
-      if (planSpecific > 0) discountVal = planSpecific;
-
-      // If no discount applies to this plan, reject
-      if (discountVal <= 0) {
-        return new Response(JSON.stringify({ error: "This promo code does not apply to the selected plan." }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-          status: 400,
-        });
-      }
-
-      // Create a Stripe coupon dynamically
-      const couponParams: any = {
-        name: `Promo ${promoData.code}`,
-      };
-
-      if (promoData.first_billing_cycle_only) {
-        couponParams.duration = "once";
-      } else {
-        couponParams.duration = "forever";
-      }
-
-      if (promoData.discount_type === "percentage") {
-        couponParams.percent_off = discountVal;
-      } else {
-        couponParams.amount_off = Math.round(discountVal * 100); // cents
-        couponParams.currency = "usd";
-      }
-
-      const coupon = await stripe.coupons.create(couponParams);
-      discounts = [{ coupon: coupon.id }];
-
-      // Store promo ID for post-payment usage increment — DO NOT increment here
-      validatedPromoId = promoData.id;
     }
 
     const sessionParams: any = {
@@ -164,15 +128,11 @@ serve(async (req) => {
       cancel_url: `${req.headers.get("origin")}/pricing`,
     };
 
+    // ALWAYS apply trial if the plan has one — trials and discounts are independent.
+    // Stripe applies the coupon to the first PAID invoice (after trial ends),
+    // so they layer correctly: trial first, then discounted first paid month, then normal.
     if (trialPeriodDays) {
       sessionParams.subscription_data = { trial_period_days: trialPeriodDays };
-    }
-
-    // Store the promo ID in metadata so the webhook can increment usage after payment
-    if (validatedPromoId) {
-      sessionParams.metadata = { promo_id: validatedPromoId };
-      if (!sessionParams.subscription_data) sessionParams.subscription_data = {};
-      sessionParams.subscription_data.metadata = { promo_id: validatedPromoId };
     }
 
     if (discounts) {
