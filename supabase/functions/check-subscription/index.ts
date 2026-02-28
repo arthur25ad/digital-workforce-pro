@@ -101,7 +101,64 @@ serve(async (req) => {
       }
       productId = activeSub.items.data[0]?.price?.product ?? null;
       priceId = activeSub.items.data[0]?.price?.id ?? null;
-      logStep("Active/trialing subscription found", { productId, priceId, status: activeSub.status });
+
+      // Get current billing amount from the subscription item
+      const priceObj = activeSub.items.data[0]?.price;
+      let currentAmount: number | null = null;
+      let currency: string | null = null;
+      if (priceObj) {
+        currentAmount = priceObj.unit_amount; // in cents
+        currency = priceObj.currency;
+      }
+
+      // Check for active discount / coupon on the subscription
+      let discountAmount: number | null = null;
+      let discountLabel: string | null = null;
+      const discount = activeSub.discount;
+      if (discount && discount.coupon) {
+        const coupon = discount.coupon;
+        if (coupon.percent_off) {
+          discountLabel = `${coupon.percent_off}% off`;
+          if (currentAmount) {
+            discountAmount = Math.round(currentAmount * (coupon.percent_off / 100));
+          }
+        } else if (coupon.amount_off) {
+          discountLabel = `$${(coupon.amount_off / 100).toFixed(2)} off`;
+          discountAmount = coupon.amount_off;
+        }
+      }
+
+      // Try to get next invoice amount (most accurate for promo pricing)
+      let upcomingAmount: number | null = null;
+      try {
+        const upcoming = await stripe.invoices.retrieveUpcoming({ customer: customerId });
+        if (upcoming) {
+          upcomingAmount = upcoming.amount_due; // in cents
+        }
+      } catch {
+        logStep("No upcoming invoice available");
+      }
+
+      logStep("Active/trialing subscription found", { productId, priceId, status: activeSub.status, currentAmount, discountLabel, upcomingAmount });
+
+      return new Response(JSON.stringify({
+        subscribed: true,
+        product_id: productId,
+        price_id: priceId,
+        subscription_end: subscriptionEnd,
+        subscription_start: subscriptionStart,
+        current_period_start: currentPeriodStart,
+        subscription_status: subscriptionStatus,
+        cancel_at_period_end: cancelAtPeriodEnd,
+        current_amount: currentAmount,
+        upcoming_amount: upcomingAmount,
+        currency: currency,
+        discount_label: discountLabel,
+        discount_amount: discountAmount,
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
     }
 
     return new Response(JSON.stringify({
