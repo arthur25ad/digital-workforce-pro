@@ -12,6 +12,17 @@ const logStep = (step: string, details?: any) => {
   console.log(`[CHECK-SUBSCRIPTION] ${step}${detailsStr}`);
 };
 
+function safeTimestamp(ts: any): string | null {
+  if (!ts) return null;
+  try {
+    const num = typeof ts === "number" ? ts : Number(ts);
+    if (isNaN(num) || num <= 0) return null;
+    return new Date(num * 1000).toISOString();
+  } catch {
+    return null;
+  }
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -39,7 +50,7 @@ serve(async (req) => {
     if (!user?.email) throw new Error("User not authenticated or email not available");
     logStep("User authenticated", { email: user.email });
 
-    // Owner/developer bypass — always return full access
+    // Owner/developer bypass
     if (user.email === "arthur25.ad@gmail.com") {
       logStep("Owner account detected, granting full access");
       return new Response(JSON.stringify({
@@ -47,6 +58,15 @@ serve(async (req) => {
         product_id: "owner_bypass",
         price_id: "owner_bypass",
         subscription_end: null,
+        subscription_start: null,
+        current_period_start: null,
+        subscription_status: "active",
+        cancel_at_period_end: false,
+        current_amount: null,
+        upcoming_amount: null,
+        currency: null,
+        discount_label: null,
+        discount_amount: null,
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
@@ -65,104 +85,103 @@ serve(async (req) => {
     }
 
     const customerId = customers.data[0].id;
-    // Check for both active and trialing subscriptions (trials auto-bill after)
+    logStep("Customer found", { customerId });
+
+    // List subscriptions
     const subscriptions = await stripe.subscriptions.list({
       customer: customerId,
-      limit: 5,
+      limit: 10,
     });
 
     const activeSub = subscriptions.data.find(
       (s) => s.status === "active" || s.status === "trialing"
     );
 
-    let productId = null;
-    let priceId = null;
-    let subscriptionEnd = null;
-    let subscriptionStart = null;
-    let currentPeriodStart = null;
-    let subscriptionStatus = null;
-    let cancelAtPeriodEnd = false;
-
-    if (activeSub) {
-      subscriptionStatus = activeSub.status;
-      cancelAtPeriodEnd = activeSub.cancel_at_period_end ?? false;
-      try {
-        if (activeSub.current_period_end) {
-          subscriptionEnd = new Date(activeSub.current_period_end * 1000).toISOString();
-        }
-        if (activeSub.current_period_start) {
-          currentPeriodStart = new Date(activeSub.current_period_start * 1000).toISOString();
-        }
-        if (activeSub.start_date) {
-          subscriptionStart = new Date(activeSub.start_date * 1000).toISOString();
-        }
-      } catch {
-        logStep("Could not parse date fields");
-      }
-      productId = activeSub.items.data[0]?.price?.product ?? null;
-      priceId = activeSub.items.data[0]?.price?.id ?? null;
-
-      // Get current billing amount from the subscription item
-      const priceObj = activeSub.items.data[0]?.price;
-      let currentAmount: number | null = null;
-      let currency: string | null = null;
-      if (priceObj) {
-        currentAmount = priceObj.unit_amount; // in cents
-        currency = priceObj.currency;
-      }
-
-      // Check for active discount / coupon on the subscription
-      let discountAmount: number | null = null;
-      let discountLabel: string | null = null;
-      const discount = activeSub.discount;
-      if (discount && discount.coupon) {
-        const coupon = discount.coupon;
-        if (coupon.percent_off) {
-          discountLabel = `${coupon.percent_off}% off`;
-          if (currentAmount) {
-            discountAmount = Math.round(currentAmount * (coupon.percent_off / 100));
-          }
-        } else if (coupon.amount_off) {
-          discountLabel = `$${(coupon.amount_off / 100).toFixed(2)} off`;
-          discountAmount = coupon.amount_off;
-        }
-      }
-
-      // Try to get next invoice amount (most accurate for promo pricing)
-      let upcomingAmount: number | null = null;
-      try {
-        const upcoming = await stripe.invoices.retrieveUpcoming({ customer: customerId });
-        if (upcoming) {
-          upcomingAmount = upcoming.amount_due; // in cents
-        }
-      } catch {
-        logStep("No upcoming invoice available");
-      }
-
-      logStep("Active/trialing subscription found", { productId, priceId, status: activeSub.status, currentAmount, discountLabel, upcomingAmount });
-
+    if (!activeSub) {
+      // Check for canceled but still accessible subscriptions
+      const canceledSub = subscriptions.data.find(s => s.status === "canceled");
+      logStep("No active subscription found", { totalSubs: subscriptions.data.length, hasCanceled: !!canceledSub });
       return new Response(JSON.stringify({
-        subscribed: true,
-        product_id: productId,
-        price_id: priceId,
-        subscription_end: subscriptionEnd,
-        subscription_start: subscriptionStart,
-        current_period_start: currentPeriodStart,
-        subscription_status: subscriptionStatus,
-        cancel_at_period_end: cancelAtPeriodEnd,
-        current_amount: currentAmount,
-        upcoming_amount: upcomingAmount,
-        currency: currency,
-        discount_label: discountLabel,
-        discount_amount: discountAmount,
+        subscribed: false,
+        product_id: null,
+        price_id: null,
+        subscription_end: null,
+        subscription_start: null,
+        current_period_start: null,
+        subscription_status: canceledSub?.status || null,
+        cancel_at_period_end: false,
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
       });
     }
 
+    // Retrieve the full subscription object to ensure all fields are present
+    const fullSub = await stripe.subscriptions.retrieve(activeSub.id);
+    
+    // Log raw field values for debugging
+    logStep("Raw subscription fields", {
+      id: fullSub.id,
+      status: fullSub.status,
+      current_period_start: fullSub.current_period_start,
+      current_period_end: fullSub.current_period_end,
+      start_date: fullSub.start_date,
+      cancel_at_period_end: fullSub.cancel_at_period_end,
+      created: fullSub.created,
+    });
+
+    const subscriptionEnd = safeTimestamp(fullSub.current_period_end);
+    const currentPeriodStart = safeTimestamp(fullSub.current_period_start);
+    const subscriptionStart = safeTimestamp(fullSub.start_date) || safeTimestamp(fullSub.created);
+    const subscriptionStatus = fullSub.status;
+    const cancelAtPeriodEnd = fullSub.cancel_at_period_end ?? false;
+
+    const priceItem = fullSub.items?.data?.[0]?.price;
+    const productId = priceItem?.product ?? null;
+    const priceId = priceItem?.id ?? null;
+    const currentAmount: number | null = priceItem?.unit_amount ?? null;
+    const currency: string | null = priceItem?.currency ?? null;
+
+    // Check discount
+    let discountAmount: number | null = null;
+    let discountLabel: string | null = null;
+    const discount = fullSub.discount;
+    if (discount && discount.coupon) {
+      const coupon = discount.coupon;
+      if (coupon.percent_off) {
+        discountLabel = `${coupon.percent_off}% off`;
+        if (currentAmount) {
+          discountAmount = Math.round(currentAmount * (coupon.percent_off / 100));
+        }
+      } else if (coupon.amount_off) {
+        discountLabel = `$${(coupon.amount_off / 100).toFixed(2)} off`;
+        discountAmount = coupon.amount_off;
+      }
+    }
+
+    // Try upcoming invoice for accurate next charge amount
+    let upcomingAmount: number | null = null;
+    try {
+      const upcoming = await stripe.invoices.retrieveUpcoming({ customer: customerId });
+      if (upcoming && upcoming.amount_due != null) {
+        upcomingAmount = upcoming.amount_due;
+        logStep("Upcoming invoice found", { amount_due: upcoming.amount_due });
+      }
+    } catch (e: any) {
+      logStep("No upcoming invoice", { reason: e?.message || "unknown" });
+      // If no upcoming invoice, use current amount minus discount as estimate
+      if (currentAmount !== null) {
+        upcomingAmount = discountAmount ? (currentAmount - discountAmount) : currentAmount;
+      }
+    }
+
+    logStep("Returning subscription data", {
+      productId, priceId, subscriptionEnd, currentPeriodStart, subscriptionStart,
+      status: subscriptionStatus, currentAmount, upcomingAmount, discountLabel,
+    });
+
     return new Response(JSON.stringify({
-      subscribed: !!activeSub,
+      subscribed: true,
       product_id: productId,
       price_id: priceId,
       subscription_end: subscriptionEnd,
@@ -170,6 +189,11 @@ serve(async (req) => {
       current_period_start: currentPeriodStart,
       subscription_status: subscriptionStatus,
       cancel_at_period_end: cancelAtPeriodEnd,
+      current_amount: currentAmount,
+      upcoming_amount: upcomingAmount,
+      currency: currency,
+      discount_label: discountLabel,
+      discount_amount: discountAmount,
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
