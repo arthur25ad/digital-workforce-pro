@@ -16,7 +16,7 @@ import ConnectionCard from "@/components/workspace/ConnectionCard";
 import {
   Check, ThumbsUp, X, PenLine, Calendar, Eye,
   Instagram, Facebook, Linkedin, Twitter, Music2, Loader2, Sparkles, Plus, Clock,
-  BarChart3, Zap, FileText, TrendingUp,
+  BarChart3, Zap, FileText, TrendingUp, Edit3, Trash2, ChevronDown,
 } from "lucide-react";
 
 const platformIcon: Record<string, any> = { Instagram, Facebook, LinkedIn: Linkedin, "X / Twitter": Twitter, TikTok: Music2 };
@@ -228,16 +228,7 @@ const SocialMediaDemo = () => {
             ) : (
               <div className="space-y-3">
                 {scheduledDrafts.sort((a, b) => new Date(a.scheduled_date!).getTime() - new Date(b.scheduled_date!).getTime()).map(d => (
-                  <div key={d.id} className="flex items-center justify-between rounded-xl border border-border/50 bg-card p-4">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary"><Calendar size={18} /></div>
-                      <div>
-                        <p className="text-sm font-medium text-foreground">{d.idea_title}</p>
-                        <p className="text-xs text-muted-foreground">{d.platform} · {new Date(d.scheduled_date!).toLocaleDateString()} · {new Date(d.scheduled_date!).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
-                      </div>
-                    </div>
-                    <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-medium text-primary">Scheduled</span>
-                  </div>
+                  <ScheduledPostCard key={d.id} draft={d} onReschedule={updateDraftSchedule} onUnschedule={(id) => updateDraftStatus(id, "approved")} />
                 ))}
               </div>
             )}
@@ -286,6 +277,7 @@ const SocialMediaDemo = () => {
 const DraftCard = ({ draft, onStatusChange, onSchedule }: { draft: SocialDraft; onStatusChange: (id: string, status: string) => void; onSchedule: (id: string, date: string) => void }) => {
   const [scheduling, setScheduling] = useState(false);
   const [schedDate, setSchedDate] = useState("");
+  const [schedTime, setSchedTime] = useState("12:00");
 
   const statusStyle: Record<string, string> = {
     draft: "bg-secondary text-muted-foreground", pending: "bg-yellow-500/10 text-yellow-400",
@@ -321,7 +313,9 @@ const DraftCard = ({ draft, onStatusChange, onSchedule }: { draft: SocialDraft; 
           <div className="flex items-center gap-2">
             <input type="date" value={schedDate} onChange={e => setSchedDate(e.target.value)}
               className="rounded-lg border border-border bg-secondary px-3 py-1.5 text-xs text-foreground focus:border-primary/50 focus:outline-none" />
-            <button onClick={() => { if (schedDate) { onSchedule(draft.id, new Date(schedDate).toISOString()); toast({ title: "Scheduled" }); setScheduling(false); } }}
+            <input type="time" value={schedTime} onChange={e => setSchedTime(e.target.value)}
+              className="rounded-lg border border-border bg-secondary px-3 py-1.5 text-xs text-foreground focus:border-primary/50 focus:outline-none" />
+            <button onClick={() => { if (schedDate) { const dt = `${schedDate}T${schedTime}:00`; onSchedule(draft.id, new Date(dt).toISOString()); toast({ title: "Scheduled" }); setScheduling(false); } }}
               className="rounded-lg bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary hover:bg-primary/20">Confirm</button>
           </div>
         )}
@@ -331,3 +325,56 @@ const DraftCard = ({ draft, onStatusChange, onSchedule }: { draft: SocialDraft; 
 };
 
 export default SocialMediaDemo;
+
+const ScheduledPostCard = ({ draft, onReschedule, onUnschedule }: { draft: SocialDraft; onReschedule: (id: string, date: string) => void; onUnschedule: (id: string) => void }) => {
+  const [editing, setEditing] = useState(false);
+  const [newDate, setNewDate] = useState("");
+  const [newTime, setNewTime] = useState("");
+
+  const handleSave = () => {
+    if (!newDate) return;
+    const dateTime = newTime ? `${newDate}T${newTime}:00` : `${newDate}T12:00:00`;
+    onReschedule(draft.id, new Date(dateTime).toISOString());
+    toast({ title: "Rescheduled", description: `Post moved to ${new Date(dateTime).toLocaleString()}` });
+    setEditing(false);
+  };
+
+  return (
+    <div className="rounded-xl border border-border/50 bg-card p-4 transition-all hover:border-border/60">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary"><Calendar size={18} /></div>
+          <div>
+            <p className="text-sm font-medium text-foreground">{draft.idea_title}</p>
+            <p className="text-xs text-muted-foreground">{draft.platform} · {new Date(draft.scheduled_date!).toLocaleDateString()} · {new Date(draft.scheduled_date!).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          {!editing && (
+            <>
+              <button onClick={() => { setEditing(true); const d = new Date(draft.scheduled_date!); setNewDate(d.toISOString().split("T")[0]); setNewTime(d.toTimeString().slice(0, 5)); }}
+                className="flex items-center gap-1 rounded-lg bg-secondary px-2.5 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors">
+                <Edit3 size={12} /> Edit
+              </button>
+              <button onClick={() => { onUnschedule(draft.id); toast({ title: "Unscheduled", description: "Post moved back to Approved drafts." }); }}
+                className="flex items-center gap-1 rounded-lg bg-secondary px-2.5 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors">
+                <X size={12} /> Remove
+              </button>
+            </>
+          )}
+          {!editing && <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-medium text-primary">Scheduled</span>}
+        </div>
+      </div>
+      {editing && (
+        <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-border/30 pt-3">
+          <input type="date" value={newDate} onChange={e => setNewDate(e.target.value)}
+            className="rounded-lg border border-border bg-secondary px-3 py-1.5 text-xs text-foreground focus:border-primary/50 focus:outline-none" />
+          <input type="time" value={newTime} onChange={e => setNewTime(e.target.value)}
+            className="rounded-lg border border-border bg-secondary px-3 py-1.5 text-xs text-foreground focus:border-primary/50 focus:outline-none" />
+          <button onClick={handleSave} className="rounded-lg bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary hover:bg-primary/20 transition-colors">Save</button>
+          <button onClick={() => setEditing(false)} className="rounded-lg bg-secondary px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors">Cancel</button>
+        </div>
+      )}
+    </div>
+  );
+};
