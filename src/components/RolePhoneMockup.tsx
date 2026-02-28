@@ -203,7 +203,7 @@ export default function RolePhoneMockup({ activeRole }: RolePhoneMockupProps) {
                       <span className="text-[10px] text-muted-foreground font-medium">9:41</span>
                       <div className="flex items-center gap-1.5">
                         {/* Wi-Fi icon */}
-                        <svg width="13" height="10" viewBox="0 0 16 12" fill="none" className="text-foreground/60">
+                        <svg width="13" height="10" viewBox="0 0 16 12" fill="none" className="text-foreground/60 translate-y-[1px]">
                           <path d="M8 11.5a1.25 1.25 0 1 0 0-2.5 1.25 1.25 0 0 0 0 2.5Z" fill="currentColor"/>
                           <path d="M5.17 8.33a4.002 4.002 0 0 1 5.66 0" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
                           <path d="M2.34 5.5a8.003 8.003 0 0 1 11.32 0" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
