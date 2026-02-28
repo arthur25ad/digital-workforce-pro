@@ -199,7 +199,7 @@ export default function RolePhoneMockup({ activeRole }: RolePhoneMockupProps) {
                     className="h-full flex flex-col"
                   >
                     {/* Status bar */}
-                    <div className="pt-10 pb-0 px-5 flex items-center justify-between">
+                    <div className="pt-11 pb-0 px-5 flex items-center justify-between">
                       <span className="text-[10px] text-muted-foreground font-medium">9:41</span>
                       <div className="flex items-center gap-1.5">
                         {/* Wi-Fi icon */}
