@@ -201,14 +201,20 @@ export default function RolePhoneMockup({ activeRole }: RolePhoneMockupProps) {
                     {/* Status bar */}
                     <div className="pt-10 pb-0 px-5 flex items-center justify-between">
                       <span className="text-[10px] text-muted-foreground font-medium">9:41</span>
-                      <div className="flex items-center gap-1">
-                        <div className="flex gap-0.5">
-                          {[1, 2, 3, 4].map(i => (
-                            <div key={i} className={`w-[3px] rounded-full ${i <= 3 ? 'bg-foreground/60' : 'bg-foreground/20'}`} style={{ height: 4 + i * 2 }} />
-                          ))}
-                        </div>
-                        <div className="ml-1 w-6 h-3 rounded-sm border border-foreground/40 relative">
-                          <div className="absolute inset-0.5 rounded-[1px] bg-foreground/50 w-[60%]" />
+                      <div className="flex items-center gap-1.5">
+                        {/* Wi-Fi icon */}
+                        <svg width="13" height="10" viewBox="0 0 16 12" fill="none" className="text-foreground/60">
+                          <path d="M8 11.5a1.25 1.25 0 1 0 0-2.5 1.25 1.25 0 0 0 0 2.5Z" fill="currentColor"/>
+                          <path d="M5.17 8.33a4.002 4.002 0 0 1 5.66 0" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+                          <path d="M2.34 5.5a8.003 8.003 0 0 1 11.32 0" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+                          <path d="M0 2.68a11.5 11.5 0 0 1 16 0" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+                        </svg>
+                        {/* Battery icon */}
+                        <div className="flex items-center">
+                          <div className="w-[22px] h-[10px] rounded-[2.5px] border border-foreground/50 relative">
+                            <div className="absolute top-[1.5px] left-[1.5px] bottom-[1.5px] rounded-[1px] bg-foreground/55 w-[60%]" />
+                          </div>
+                          <div className="w-[1.5px] h-[4px] rounded-r-full bg-foreground/40 ml-[0.5px]" />
                         </div>
                       </div>
                     </div>
