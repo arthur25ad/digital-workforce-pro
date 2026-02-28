@@ -7,17 +7,16 @@ const PromoBanner = () => {
   if (loading || !homepagePromo) return null;
 
   return (
-    <div className="w-full bg-emerald-600 text-white py-3 md:py-2.5 px-5 text-center font-medium">
+    <div className="w-full bg-emerald-600 text-white py-4 md:py-2.5 px-5 text-center font-medium">
       {/* Mobile: two-line stacked layout */}
-      <div className="flex flex-col items-center gap-0.5 md:hidden text-xs">
-        <span>
-          Use code "<span className="font-bold font-mono text-sm">{homepagePromo.code}</span>"
+      <div className="flex min-h-[60px] flex-col items-center justify-center gap-1 md:hidden leading-tight">
+        <span className="text-sm">
+          Use code "<span className="font-bold font-mono text-base">{homepagePromo.code}</span>"
         </span>
-        <span>
+        <span className="text-[12px] text-emerald-100">
           Save {homepagePromo.discount_type === "percentage"
             ? `${homepagePromo.discount_value}%`
-            : `$${homepagePromo.discount_value}`}
-          {homepagePromo.first_billing_cycle_only && <span className="text-emerald-200 ml-1">(first month)</span>}
+            : `$${homepagePromo.discount_value}`}{homepagePromo.first_billing_cycle_only ? " first month" : ""}
         </span>
       </div>
       {/* Desktop: single line */}
