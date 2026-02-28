@@ -1,9 +1,21 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { Loader2, Mail, Lock, User, ArrowLeft } from "lucide-react";
+import {
+  Loader2, Mail, Lock, User, ArrowLeft, CheckCircle2,
+  Sparkles, MessageSquare, Calendar, BarChart3, Brain, Zap
+} from "lucide-react";
+
+const features = [
+  { icon: Sparkles, label: "AI Social Media Manager", desc: "Auto-generate posts & schedule content" },
+  { icon: MessageSquare, label: "AI Customer Support", desc: "Instant replies trained on your business" },
+  { icon: Mail, label: "AI Email Marketer", desc: "Campaigns that write & optimize themselves" },
+  { icon: Calendar, label: "AI Virtual Assistant", desc: "Scheduling, follow-ups & admin on autopilot" },
+  { icon: Brain, label: "VANTABRAIN Intelligence", desc: "Learns your brand and gets smarter over time" },
+  { icon: BarChart3, label: "Unified Dashboard", desc: "All your AI employees in one workspace" },
+];
 
 const AuthPage = () => {
   const [mode, setMode] = useState<"login" | "signup" | "forgot">("login");
@@ -12,18 +24,20 @@ const AuthPage = () => {
   const [fullName, setFullName] = useState("");
   const [loading, setLoading] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
+  const [success, setSuccess] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setLoading(false);
     if (error) {
+      setLoading(false);
       toast({ title: "Login failed", description: error.message, variant: "destructive" });
     } else {
-      toast({ title: "Welcome back!" });
-      navigate("/dashboard");
+      setSuccess(true);
+      toast({ title: "Welcome to VANTORY" });
+      setTimeout(() => navigate("/dashboard"), 1200);
     }
   };
 
@@ -84,90 +98,315 @@ const AuthPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4">
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
-        <div className="mb-4">
-          <Link
-            to="/"
-            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
-          >
+    <div className="min-h-screen bg-background relative overflow-hidden flex">
+      {/* Ambient glows */}
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] rounded-full opacity-30"
+          style={{ background: "radial-gradient(circle, hsl(217 91% 60% / 0.15), transparent 70%)" }} />
+        <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full opacity-20"
+          style={{ background: "radial-gradient(circle, hsl(280 70% 65% / 0.1), transparent 70%)" }} />
+        <div className="absolute top-[40%] right-[20%] w-[30%] h-[30%] rounded-full opacity-15"
+          style={{ background: "radial-gradient(circle, hsl(217 91% 60% / 0.08), transparent 70%)" }} />
+      </div>
+
+      {/* Left panel — product showcase (hidden on mobile) */}
+      <div className="hidden lg:flex lg:w-[52%] relative flex-col justify-between p-12 xl:p-16">
+        <div className="relative z-10">
+          <Link to="/" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground mb-12">
             <ArrowLeft size={14} />
             Back to Home
           </Link>
-        </div>
-        <div className="text-center mb-8">
-          <h1 className="font-display text-3xl font-bold">
-            <span style={{
-              backgroundImage: "linear-gradient(135deg, hsl(0 0% 100%), hsl(225 60% 82%), hsl(0 0% 100%), hsl(225 50% 78%))",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-            }}>VANTORY</span>
-          </h1>
-          <p className="mt-2 text-muted-foreground">
-            {mode === "login" ? "Welcome back to your workspace" : mode === "signup" ? "Create your AI workforce account" : "Reset your password"}
-          </p>
-        </div>
 
-        <div className="card-glass rounded-2xl p-6">
-          {mode !== "forgot" && (
-            <div className="mb-6 flex rounded-lg bg-secondary p-1">
-              <button onClick={() => setMode("login")} className={`flex-1 rounded-md py-2 text-sm font-medium transition-all ${mode === "login" ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}>
-                Log In
-              </button>
-              <button onClick={() => setMode("signup")} className={`flex-1 rounded-md py-2 text-sm font-medium transition-all ${mode === "signup" ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}>
-                Sign Up
-              </button>
-            </div>
-          )}
+          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
+            <h1 className="font-display text-5xl xl:text-6xl font-bold leading-[1.1] mb-6">
+              <span className="hero-flowing-text">Your AI</span>
+              <br />
+              <span className="text-foreground">Workforce Awaits</span>
+            </h1>
+            <p className="text-muted-foreground text-lg max-w-md leading-relaxed">
+              AI employees that handle social media, customer support, email marketing, and scheduling — so you can focus on growth.
+            </p>
+          </motion.div>
 
-          <form onSubmit={mode === "login" ? handleLogin : mode === "signup" ? handleSignup : handleForgot} className="space-y-4">
-            {mode === "signup" && (
-              <div>
-                <label className="mb-1 block text-xs font-medium text-muted-foreground">Full Name</label>
-                <div className="relative">
-                  <User size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                  <input required value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Your name"
-                    className="w-full rounded-lg border border-border bg-secondary pl-10 pr-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary/50 focus:outline-none" />
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.6 }}
+            className="mt-12 grid grid-cols-2 gap-3"
+          >
+            {features.map((f, i) => (
+              <motion.div
+                key={f.label}
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 + i * 0.08, duration: 0.4 }}
+                className="group flex items-start gap-3 rounded-xl border border-border/40 bg-secondary/30 backdrop-blur-sm p-3.5 transition-all duration-300 hover:border-primary/30 hover:bg-secondary/50"
+              >
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors group-hover:bg-primary/20">
+                  <f.icon size={18} />
                 </div>
-              </div>
-            )}
-            <div>
-              <label className="mb-1 block text-xs font-medium text-muted-foreground">Email</label>
-              <div className="relative">
-                <Mail size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                <input required type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@company.com"
-                  className="w-full rounded-lg border border-border bg-secondary pl-10 pr-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary/50 focus:outline-none" />
-              </div>
-            </div>
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-foreground leading-tight">{f.label}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5 leading-snug">{f.desc}</p>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+
+        {/* Bottom tagline */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1, duration: 0.8 }}
+          className="relative z-10 flex items-center gap-3 mt-12"
+        >
+          <div className="flex items-center gap-1.5">
+            <Zap size={14} className="text-primary" />
+            <span className="text-xs text-muted-foreground tracking-wide">Powered by</span>
+          </div>
+          <span className="text-sm font-bold tracking-widest" style={{ color: "hsl(280 70% 65%)" }}>
+            VANTABRAIN
+          </span>
+        </motion.div>
+      </div>
+
+      {/* Right panel — auth form */}
+      <div className="flex-1 flex items-center justify-center px-6 py-12 lg:px-12 relative z-10">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="w-full max-w-[420px]"
+        >
+          {/* Mobile back link */}
+          <div className="mb-6 lg:hidden">
+            <Link to="/" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground">
+              <ArrowLeft size={14} />
+              Back to Home
+            </Link>
+          </div>
+
+          {/* Brand header */}
+          <div className="text-center mb-8">
+            <motion.h2
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="font-display text-4xl font-bold tracking-tight"
+            >
+              <span style={{
+                backgroundImage: "linear-gradient(135deg, hsl(0 0% 100%), hsl(225 60% 82%), hsl(0 0% 100%), hsl(225 50% 78%))",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+              }}>VANTORY</span>
+            </motion.h2>
+            <AnimatePresence mode="wait">
+              <motion.p
+                key={mode}
+                initial={{ opacity: 0, y: 5 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -5 }}
+                transition={{ duration: 0.2 }}
+                className="mt-2 text-muted-foreground text-sm"
+              >
+                {mode === "forgot" ? "Reset your password" : "Welcome to your workspace"}
+              </motion.p>
+            </AnimatePresence>
+          </div>
+
+          {/* Auth card */}
+          <motion.div
+            layout
+            className="rounded-2xl border border-border/60 p-7 relative overflow-hidden"
+            style={{
+              background: "linear-gradient(145deg, hsl(225 20% 8% / 0.9), hsl(225 20% 5% / 0.95))",
+              backdropFilter: "blur(20px)",
+              boxShadow: "0 0 40px hsl(217 91% 60% / 0.06), 0 8px 32px hsl(0 0% 0% / 0.4)",
+            }}
+          >
+            {/* Subtle top glow line */}
+            <div className="absolute top-0 left-[10%] right-[10%] h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
+
+            {/* Tabs */}
             {mode !== "forgot" && (
-              <div>
-                <label className="mb-1 block text-xs font-medium text-muted-foreground">Password</label>
-                <div className="relative">
-                  <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                  <input required type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" minLength={6}
-                    className="w-full rounded-lg border border-border bg-secondary pl-10 pr-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary/50 focus:outline-none" />
-                </div>
+              <div className="mb-7 flex rounded-xl bg-secondary/60 p-1 border border-border/30">
+                {(["login", "signup"] as const).map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setMode(tab)}
+                    className={`relative flex-1 rounded-lg py-2.5 text-sm font-semibold transition-all duration-300 ${
+                      mode === tab
+                        ? "text-primary-foreground"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {mode === tab && (
+                      <motion.div
+                        layoutId="auth-tab"
+                        className="absolute inset-0 rounded-lg bg-primary"
+                        style={{ boxShadow: "0 0 16px hsl(217 91% 60% / 0.3)" }}
+                        transition={{ type: "spring", bounce: 0.15, duration: 0.5 }}
+                      />
+                    )}
+                    <span className="relative z-10">{tab === "login" ? "Log In" : "Sign Up"}</span>
+                  </button>
+                ))}
               </div>
             )}
-            <button type="submit" disabled={loading} className="btn-glow w-full text-sm flex items-center justify-center gap-2 disabled:opacity-60">
-              {loading ? <><Loader2 size={16} className="animate-spin" /> Please wait...</> :
-                mode === "login" ? "Log In" : mode === "signup" ? "Create Account" : "Send Reset Link"}
-            </button>
-          </form>
 
-          {mode === "login" && (
-            <button onClick={() => setMode("forgot")} className="mt-4 block w-full text-center text-xs text-muted-foreground hover:text-primary transition-colors">
-              Forgot your password?
-            </button>
-          )}
-          {mode === "forgot" && (
-            <button onClick={() => setMode("login")} className="mt-4 block w-full text-center text-xs text-muted-foreground hover:text-primary transition-colors">
-              Back to login
-            </button>
-          )}
-        </div>
-      </motion.div>
+            {/* Form */}
+            <AnimatePresence mode="wait">
+              <motion.form
+                key={mode}
+                initial={{ opacity: 0, x: mode === "signup" ? 20 : -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: mode === "signup" ? -20 : 20 }}
+                transition={{ duration: 0.25 }}
+                onSubmit={mode === "login" ? handleLogin : mode === "signup" ? handleSignup : handleForgot}
+                className="space-y-5"
+              >
+                {mode === "signup" && (
+                  <div>
+                    <label className="mb-1.5 block text-xs font-medium text-muted-foreground uppercase tracking-wider">Full Name</label>
+                    <div className="relative group">
+                      <User size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary" />
+                      <input
+                        required
+                        value={fullName}
+                        onChange={(e) => setFullName(e.target.value)}
+                        placeholder="Your name"
+                        className="w-full rounded-xl border border-border/60 bg-secondary/40 pl-11 pr-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/60 focus:border-primary/50 focus:bg-secondary/60 focus:outline-none focus:ring-1 focus:ring-primary/20 transition-all duration-200"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                <div>
+                  <label className="mb-1.5 block text-xs font-medium text-muted-foreground uppercase tracking-wider">Email</label>
+                  <div className="relative group">
+                    <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary" />
+                    <input
+                      required
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="you@company.com"
+                      className="w-full rounded-xl border border-border/60 bg-secondary/40 pl-11 pr-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/60 focus:border-primary/50 focus:bg-secondary/60 focus:outline-none focus:ring-1 focus:ring-primary/20 transition-all duration-200"
+                    />
+                  </div>
+                </div>
+
+                {mode !== "forgot" && (
+                  <div>
+                    <label className="mb-1.5 block text-xs font-medium text-muted-foreground uppercase tracking-wider">Password</label>
+                    <div className="relative group">
+                      <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary" />
+                      <input
+                        required
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="••••••••"
+                        minLength={6}
+                        className="w-full rounded-xl border border-border/60 bg-secondary/40 pl-11 pr-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/60 focus:border-primary/50 focus:bg-secondary/60 focus:outline-none focus:ring-1 focus:ring-primary/20 transition-all duration-200"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Submit button */}
+                <motion.button
+                  type="submit"
+                  disabled={loading || success}
+                  whileHover={!loading && !success ? { scale: 1.01 } : {}}
+                  whileTap={!loading && !success ? { scale: 0.98 } : {}}
+                  className={`w-full rounded-xl py-3.5 text-sm font-semibold flex items-center justify-center gap-2 transition-all duration-500 ${
+                    success
+                      ? "bg-emerald-500 text-white"
+                      : "bg-primary text-primary-foreground hover:shadow-[0_0_30px_hsl(217_91%_60%/0.35)]"
+                  } disabled:opacity-70`}
+                  style={!success ? { boxShadow: "0 0 20px hsl(217 91% 60% / 0.2)" } : {}}
+                >
+                  <AnimatePresence mode="wait">
+                    {success ? (
+                      <motion.div
+                        key="success"
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        className="flex items-center gap-2"
+                      >
+                        <CheckCircle2 size={18} />
+                        <span>You're in!</span>
+                      </motion.div>
+                    ) : loading ? (
+                      <motion.div
+                        key="loading"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="flex items-center gap-2"
+                      >
+                        <Loader2 size={16} className="animate-spin" />
+                        <span>Please wait...</span>
+                      </motion.div>
+                    ) : (
+                      <motion.span
+                        key="idle"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                      >
+                        {mode === "login" ? "Log In" : mode === "signup" ? "Create Account" : "Send Reset Link"}
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
+                </motion.button>
+              </motion.form>
+            </AnimatePresence>
+
+            {/* Footer links */}
+            {mode === "login" && (
+              <motion.button
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3 }}
+                onClick={() => setMode("forgot")}
+                className="mt-5 block w-full text-center text-xs text-muted-foreground hover:text-primary transition-colors duration-200"
+              >
+                Forgot your password?
+              </motion.button>
+            )}
+            {mode === "forgot" && (
+              <motion.button
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3 }}
+                onClick={() => setMode("login")}
+                className="mt-5 block w-full text-center text-xs text-muted-foreground hover:text-primary transition-colors duration-200"
+              >
+                Back to login
+              </motion.button>
+            )}
+          </motion.div>
+
+          {/* Mobile features */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+            className="mt-8 lg:hidden"
+          >
+            <div className="flex flex-wrap justify-center gap-2">
+              {features.slice(0, 4).map((f) => (
+                <div key={f.label} className="flex items-center gap-1.5 rounded-full border border-border/40 bg-secondary/30 px-3 py-1.5 text-xs text-muted-foreground">
+                  <f.icon size={12} className="text-primary" />
+                  {f.label.replace("AI ", "")}
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        </motion.div>
+      </div>
     </div>
   );
 };
