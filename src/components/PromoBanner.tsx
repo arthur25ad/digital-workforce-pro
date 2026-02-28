@@ -7,7 +7,7 @@ const PromoBanner = () => {
   if (loading || !homepagePromo) return null;
 
   return (
-    <div className="w-full bg-emerald-600 text-white py-2 px-4 text-center text-xs md:text-sm font-medium">
+    <div className="w-full bg-emerald-600 text-white py-2.5 px-5 text-center text-xs md:text-sm font-medium">
       <div className="flex items-center justify-center gap-1.5 md:gap-2">
         <Tag size={12} className="shrink-0 hidden md:block" />
         {/* Mobile: ultra-compact single line */}
