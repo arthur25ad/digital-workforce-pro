@@ -12,8 +12,7 @@ const logStep = (step: string, details?: any) => {
   console.log(`[CREATE-CHECKOUT] ${step}${detailsStr}`);
 };
 
-// ── Centralized rules engine (mirrors src/lib/promoRules.ts exactly) ──
-
+// ── Centralized rules engine ──
 const DEFAULT_PLAN_TRIALS: Record<string, number> = {
   starter: 3,
   growth: 7,
@@ -27,30 +26,23 @@ function getDiscountForPlan(promo: any, planKey: string): number {
     : planKey === "team" ? (promo.team_discount || 0)
     : 0;
   if (planDiscount > 0) return planDiscount;
-  // Team plan gets 0 unless team_discount is explicitly set
   if (planKey === "team") return 0;
   return promo.discount_value || 0;
 }
 
 interface ResolvedCheckout {
-  // Trial
   trialDays: number;
   removeTrial: boolean;
   hasCustomTrial: boolean;
-  // Billing
   billingDelayDays: number;
-  // Stripe trial_period_days (combines trial + delay)
   stripeTrialDays: number | null;
-  // Discount
   hasDiscount: boolean;
   discountValue: number;
   discountType: string;
   stripeDuration: "once" | "repeating" | "forever";
   stripeDurationMonths: number | null;
-  // Flags
   isFirstCycleOnly: boolean;
   isRecurringDiscount: boolean;
-  // Promo ref
   promoId: string | null;
   promoCode: string | null;
 }
@@ -77,8 +69,6 @@ function resolveCheckoutRules(promo: any | null, planKey: string): ResolvedCheck
     };
   }
 
-  // ── RULE 1: Trial behavior ──
-  // Priority: remove_trial > custom trial_days > default plan trial
   let trialDays = defaultTrialDays;
   let hasCustomTrial = false;
   const removeTrial = promo.remove_trial || false;
@@ -90,15 +80,10 @@ function resolveCheckoutRules(promo: any | null, planKey: string): ResolvedCheck
     hasCustomTrial = true;
   }
 
-  // ── RULE 2: Billing delay (adds to effective trial period in Stripe) ──
   const billingDelayDays = promo.billing_delay_days || 0;
-
-  // Compute final Stripe trial_period_days
-  // Billing delay adds to whatever trial remains
   const effectiveTrialDays = trialDays + billingDelayDays;
   const stripeTrialDays = effectiveTrialDays > 0 ? effectiveTrialDays : null;
 
-  // ── RULE 3: Discount ──
   const discountValue = getDiscountForPlan(promo, planKey);
   const hasDiscount = discountValue > 0;
   const discountType = promo.discount_type || "percentage";
@@ -106,7 +91,6 @@ function resolveCheckoutRules(promo: any | null, planKey: string): ResolvedCheck
   const isRecurringDiscount = promo.recurring_discount || false;
   const discountDurationMonths = promo.discount_duration_months || null;
 
-  // Determine Stripe coupon duration
   let stripeDuration: "once" | "repeating" | "forever" = "once";
   let stripeDurationMonths: number | null = null;
 
@@ -118,7 +102,6 @@ function resolveCheckoutRules(promo: any | null, planKey: string): ResolvedCheck
   } else if (isFirstCycleOnly) {
     stripeDuration = "once";
   } else {
-    // Default: treat as "once" (single application)
     stripeDuration = "once";
   }
 
@@ -140,7 +123,11 @@ function resolveCheckoutRules(promo: any | null, planKey: string): ResolvedCheck
   };
 }
 
-// ── Main handler ──
+const PRICE_TO_KEY: Record<string, string> = {
+  "price_1T5QmBK99ArQ30pFn7FGni9h": "starter",
+  "price_1T5QmTK99ArQ30pFmRrxLr1w": "growth",
+  "price_1T5QmlK99ArQ30pFRKx2fT3z": "team",
+};
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -167,13 +154,10 @@ serve(async (req) => {
 
     // Owner/developer bypass
     if (user.email === "arthur25.ad@gmail.com") {
-      return new Response(JSON.stringify({ error: "Owner account has free access. No checkout needed." }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 400,
-      });
+      return errResp("Owner account has free access. No checkout needed.");
     }
 
-    const { priceId, promoCode } = await req.json();
+    const { priceId, promoCode, isPlanSwitch } = await req.json();
     if (!priceId) throw new Error("priceId is required");
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
@@ -181,19 +165,90 @@ serve(async (req) => {
     });
 
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
-    let customerId;
+    let customerId: string | undefined;
     if (customers.data.length > 0) {
       customerId = customers.data[0].id;
     }
 
-    const priceToKey: Record<string, string> = {
-      "price_1T5QmBK99ArQ30pFn7FGni9h": "starter",
-      "price_1T5QmTK99ArQ30pFmRrxLr1w": "growth",
-      "price_1T5QmlK99ArQ30pFRKx2fT3z": "team",
-    };
-    const planKey = priceToKey[priceId] || "";
+    const planKey = PRICE_TO_KEY[priceId] || "";
 
-    // ── Validate & fetch promo if provided ──
+    // ── PLAN SWITCH: Update existing subscription instead of new checkout ──
+    if (isPlanSwitch && customerId) {
+      logStep("Plan switch requested", { planKey, customerId });
+
+      const subs = await stripe.subscriptions.list({
+        customer: customerId,
+        status: "active",
+        limit: 5,
+      });
+
+      // Also check trialing
+      const trialSubs = await stripe.subscriptions.list({
+        customer: customerId,
+        status: "trialing",
+        limit: 5,
+      });
+
+      const allActiveSubs = [...subs.data, ...trialSubs.data];
+
+      if (allActiveSubs.length > 0) {
+        const currentSub = allActiveSubs[0];
+        const currentItemId = currentSub.items.data[0]?.id;
+
+        if (currentItemId) {
+          // Update the subscription to the new price (prorate by default)
+          logStep("Updating existing subscription", {
+            subscriptionId: currentSub.id,
+            oldItemId: currentItemId,
+            newPriceId: priceId,
+          });
+
+          const updatedSub = await stripe.subscriptions.update(currentSub.id, {
+            items: [
+              {
+                id: currentItemId,
+                price: priceId,
+              },
+            ],
+            proration_behavior: "create_prorations",
+          });
+
+          // Cancel any OTHER active subscriptions (cleanup duplicates)
+          for (let i = 1; i < allActiveSubs.length; i++) {
+            try {
+              await stripe.subscriptions.update(allActiveSubs[i].id, {
+                cancel_at_period_end: true,
+              });
+              logStep("Marked duplicate subscription for cancellation", { subId: allActiveSubs[i].id });
+            } catch (e: any) {
+              logStep("Could not cancel duplicate sub", { subId: allActiveSubs[i].id, error: e.message });
+            }
+          }
+
+          logStep("Subscription updated successfully", {
+            newStatus: updatedSub.status,
+            newPriceId: updatedSub.items.data[0]?.price?.id,
+          });
+
+          return new Response(JSON.stringify({
+            success: true,
+            switched: true,
+            newPlanKey: planKey,
+            message: "Your plan has been updated successfully.",
+          }), {
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+            status: 200,
+          });
+        }
+      }
+
+      // If no active subscription found, fall through to normal checkout
+      logStep("No active subscription found for plan switch, falling back to checkout");
+    }
+
+    // ── Standard checkout flow (new subscription) ──
+
+    // Validate & fetch promo if provided
     let promoData: any = null;
 
     if (promoCode) {
@@ -210,7 +265,6 @@ serve(async (req) => {
         return errResp("Invalid or inactive promo code.");
       }
 
-      // Validate date window
       const now = new Date();
       if (fetchedPromo.start_date && new Date(fetchedPromo.start_date) > now) {
         return errResp("This promo code is not yet active.");
@@ -225,15 +279,13 @@ serve(async (req) => {
         return errResp("This promo code has reached its usage limit.");
       }
 
-      // New customers only check
       if (fetchedPromo.new_customers_only && customerId) {
-        const subs = await stripe.subscriptions.list({ customer: customerId, limit: 1 });
-        if (subs.data.length > 0) {
+        const existingSubs = await stripe.subscriptions.list({ customer: customerId, limit: 1 });
+        if (existingSubs.data.length > 0) {
           return errResp("This promo code is only available for new customers.");
         }
       }
 
-      // Check if promo has ANY effect on this plan
       const discountVal = getDiscountForPlan(fetchedPromo, planKey);
       const hasTrialEffect = fetchedPromo.remove_trial || (fetchedPromo.trial_days && fetchedPromo.trial_days > 0);
       const hasBillingDelay = fetchedPromo.billing_delay_days && fetchedPromo.billing_delay_days > 0;
@@ -245,50 +297,36 @@ serve(async (req) => {
       promoData = fetchedPromo;
     }
 
-    // ── Resolve billing rules (single source of truth) ──
     const resolved = resolveCheckoutRules(promoData, planKey);
 
     logStep("RESOLVED BILLING RULES", {
       planKey,
       promoCode: resolved.promoCode,
-      removeTrial: resolved.removeTrial,
-      trialDays: resolved.trialDays,
-      billingDelayDays: resolved.billingDelayDays,
       stripeTrialDays: resolved.stripeTrialDays,
       hasDiscount: resolved.hasDiscount,
       discountValue: resolved.discountValue,
-      discountType: resolved.discountType,
-      stripeDuration: resolved.stripeDuration,
-      stripeDurationMonths: resolved.stripeDurationMonths,
-      chargesImmediately: resolved.stripeTrialDays === null,
     });
 
-    // ── Build Stripe checkout session from resolved result ──
+    const origin = req.headers.get("origin") || "http://localhost:3000";
     const sessionParams: any = {
       customer: customerId,
       customer_email: customerId ? undefined : user.email,
       line_items: [{ price: priceId, quantity: 1 }],
       mode: "subscription",
-      success_url: `${req.headers.get("origin")}/dashboard?checkout=success&plan=${planKey}`,
-      cancel_url: `${req.headers.get("origin")}/pricing?checkout=cancelled${promoCode ? `&promo=${encodeURIComponent(promoCode)}` : ""}&plan=${planKey}`,
+      success_url: `${origin}/dashboard?checkout=success&plan=${planKey}`,
+      cancel_url: `${origin}/pricing?checkout=cancelled${promoCode ? `&promo=${encodeURIComponent(promoCode)}` : ""}&plan=${planKey}`,
     };
 
-    // Trial / billing delay → Stripe trial_period_days
     if (resolved.stripeTrialDays !== null && resolved.stripeTrialDays > 0) {
       sessionParams.subscription_data = { trial_period_days: resolved.stripeTrialDays };
-      logStep("Stripe: setting trial_period_days", { days: resolved.stripeTrialDays });
-    } else {
-      logStep("Stripe: NO trial — customer charged immediately");
     }
 
-    // Promo metadata
     if (resolved.promoId) {
       if (!sessionParams.subscription_data) sessionParams.subscription_data = {};
       sessionParams.metadata = { promo_id: resolved.promoId, promo_code: resolved.promoCode };
       sessionParams.subscription_data.metadata = { promo_id: resolved.promoId, promo_code: resolved.promoCode };
     }
 
-    // Discount coupon
     if (resolved.hasDiscount) {
       const couponParams: any = {
         name: `Promo ${resolved.promoCode}`,
@@ -306,14 +344,7 @@ serve(async (req) => {
 
       const coupon = await stripe.coupons.create(couponParams);
       sessionParams.discounts = [{ coupon: coupon.id }];
-      logStep("Stripe: created coupon", { couponId: coupon.id, ...couponParams });
     }
-
-    logStep("Stripe: final session params", {
-      hasTrialPeriod: !!sessionParams.subscription_data?.trial_period_days,
-      trialDays: sessionParams.subscription_data?.trial_period_days || 0,
-      hasDiscount: !!sessionParams.discounts,
-    });
 
     const session = await stripe.checkout.sessions.create(sessionParams);
     logStep("Checkout session created", { sessionId: session.id });
@@ -322,7 +353,7 @@ serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });
-  } catch (error) {
+  } catch (error: any) {
     logStep("ERROR", { message: error.message });
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

@@ -8,7 +8,7 @@ import { Link } from "react-router-dom";
 import {
   CreditCard, ArrowUpRight, AlertCircle, CheckCircle2,
   Crown, RefreshCw, ExternalLink, Shield, Users, Calendar,
-  DollarSign, Clock, Sparkles, ArrowRight, XCircle,
+  DollarSign, Clock, Sparkles, ArrowRight, XCircle, Repeat,
 } from "lucide-react";
 
 interface SubscriptionData {
@@ -97,7 +97,6 @@ const SubscriptionDetails = () => {
   const planName = isOwnerBypass ? "Team" : pkg?.name || (planKey.charAt(0).toUpperCase() + planKey.slice(1));
   const includedEmployees = planEmployees[planKey] || 0;
 
-  // Price display: prefer upcoming_amount (most accurate with promos), fall back to current_amount
   const displayAmount = subData?.upcoming_amount ?? subData?.current_amount;
   const baseAmount = subData?.current_amount;
   const hasDiscount = !!subData?.discount_label;
@@ -185,28 +184,30 @@ const SubscriptionDetails = () => {
               <Crown size={26} className="text-primary" />
             </div>
             <div>
-              <div className="flex items-center gap-3 mb-1.5">
+              <div className="flex items-center gap-3 mb-1.5 flex-wrap">
                 <h2 className="font-display text-2xl font-bold text-foreground">{planName} Plan</h2>
                 <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary">
-                  <CheckCircle2 size={9} /> Current
+                  <CheckCircle2 size={9} /> Current Plan
                 </span>
+                {/* Status badge inline */}
+                {statusStyle && (
+                  <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${statusStyle.bg} ${statusStyle.text}`}>
+                    <StatusIcon size={9} />
+                    {statusStyle.label}
+                  </span>
+                )}
               </div>
               <p className="text-sm text-muted-foreground">
                 {pkg?.description || "Your active subscription plan"}
               </p>
-            </div>
-          </div>
-
-          {/* Status badge */}
-          {statusStyle && (
-            <div className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold ${statusStyle.bg} ${statusStyle.text} shrink-0`}>
-              <StatusIcon size={12} />
-              {statusStyle.label}
               {subData?.cancel_at_period_end && (
-                <span className="text-[10px] opacity-70 ml-0.5">· Cancels at period end</span>
+                <p className="text-xs text-red-400 mt-1.5 flex items-center gap-1.5">
+                  <AlertCircle size={11} />
+                  Cancels at end of billing period · Access until {formatDate(subData?.subscription_end)}
+                </p>
               )}
             </div>
-          )}
+          </div>
         </div>
       </div>
 
@@ -249,18 +250,43 @@ const SubscriptionDetails = () => {
             )}
           </div>
 
+          {/* Billing Frequency */}
+          <div className="bg-card/60 px-5 py-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Repeat size={13} className="text-muted-foreground/40" />
+              <span className="text-[11px] uppercase tracking-wider text-muted-foreground/50 font-medium">Billing Frequency</span>
+            </div>
+            <p className="text-sm font-semibold text-foreground">Monthly</p>
+            <p className="text-[11px] text-muted-foreground/50 mt-0.5">
+              {subData?.cancel_at_period_end ? "Will not renew" : "Auto-renews monthly"}
+            </p>
+          </div>
+
           {/* Current Period */}
           <div className="bg-card/60 px-5 py-4">
             <div className="flex items-center gap-2 mb-2">
               <Calendar size={13} className="text-muted-foreground/40" />
               <span className="text-[11px] uppercase tracking-wider text-muted-foreground/50 font-medium">Current Period</span>
             </div>
-            <p className="text-sm font-semibold text-foreground">
-              {formatDate(subData?.current_period_start)}
-            </p>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              to {formatDate(subData?.subscription_end)}
-            </p>
+            {subData?.current_period_start && subData?.subscription_end ? (
+              <>
+                <p className="text-sm font-semibold text-foreground">
+                  {formatDate(subData.current_period_start)}
+                </p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  to {formatDate(subData.subscription_end)}
+                </p>
+              </>
+            ) : subData?.subscription_start ? (
+              <>
+                <p className="text-sm font-semibold text-foreground">
+                  Started {formatDate(subData.subscription_start)}
+                </p>
+                <p className="text-[11px] text-muted-foreground/50 mt-0.5">Monthly cycle</p>
+              </>
+            ) : (
+              <p className="text-sm text-muted-foreground">Active</p>
+            )}
           </div>
 
           {/* Next Billing Date */}
@@ -274,11 +300,13 @@ const SubscriptionDetails = () => {
                 <p className="text-sm font-semibold text-red-400">No renewal</p>
                 <p className="text-[11px] text-muted-foreground/50 mt-0.5">Access ends {formatDate(subData?.subscription_end)}</p>
               </>
-            ) : (
+            ) : subData?.subscription_end ? (
               <>
-                <p className="text-sm font-semibold text-foreground">{formatDate(subData?.subscription_end)}</p>
-                <p className="text-[11px] text-muted-foreground/50 mt-0.5">Auto-renews</p>
+                <p className="text-sm font-semibold text-foreground">{formatDate(subData.subscription_end)}</p>
+                <p className="text-[11px] text-muted-foreground/50 mt-0.5">Auto-renews monthly</p>
               </>
+            ) : (
+              <p className="text-sm text-muted-foreground">Pending</p>
             )}
           </div>
 
@@ -300,17 +328,8 @@ const SubscriptionDetails = () => {
             <p className="text-sm font-semibold text-foreground">
               {profile?.unlocked_roles?.length || 0} of {includedEmployees} active
             </p>
-          </div>
-
-          {/* Plan Includes */}
-          <div className="bg-card/60 px-5 py-4">
-            <div className="flex items-center gap-2 mb-2">
-              <CreditCard size={13} className="text-muted-foreground/40" />
-              <span className="text-[11px] uppercase tracking-wider text-muted-foreground/50 font-medium">Plan Includes</span>
-            </div>
-            <p className="text-sm font-semibold text-foreground">{includedEmployees} AI employee{includedEmployees !== 1 ? "s" : ""}</p>
             <p className="text-[11px] text-muted-foreground/50 mt-0.5">
-              {planKey === "team" ? "Full AI team" : `Up to ${includedEmployees}`}
+              {planKey === "team" ? "Full AI team included" : `Up to ${includedEmployees} included`}
             </p>
           </div>
         </div>
