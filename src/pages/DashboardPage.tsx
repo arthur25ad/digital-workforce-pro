@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Link, useSearchParams } from "react-router-dom";
 import PageLayout from "@/components/PageLayout";
 import { useAuth } from "@/hooks/useAuth";
+import SubscriptionDetails from "@/components/SubscriptionDetails";
 import { useWorkspaceData } from "@/hooks/useWorkspaceData";
 import { useCustomerSupportData } from "@/hooks/useCustomerSupportData";
 import { useEmailMarketingData } from "@/hooks/useEmailMarketingData";
@@ -474,6 +475,9 @@ const DashboardPage = () => {
               </div>
             </div>
           </motion.div>
+
+          {/* ── Subscription Details ── */}
+          <SubscriptionDetails />
 
         </div>
       </section>
