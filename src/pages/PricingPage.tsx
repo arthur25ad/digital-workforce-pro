@@ -255,13 +255,12 @@ const PricingPage = () => {
 
           {user && (
             <div className="mt-8 text-center">
-              <button
-                onClick={handleManageSubscription}
-                disabled={loadingPlan === "manage"}
-                className="text-sm text-primary hover:underline disabled:opacity-50"
+              <Link
+                to="/subscription-details"
+                className="text-sm text-primary hover:underline"
               >
-                {loadingPlan === "manage" ? "Opening..." : "Manage existing subscription →"}
-              </button>
+                Manage existing subscription →
+              </Link>
             </div>
           )}
 
