@@ -100,7 +100,8 @@ const SubscriptionDetails = () => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.4 }}
-      className="rounded-2xl border border-border/40 bg-card/60 backdrop-blur-sm overflow-hidden"
+      id="subscription"
+      className="rounded-2xl border border-border/40 bg-card/60 backdrop-blur-sm overflow-hidden scroll-mt-24"
     >
       {/* Header */}
       <div className="flex items-center justify-between border-b border-border/30 px-6 py-4 md:px-8">
