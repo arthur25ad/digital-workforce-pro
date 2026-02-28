@@ -3,7 +3,7 @@ import { useVantaBrainActions, useVantaBrainSuggestions } from "@/hooks/useVanta
 import SmartSuggestions from "@/components/SmartSuggestions";
 import { useAuth } from "@/hooks/useAuth";
 import { useWorkspaceData, SocialDraft } from "@/hooks/useWorkspaceData";
-import ConnectPlatformModal from "@/components/ConnectPlatformModal";
+
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import WorkspaceShell from "@/components/workspace/WorkspaceShell";
@@ -29,7 +29,7 @@ interface GeneratedIdea {
 const SocialMediaDemo = () => {
   const { workspace, brandProfile, updateBrandProfile, updateWorkspace } = useAuth();
   const { drafts, isConnected, getConnection, connectPlatform, disconnectPlatform, addDraft, updateDraftStatus, updateDraftSchedule, logActivity, activities } = useWorkspaceData();
-  const [connectModal, setConnectModal] = useState<string | null>(null);
+  
   const { recordInteraction } = useVantaBrainActions();
   const { suggestions: brainSuggestions, loading: suggestionsLoading, sendFeedback } = useVantaBrainSuggestions("social-media-manager");
   const [activeTab, setActiveTab] = useState(0);
@@ -159,7 +159,7 @@ const SocialMediaDemo = () => {
                 return (
                   <ConnectionCard key={p} name={p} icon={<Icon size={20} />} connected={isConnected(p)}
                     accountName={conn?.account_name} connectedAt={conn?.connected_at}
-                    onConnect={() => setConnectModal(p)} onDisconnect={() => disconnectPlatform(p)} />
+                    onDisconnect={() => disconnectPlatform(p)} comingSoon />
                 );
               })}
             </div>
@@ -268,8 +268,6 @@ const SocialMediaDemo = () => {
         )}
       </WorkspaceShell>
 
-      <ConnectPlatformModal open={!!connectModal} onClose={() => setConnectModal(null)} platformName={connectModal || ""}
-        onConnect={(accountName) => { if (connectModal) { connectPlatform(connectModal, accountName); toast({ title: "Connected", description: `${connectModal} linked successfully.` }); } setConnectModal(null); }} />
     </>
   );
 };

@@ -3,7 +3,7 @@ import { useVantaBrainActions, useVantaBrainSuggestions } from "@/hooks/useVanta
 import SmartSuggestions from "@/components/SmartSuggestions";
 import { useVirtualAssistantData } from "@/hooks/useVirtualAssistantData";
 import { useAuth } from "@/hooks/useAuth";
-import ConnectPlatformModal from "@/components/ConnectPlatformModal";
+
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import WorkspaceShell from "@/components/workspace/WorkspaceShell";
@@ -41,7 +41,7 @@ const VirtualAssistantDemo = () => {
   } = useVirtualAssistantData();
 
   const [activeTab, setActiveTab] = useState(0);
-  const [connectModal, setConnectModal] = useState<string | null>(null);
+  
   const [generating, setGenerating] = useState<string | null>(null);
   const [foundationForm, setFoundationForm] = useState<Record<string, string>>({});
   const [foundationSaved, setFoundationSaved] = useState(false);
@@ -353,7 +353,7 @@ const VirtualAssistantDemo = () => {
         {/* Tools */}
         {activeTab === 6 && (
           <WorkspaceSection title="Connected Tools" description="Link calendars, booking platforms, and communication tools.">
-            <div className="space-y-3">{toolPlatforms.map(p => { const conn = getToolConnection(p.name); return <ConnectionCard key={p.name} name={p.name} icon={<p.icon size={20} />} connected={isToolConnected(p.name)} accountName={conn?.account_name} connectedAt={conn?.connected_at} onConnect={() => setConnectModal(p.name)} onDisconnect={() => disconnectTool(p.name)} />; })}</div>
+            <div className="space-y-3">{toolPlatforms.map(p => { const conn = getToolConnection(p.name); return <ConnectionCard key={p.name} name={p.name} icon={<p.icon size={20} />} connected={isToolConnected(p.name)} accountName={conn?.account_name} connectedAt={conn?.connected_at} onDisconnect={() => disconnectTool(p.name)} comingSoon />; })}</div>
           </WorkspaceSection>
         )}
 
@@ -425,8 +425,6 @@ const VirtualAssistantDemo = () => {
         )}
       </WorkspaceShell>
 
-      <ConnectPlatformModal open={!!connectModal} onClose={() => setConnectModal(null)} platformName={connectModal || ""}
-        onConnect={(accountName) => { if (connectModal) { connectTool(connectModal, accountName); toast({ title: "Connected", description: `${connectModal} linked.` }); } setConnectModal(null); }} />
     </>
   );
 };
