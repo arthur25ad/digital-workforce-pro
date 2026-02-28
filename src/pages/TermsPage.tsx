@@ -36,7 +36,7 @@ const TermsPage = () => (
             </div>
             <div>
               <h2 className="font-display text-lg font-semibold text-foreground mb-3">7. Contact</h2>
-              <p>For questions about these terms, please reach out to <a href="mailto:legalvantory@gmail.com" className="text-primary hover:underline">legalvantory@gmail.com</a> or call <a href="tel:+18067794074" className="text-primary hover:underline">+1 (806) 779-4074</a>.</p>
+              <p>For questions about these terms, please reach out to <a href="mailto:vantoryteam@gmail.com" className="text-primary hover:underline">vantoryteam@gmail.com</a> or call <a href="tel:+18067794074" className="text-primary hover:underline">+1 (806) 779-4074</a>.</p>
             </div>
           </div>
         </motion.div>
