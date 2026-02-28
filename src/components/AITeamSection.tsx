@@ -39,16 +39,16 @@ const roles = [
 
 const AITeamSection = () => (
   <section id="team" className="section-padding">
-    <div className="mx-auto max-w-[1600px] px-6 md:px-12 lg:px-16">
-      <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} className="mb-14 text-center">
-        <h2 className="font-display text-3xl font-bold text-foreground md:text-4xl">Specialized AI Roles for Real Business Work</h2>
-        <p className="mx-auto mt-4 max-w-2xl text-muted-foreground">Deploy a focused digital team built to handle the repetitive work that slows small businesses down.</p>
+    <div className="mx-auto max-w-[1600px] px-0 md:px-12 lg:px-16">
+      <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} className="mb-8 md:mb-14 text-center">
+        <h2 className="font-display text-2xl font-bold text-foreground md:text-4xl">Specialized AI Roles for Real Business Work</h2>
+        <p className="mx-auto mt-3 md:mt-4 max-w-2xl text-sm md:text-base text-muted-foreground">Deploy a focused digital team built to handle the repetitive work that slows small businesses down.</p>
       </motion.div>
 
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {roles.map((role, i) => (
           <motion.div key={role.title} initial={{ opacity: 0, y: 25 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: i * 0.1 }}>
-            <Link to={`/ai-employees/${role.slug}`} className={`card-glass group block cursor-pointer rounded-xl border-t-2 border-t-transparent p-6 ${role.accentBorder}`}>
+            <Link to={`/ai-employees/${role.slug}`} className={`card-glass group block cursor-pointer rounded-xl border-t-2 border-t-transparent p-4 md:p-6 ${role.accentBorder}`}>
               <div className={`mb-4 flex h-11 w-11 items-center justify-center rounded-lg ${role.iconBg} ${role.iconColor} transition-colors`}>
                 <role.icon size={22} />
               </div>

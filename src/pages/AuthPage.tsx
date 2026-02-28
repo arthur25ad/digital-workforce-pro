@@ -79,7 +79,7 @@ const AuthPage = () => {
   if (emailSent) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center px-4">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md text-center">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-sm md:max-w-md text-center">
           <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">
             <Mail size={28} className="text-primary" />
           </div>
@@ -175,28 +175,28 @@ const AuthPage = () => {
       </div>
 
       {/* Right panel — auth form */}
-      <div className="flex-1 flex items-center justify-center px-6 py-12 lg:px-12 relative z-10">
+      <div className="flex-1 flex items-center justify-center px-4 py-8 md:py-12 lg:px-12 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          className="w-full max-w-[420px]"
+          className="w-full max-w-[380px] md:max-w-[420px]"
         >
           {/* Mobile back link */}
-          <div className="mb-6 lg:hidden">
-            <Link to="/" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground">
+          <div className="mb-4 lg:hidden">
+            <Link to="/" className="inline-flex items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground">
               <ArrowLeft size={14} />
-              Back to Home
+              Back
             </Link>
           </div>
 
           {/* Brand header */}
-          <div className="text-center mb-8">
+          <div className="text-center mb-6 md:mb-8">
             <motion.h2
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="font-display text-4xl font-bold tracking-tight"
+              className="font-display text-3xl md:text-4xl font-bold tracking-tight"
             >
               <span style={{
                 backgroundImage: "linear-gradient(135deg, hsl(0 0% 100%), hsl(225 60% 82%), hsl(0 0% 100%), hsl(225 50% 78%))",
@@ -222,7 +222,7 @@ const AuthPage = () => {
           {/* Auth card */}
           <motion.div
             layout
-            className="rounded-2xl border border-border/60 p-7 relative overflow-hidden"
+            className="rounded-2xl border border-border/60 p-5 md:p-7 relative overflow-hidden"
             style={{
               background: "linear-gradient(145deg, hsl(225 20% 8% / 0.9), hsl(225 20% 5% / 0.95))",
               backdropFilter: "blur(20px)",
@@ -234,7 +234,7 @@ const AuthPage = () => {
 
             {/* Tabs */}
             {mode !== "forgot" && (
-              <div className="mb-7 flex rounded-xl bg-secondary/60 p-1 border border-border/30">
+              <div className="mb-5 md:mb-7 flex rounded-xl bg-secondary/60 p-1 border border-border/30">
                 {(["login", "signup"] as const).map((tab) => (
                   <button
                     key={tab}
@@ -268,7 +268,7 @@ const AuthPage = () => {
                 exit={{ opacity: 0, x: mode === "signup" ? -20 : 20 }}
                 transition={{ duration: 0.25 }}
                 onSubmit={mode === "login" ? handleLogin : mode === "signup" ? handleSignup : handleForgot}
-                className="space-y-5"
+                className="space-y-4 md:space-y-5"
               >
                 {mode === "signup" && (
                   <div>
@@ -397,12 +397,12 @@ const AuthPage = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
-            className="mt-8 lg:hidden"
+            className="mt-6 lg:hidden"
           >
-            <div className="flex flex-wrap justify-center gap-2">
+            <div className="flex flex-wrap justify-center gap-1.5">
               {features.slice(0, 4).map((f) => (
-                <div key={f.label} className={`flex items-center gap-1.5 rounded-full border border-border/40 bg-secondary/30 px-3 py-1.5 text-xs text-muted-foreground`}>
-                  <f.icon size={12} className={f.textClass} />
+                <div key={f.label} className={`flex items-center gap-1 rounded-full border border-border/40 bg-secondary/30 px-2.5 py-1 text-[10px] text-muted-foreground`}>
+                  <f.icon size={10} className={f.textClass} />
                   {f.label.replace("AI ", "")}
                 </div>
               ))}

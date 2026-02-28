@@ -41,9 +41,9 @@ const FAQSection = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mb-14 text-center"
+          className="mb-8 md:mb-14 text-center"
         >
-          <h2 className="font-display text-3xl font-bold text-foreground md:text-4xl">
+          <h2 className="font-display text-2xl font-bold text-foreground md:text-4xl">
             FAQ
           </h2>
         </motion.div>

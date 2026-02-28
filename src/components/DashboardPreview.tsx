@@ -105,22 +105,22 @@ const DashboardPreview = () => {
         <div className="absolute left-1/2 top-1/2 h-[400px] w-[400px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-10 blur-[80px]" style={{ background: "radial-gradient(circle, hsl(160 60% 45% / 0.4), transparent 70%)" }} />
       </div>
 
-      <div className="relative mx-auto max-w-[1400px] px-6 md:px-12 lg:px-16">
+      <div className="relative mx-auto max-w-[1400px] px-4 md:px-12 lg:px-16">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mb-16 text-center"
+          className="mb-10 md:mb-16 text-center"
         >
-          <h2 className="font-display text-4xl font-bold text-foreground md:text-5xl lg:text-6xl">
+          <h2 className="font-display text-2xl font-bold text-foreground md:text-5xl lg:text-6xl">
             Your AI Team{" "}
             <span className="relative">
               <span className="gradient-text">Never Stops</span>
             </span>{" "}
             Working
           </h2>
-          <p className="mx-auto mt-5 max-w-2xl text-lg text-muted-foreground">
+          <p className="mx-auto mt-3 md:mt-5 max-w-2xl text-sm md:text-lg text-muted-foreground">
             While you sleep, your AI employees handle social media, customer support, email marketing, and admin — here's what a typical day looks like.
           </p>
           <motion.div
@@ -135,7 +135,7 @@ const DashboardPreview = () => {
         </motion.div>
 
         {/* Big stat cards with animated counters */}
-        <div className="relative mb-8 grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-5">
+        <div className="relative mb-6 md:mb-8 grid grid-cols-2 gap-3 md:gap-4 md:grid-cols-4 md:gap-5">
           {roleDetails.map((role, i) => (
             <motion.div
               key={role.label}
@@ -146,8 +146,8 @@ const DashboardPreview = () => {
               className="group relative cursor-pointer"
               onClick={() => setExpandedCard(expandedCard === i ? null : i)}
             >
-              <div
-                className={`relative overflow-hidden rounded-2xl border ${role.border} p-5 transition-all duration-500 hover:scale-[1.02]`}
+                <div
+                  className={`relative overflow-hidden rounded-xl md:rounded-2xl border ${role.border} p-4 md:p-5 transition-all duration-500 hover:scale-[1.02]`}
                 style={{ background: `linear-gradient(160deg, ${role.glow}, transparent 60%)` }}
               >
                 <div
@@ -155,12 +155,12 @@ const DashboardPreview = () => {
                   style={{ background: role.accent }}
                 />
                 <div className="relative">
-                  <div className={`mb-4 flex h-12 w-12 items-center justify-center rounded-xl ${role.bg} ${role.text} transition-transform duration-300 group-hover:scale-110`}>
-                    <role.icon size={22} />
+                    <div className={`mb-3 md:mb-4 flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-xl ${role.bg} ${role.text} transition-transform duration-300 group-hover:scale-110`}>
+                      <role.icon size={18} className="md:hidden" /><role.icon size={22} className="hidden md:block" />
                   </div>
                   <p className="font-display text-xs font-semibold uppercase tracking-wider text-muted-foreground/70">{role.label}</p>
-                  <div className="mt-2 flex items-end gap-2">
-                    <span className="font-display text-3xl font-bold text-foreground">
+                  <div className="mt-1.5 md:mt-2 flex items-end gap-2">
+                    <span className="font-display text-2xl md:text-3xl font-bold text-foreground">
                       <AnimatedCounter target={parseInt(role.stat)} />
                     </span>
                     <span className="mb-1 text-xs text-muted-foreground">{role.unit}</span>
@@ -271,7 +271,7 @@ const DashboardPreview = () => {
         </AnimatePresence>
 
         {/* Main content area — two columns on desktop */}
-        <div className="grid gap-5 lg:grid-cols-[1fr_340px]">
+        <div className="grid gap-4 md:gap-5 lg:grid-cols-[1fr_340px]">
           {/* Activity feed */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -280,12 +280,12 @@ const DashboardPreview = () => {
             transition={{ duration: 0.7, delay: 0.15 }}
             className="overflow-hidden rounded-2xl border border-border/40 bg-card/60 backdrop-blur-sm"
           >
-            <div className="flex items-center justify-between border-b border-border/30 px-6 py-4">
-              <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
-                  <Zap size={16} className="text-primary" />
+            <div className="flex items-center justify-between border-b border-border/30 px-4 py-3 md:px-6 md:py-4">
+              <div className="flex items-center gap-2 md:gap-3">
+                <div className="flex h-7 w-7 md:h-9 md:w-9 items-center justify-center rounded-lg bg-primary/10">
+                  <Zap size={14} className="text-primary" />
                 </div>
-                <span className="font-display text-sm font-semibold text-foreground">Live Activity Feed</span>
+                <span className="font-display text-xs md:text-sm font-semibold text-foreground">Live Activity Feed</span>
               </div>
               <span className="flex items-center gap-2 text-xs text-muted-foreground">
                 <span className="relative flex h-2 w-2">
@@ -296,7 +296,7 @@ const DashboardPreview = () => {
               </span>
             </div>
 
-            <div className="divide-y divide-border/20 px-3 py-2">
+            <div className="divide-y divide-border/20 px-2 py-1 md:px-3 md:py-2">
               {activityRows.map((row, i) => {
                 const colors = roleColors[row.role as keyof typeof roleColors];
                 return (
@@ -306,12 +306,12 @@ const DashboardPreview = () => {
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.4, delay: 0.2 + i * 0.08 }}
-                    className="group/row flex items-center gap-3 rounded-xl px-3 py-3.5 transition-colors hover:bg-secondary/40 md:gap-4"
+                    className="group/row flex items-center gap-2.5 md:gap-3 rounded-xl px-2.5 py-3 md:px-3 md:py-3.5 transition-colors hover:bg-secondary/40 md:gap-4"
                   >
-                    <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${colors.bg} ${colors.text} transition-transform duration-200 group-hover/row:scale-110`}>
+                    <div className={`flex h-7 w-7 md:h-9 md:w-9 shrink-0 items-center justify-center rounded-lg ${colors.bg} ${colors.text} transition-transform duration-200 group-hover/row:scale-110`}>
                       <row.roleIcon size={15} />
                     </div>
-                    <span className="flex-1 text-sm text-foreground/90">{row.text}</span>
+                    <span className="flex-1 text-xs md:text-sm text-foreground/90 line-clamp-1">{row.text}</span>
                     <span className={`hidden shrink-0 rounded-full px-3 py-1 text-[10px] font-semibold sm:inline-block ${row.statusColor} ${row.statusBg}`}>
                       {row.status}
                     </span>

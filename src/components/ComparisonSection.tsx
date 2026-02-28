@@ -20,24 +20,24 @@ const ai = [
 const ComparisonSection = () => {
   return (
     <section className="section-padding">
-      <div className="mx-auto max-w-[1200px]">
+      <div className="mx-auto max-w-[1200px] px-0 md:px-0">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mb-14 text-center"
+          className="mb-8 md:mb-14 text-center"
         >
-          <h2 className="font-display text-3xl font-bold text-foreground md:text-4xl">
+          <h2 className="font-display text-2xl font-bold text-foreground md:text-4xl">
             Grow Without Adding Immediate Payroll
           </h2>
         </motion.div>
 
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-4 md:gap-6 md:grid-cols-2">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="rounded-xl border border-border/50 border-t-2 border-t-red-400/30 bg-card p-6"
+            className="rounded-xl border border-border/50 border-t-2 border-t-red-400/30 bg-card p-5 md:p-6"
           >
             <h3 className="mb-5 font-display text-lg font-semibold text-muted-foreground">Traditional Hiring</h3>
             <div className="space-y-3">
@@ -54,7 +54,7 @@ const ComparisonSection = () => {
             initial={{ opacity: 0, x: 20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="rounded-xl border border-primary/20 border-t-2 border-t-[hsl(174,60%,50%)]/50 bg-card p-6"
+            className="rounded-xl border border-primary/20 border-t-2 border-t-[hsl(174,60%,50%)]/50 bg-card p-5 md:p-6"
           >
             <h3 className="mb-5 font-display text-lg font-semibold text-[hsl(174,60%,50%)]">AI Employees</h3>
             <div className="space-y-3">

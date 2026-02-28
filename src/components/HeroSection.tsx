@@ -24,28 +24,28 @@ const HeroSection = () => {
   const [demoOpen, setDemoOpen] = useState(false);
 
   return (
-    <section className="blue-ambient relative overflow-hidden pt-16 pb-16 md:pt-20 md:pb-20">
+    <section className="blue-ambient relative overflow-hidden pt-12 pb-10 md:pt-20 md:pb-20">
       <PromoBanner />
-      <div className="mx-auto max-w-[1600px] px-6 md:px-12 lg:px-16">
-        <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-20 xl:gap-28">
+      <div className="mx-auto max-w-[1600px] px-4 md:px-12 lg:px-16">
+        <div className="grid items-center gap-8 md:gap-12 lg:grid-cols-2 lg:gap-20 xl:gap-28">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }} className="text-center lg:text-left">
-            <h1 className="hero-flowing-text font-display text-4xl font-bold leading-tight tracking-tight md:text-5xl lg:text-6xl xl:text-7xl">
+            <h1 className="hero-flowing-text font-display text-3xl font-bold leading-tight tracking-tight md:text-5xl lg:text-6xl xl:text-7xl">
               AI Employees That Work While You Sleep
             </h1>
-            <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground xl:text-xl lg:mx-0">
+            <p className="mx-auto mt-4 md:mt-6 max-w-xl text-base md:text-lg leading-relaxed text-muted-foreground xl:text-xl lg:mx-0">
               Hire AI employees to handle social media, customer support, email marketing, and admin tasks 24/7 — without hiring more staff.
             </p>
-            <div className="mt-8 flex flex-wrap justify-center gap-4 lg:justify-start">
-              <Link to="/get-started" className="btn-glow text-base">Hire Your AI Team</Link>
-              <button onClick={() => setDemoOpen(true)} className="btn-outline-glow text-base">Book a Demo</button>
+            <div className="mt-6 md:mt-8 flex flex-wrap justify-center gap-3 md:gap-4 lg:justify-start">
+              <Link to="/get-started" className="btn-glow">Hire Your AI Team</Link>
+              <button onClick={() => setDemoOpen(true)} className="btn-outline-glow">Book a Demo</button>
             </div>
           </motion.div>
 
           <motion.div initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, delay: 0.2 }} className="relative">
-            <div className="card-glass rounded-2xl p-6">
-              <div className="mb-5 flex items-center justify-between">
-                <span className="font-display text-base font-semibold text-foreground">Today's AI Summary</span>
-                <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <div className="card-glass rounded-2xl p-4 md:p-6">
+              <div className="mb-4 md:mb-5 flex items-center justify-between">
+                <span className="font-display text-sm md:text-base font-semibold text-foreground">Today's AI Summary</span>
+                <span className="flex items-center gap-1.5 text-[10px] md:text-xs text-muted-foreground">
                   <span className="relative flex h-2 w-2">
                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
                     <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
@@ -53,7 +53,7 @@ const HeroSection = () => {
                   Active now
                 </span>
               </div>
-              <div className="space-y-2.5">
+              <div className="space-y-2">
                 {summaryItems.map((item, i) => (
                   <motion.div
                     key={item.text}
@@ -65,7 +65,7 @@ const HeroSection = () => {
                     <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${item.bg} ${item.color}`}>
                       <item.icon size={14} />
                     </div>
-                    <span className="flex-1 text-sm text-foreground">{item.text}</span>
+                    <span className="flex-1 text-xs md:text-sm text-foreground line-clamp-1">{item.text}</span>
                     <span className={`hidden sm:inline-block shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium ${item.color} ${item.bg}`}>
                       {item.status}
                     </span>
@@ -87,12 +87,12 @@ const HeroSection = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.8 }}
-          className="mt-16 grid grid-cols-2 gap-4 border-t border-border/40 pt-10 md:grid-cols-4 md:gap-8"
+          className="mt-10 md:mt-16 grid grid-cols-2 gap-3 md:gap-4 border-t border-border/40 pt-6 md:pt-10 md:grid-cols-4 md:gap-8"
         >
           {trustItems.map((item) => (
-            <div key={item.label} className="flex items-center gap-3">
-              <item.icon size={20} className="text-primary" />
-              <span className="text-sm font-medium text-muted-foreground">{item.label}</span>
+            <div key={item.label} className="flex items-center gap-2 md:gap-3">
+              <item.icon size={16} className="text-primary shrink-0 md:w-5 md:h-5" />
+              <span className="text-xs md:text-sm font-medium text-muted-foreground">{item.label}</span>
             </div>
           ))}
         </motion.div>

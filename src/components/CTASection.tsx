@@ -10,15 +10,15 @@ const CTASection = () => {
     <section id="cta" className="section-padding blue-ambient">
       <div className="mx-auto max-w-4xl text-center">
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-          <h2 className="font-display text-3xl font-bold text-foreground md:text-5xl">
+          <h2 className="font-display text-2xl font-bold text-foreground md:text-5xl">
             Build Your AI Team Today
           </h2>
-          <p className="mx-auto mt-5 max-w-lg text-lg text-muted-foreground">
+          <p className="mx-auto mt-4 md:mt-5 max-w-lg text-base md:text-lg text-muted-foreground">
             Stop doing repetitive work manually. Put a digital team in place that works around the clock.
           </p>
-          <div className="mt-8 flex flex-wrap justify-center gap-4">
-            <Link to="/get-started" className="btn-glow text-base">Hire Your AI Team</Link>
-            <button onClick={() => setDemoOpen(true)} className="btn-outline-glow text-base">Book a Demo</button>
+          <div className="mt-6 md:mt-8 flex flex-wrap justify-center gap-3 md:gap-4">
+            <Link to="/get-started" className="btn-glow">Hire Your AI Team</Link>
+            <button onClick={() => setDemoOpen(true)} className="btn-outline-glow">Book a Demo</button>
           </div>
         </motion.div>
       </div>
