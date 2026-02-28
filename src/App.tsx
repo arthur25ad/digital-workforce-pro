@@ -25,6 +25,7 @@ import ChooseRolesPage from "./pages/ChooseRolesPage";
 import VantaBrainPage from "./pages/VantaBrainPage";
 import StaffPortalPage from "./pages/StaffPortalPage";
 import SupportPage from "./pages/SupportPage";
+import SubscriptionDetailsPage from "./pages/SubscriptionDetailsPage";
 import FloatingBrainButton from "./components/FloatingBrainButton";
 
 const queryClient = new QueryClient();
@@ -85,6 +86,7 @@ const App = () => (
               <Route path="/vantabrain" element={<VantaBrainPage />} />
               <Route path="/staff-portal" element={<ProtectedRoute><StaffPortalPage /></ProtectedRoute>} />
               <Route path="/support" element={<SupportPage />} />
+              <Route path="/subscription-details" element={<ProtectedRoute><SubscriptionDetailsPage /></ProtectedRoute>} />
               <Route path="/privacy" element={<PrivacyPage />} />
               <Route path="/terms" element={<TermsPage />} />
               <Route path="*" element={<NotFound />} />

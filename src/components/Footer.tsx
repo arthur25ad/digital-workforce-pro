@@ -9,7 +9,7 @@ const footerLinks = [
       { label: "Pricing", href: "/pricing" },
       { label: "FAQ", href: "/faq" },
       { label: "Support", href: "/support" },
-      { label: "Subscription Details", href: "/dashboard#subscription" },
+      { label: "Subscription Details", href: "/subscription-details" },
     ],
   },
   {
