@@ -21,7 +21,7 @@ const PricingSection = () => {
           {topPromo && (
             <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-emerald-500/10 border border-emerald-500/30 px-4 py-1.5 text-sm text-emerald-400">
               <Tag size={14} />
-              Use <span className="font-mono font-bold">{topPromo.code}</span> at checkout to save
+              Use code "<span className="font-mono font-bold text-base">{topPromo.code}</span>" at checkout to save
               {topPromo.discount_type === "percentage"
                 ? ` ${topPromo.discount_value}%`
                 : ` $${topPromo.discount_value}`}
