@@ -343,12 +343,21 @@ const AuthenticatedView = ({ initialQuestion }: { initialQuestion?: string }) =>
         </div>
       </section>
 
+      {/* ── Ask VANTABRAIN — Flagship Section ── */}
+      <section className="px-6 pt-6 pb-4 md:px-12 lg:px-16">
+        <div className="mx-auto max-w-[1400px]">
+          <motion.div {...fadeUp} transition={{ delay: 0.1 }}>
+            <VantaBrainAssistant initialQuestion={initialQuestion} variant="flagship" />
+          </motion.div>
+        </div>
+      </section>
+
       {/* ── Dashboard ── */}
       <section className="px-6 pb-20 md:px-12 lg:px-16">
         <div className="mx-auto max-w-[1400px]">
 
           {/* Stats Row */}
-          <motion.div {...fadeUp} transition={{ delay: 0.1 }} className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8 mt-8">
+          <motion.div {...fadeUp} transition={{ delay: 0.14 }} className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8 mt-4">
             {[
               { label: "Memories", value: stats.totalMemories, icon: Database, desc: "Learned preferences" },
               { label: "Patterns", value: stats.totalPatterns, icon: Activity, desc: "Behavioral insights" },
@@ -366,176 +375,6 @@ const AuthenticatedView = ({ initialQuestion }: { initialQuestion?: string }) =>
                 <p className="text-[10px] text-muted-foreground">{s.desc}</p>
               </div>
             ))}
-          </motion.div>
-
-          {/* ── Business Brain Summary ── */}
-          <motion.div {...fadeUp} transition={{ delay: 0.14 }} className="mb-6">
-            <div className="rounded-2xl border border-border/40 bg-card p-6">
-              <div className="flex items-center gap-2 mb-4">
-                <Brain size={16} style={{ color: PURPLE }} />
-                <h2 className="font-display text-base font-semibold text-foreground">Business Brain Summary</h2>
-              </div>
-              <p className="text-sm text-muted-foreground mb-4">
-                This is what VANTABRAIN currently understands about your business based on your workspace setup and usage patterns.
-              </p>
-              <div className="grid md:grid-cols-3 gap-3">
-                {memories.filter(m => m.scope === "shared").length > 0 ? (
-                  memories.filter(m => m.scope === "shared").slice(0, 6).map((m) => (
-                    <div key={m.id} className="rounded-xl border border-border/30 bg-background/50 p-3">
-                      <p className="text-xs font-medium text-foreground">{m.memory_key}</p>
-                      <p className="text-[11px] text-muted-foreground mt-0.5 leading-relaxed">{m.memory_value}</p>
-                    </div>
-                  ))
-                ) : (
-                  <div className="col-span-3 rounded-xl border border-dashed border-border/30 p-8 text-center">
-                    <Brain size={24} className="mx-auto mb-2 text-muted-foreground/30" />
-                    <p className="text-sm text-muted-foreground">No shared memories yet.</p>
-                    <p className="text-xs text-muted-foreground/60 mt-1">As you use your AI Employees, VANTABRAIN will build a profile of your business preferences.</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          </motion.div>
-
-          {/* ── Role-Specific Memory ── */}
-          <motion.div {...fadeUp} transition={{ delay: 0.18 }} className="mb-6">
-            <div className="rounded-2xl border border-border/40 bg-card p-6">
-              <div className="flex items-center gap-2 mb-4">
-                <Layers size={16} style={{ color: PURPLE }} />
-                <h2 className="font-display text-base font-semibold text-foreground">Role Intelligence</h2>
-              </div>
-
-              {/* Role tabs */}
-              <div className="flex gap-2 mb-5 flex-wrap">
-                <button
-                  className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all border ${
-                    !activeRoleTab ? "border-border bg-foreground/10 text-foreground" : "border-border/30 text-muted-foreground hover:text-foreground"
-                  }`}
-                  onClick={() => setActiveRoleTab(null)}
-                >
-                  All Roles
-                </button>
-                {ROLES.map((r) => (
-                  <button
-                    key={r.key}
-                    className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all border inline-flex items-center gap-1.5 ${
-                      activeRoleTab === r.key ? "border-border bg-foreground/10 text-foreground" : "border-border/30 text-muted-foreground hover:text-foreground"
-                    }`}
-                    onClick={() => setActiveRoleTab(r.key)}
-                  >
-                    <r.icon size={12} style={{ color: r.color }} />
-                    {r.label}
-                  </button>
-                ))}
-              </div>
-
-              {/* Memories + Patterns side by side */}
-              <div className="grid md:grid-cols-5 gap-4">
-                {/* Memories */}
-                <div className="md:col-span-3">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Lightbulb size={14} style={{ color: PURPLE }} />
-                    <h3 className="text-sm font-semibold text-foreground">Learned Preferences</h3>
-                    {roleMemories.length > 0 && (
-                      <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">{roleMemories.length}</span>
-                    )}
-                  </div>
-
-                  {loading ? (
-                    <div className="text-sm text-muted-foreground">Loading...</div>
-                  ) : roleMemories.length === 0 ? (
-                    <div className="rounded-xl border border-dashed border-border/30 p-8 text-center">
-                      <Brain size={28} className="mx-auto mb-2 text-muted-foreground/30" />
-                      <p className="text-sm text-muted-foreground">No memories yet</p>
-                      <p className="text-xs text-muted-foreground/60 mt-1">Keep using your AI Employees and preferences will appear here.</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-2 max-h-[400px] overflow-y-auto pr-1">
-                      {roleMemories.map((m) => {
-                        const CatIcon = categoryIcons[m.category] || Lightbulb;
-                        return (
-                          <div key={m.id} className="group flex items-start gap-3 rounded-xl border border-border/30 bg-background/50 p-3 transition-all hover:border-border/50">
-                            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-border/30 bg-card">
-                              <CatIcon size={12} style={{ color: PURPLE }} />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-xs font-medium text-foreground">{m.memory_key}</p>
-                              <p className="text-[11px] text-muted-foreground mt-0.5 leading-relaxed">{m.memory_value}</p>
-                              <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                                <span className="text-[10px] text-muted-foreground/60 rounded-full border border-border/30 px-1.5 py-0.5">{m.scope}</span>
-                                <span className="text-[10px] text-muted-foreground/60">{m.times_reinforced}× reinforced</span>
-                                <span className="text-[10px] text-muted-foreground/60">{Math.round(m.confidence * 100)}%</span>
-                              </div>
-                            </div>
-                            <Button variant="ghost" size="icon" className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" onClick={() => handleDeleteMemory(m.id)}>
-                              <Trash2 size={11} className="text-muted-foreground" />
-                            </Button>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-
-                {/* Patterns */}
-                <div className="md:col-span-2">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2">
-                      <TrendingUp size={14} style={{ color: PURPLE }} />
-                      <h3 className="text-sm font-semibold text-foreground">Patterns</h3>
-                      {rolePatterns.length > 0 && (
-                        <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">{rolePatterns.length}</span>
-                      )}
-                    </div>
-                    <Button variant="ghost" size="sm" className="h-6 px-2" onClick={() => setShowPatterns(!showPatterns)}>
-                      {showPatterns ? <EyeOff size={12} /> : <Eye size={12} />}
-                    </Button>
-                  </div>
-
-                  {showPatterns && (
-                    loading ? (
-                      <div className="text-sm text-muted-foreground">Loading...</div>
-                    ) : rolePatterns.length === 0 ? (
-                      <div className="rounded-xl border border-dashed border-border/30 p-8 text-center">
-                        <TrendingUp size={24} className="mx-auto mb-2 text-muted-foreground/30" />
-                        <p className="text-sm text-muted-foreground">No patterns yet</p>
-                        <p className="text-xs text-muted-foreground/60 mt-1">Trends will appear as you use the platform.</p>
-                      </div>
-                    ) : (
-                      <div className="space-y-2 max-h-[400px] overflow-y-auto pr-1">
-                        {rolePatterns.map((p) => (
-                          <div key={p.id} className="group rounded-xl border border-border/30 bg-background/50 p-3 transition-all hover:border-border/50">
-                            <p className="text-xs text-foreground leading-relaxed">{p.description}</p>
-                            <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                              <span className="text-[10px] text-muted-foreground/60 rounded-full border border-border/30 px-1.5 py-0.5">{p.pattern_type}</span>
-                              <span className="text-[10px] text-muted-foreground/60">{p.role_scope}</span>
-                              <span className="text-[10px] text-muted-foreground/60">{p.evidence_count}×</span>
-                            </div>
-                            <div className="mt-1.5">
-                              <div className="h-1 w-full rounded-full bg-muted/30 overflow-hidden">
-                                <div className="h-full rounded-full" style={{
-                                  width: `${Math.round(p.confidence * 100)}%`,
-                                  background: `linear-gradient(90deg, ${PURPLE}, hsl(217 91% 60%))`
-                                }} />
-                              </div>
-                              <p className="text-[10px] text-muted-foreground/50 mt-0.5">{Math.round(p.confidence * 100)}% confidence</p>
-                            </div>
-                            <Button variant="ghost" size="sm" className="h-5 px-2 mt-1.5 opacity-0 group-hover:opacity-100 transition-opacity text-[10px] text-muted-foreground" onClick={() => handleDismissPattern(p.id)}>
-                              <Trash2 size={10} className="mr-1" /> Dismiss
-                            </Button>
-                          </div>
-                        ))}
-                      </div>
-                    )
-                  )}
-                </div>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* ── VANTABRAIN AI Assistant ── */}
-          <motion.div {...fadeUp} transition={{ delay: 0.2 }} className="mb-6">
-            <VantaBrainAssistant initialQuestion={initialQuestion} />
           </motion.div>
 
           {/* ── Bottom row: Connected Context + Learning Controls + Recent Activity ── */}
