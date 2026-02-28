@@ -91,24 +91,37 @@ const DashboardPage = () => {
   const { stats: brainStats } = useVantaBrainStats();
   const { syncSubscription } = useSubscriptionSync();
   const [askInput, setAskInput] = useState("");
+  const [checkoutSyncing, setCheckoutSyncing] = useState(() => searchParams.get("checkout") === "success");
 
   // Sync subscription after checkout or on first load
   useEffect(() => {
     const isCheckoutSuccess = searchParams.get("checkout") === "success";
     
     const doSync = async () => {
-      const result = await syncSubscription();
+      // For post-checkout, use retries since Stripe may take a moment
+      const result = await syncSubscription(
+        isCheckoutSuccess ? { retries: 5, delayMs: 2500 } : undefined
+      );
       await refreshProfile();
       
-      if (isCheckoutSuccess && result.subscribed && result.packageKey) {
-        // Clear the query param
+      if (isCheckoutSuccess) {
+        // Clear the query params
         setSearchParams({}, { replace: true });
-        
-        if (packageNeedsRoleSelection(result.packageKey)) {
-          toast({ title: "Payment successful!", description: "Now choose your AI Employees." });
-          navigate("/choose-roles", { replace: true });
+        setCheckoutSyncing(false);
+
+        if (result.subscribed && result.packageKey) {
+          if (packageNeedsRoleSelection(result.packageKey)) {
+            toast({ title: "Payment successful!", description: "Now choose your AI Employees." });
+            navigate("/choose-roles", { replace: true });
+          } else {
+            toast({ title: "Payment successful!", description: "All AI Employees unlocked!" });
+          }
         } else {
-          toast({ title: "Payment successful!", description: "All AI Employees unlocked!" });
+          // Subscription not found after retries — tell user to wait
+          toast({
+            title: "Payment processing",
+            description: "Your payment is being confirmed. Please refresh in a moment.",
+          });
         }
       }
     };
@@ -117,6 +130,32 @@ const DashboardPage = () => {
       doSync();
     }
   }, [profile?.id]);
+
+  // Show a syncing overlay while verifying checkout
+  if (checkoutSyncing) {
+    return (
+      <PageLayout>
+        <section className="flex min-h-[60vh] items-center justify-center px-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="text-center"
+          >
+            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">
+              <Sparkles size={32} className="animate-pulse text-primary" />
+            </div>
+            <h2 className="font-display text-2xl font-bold text-foreground">
+              Confirming your purchase…
+            </h2>
+            <p className="mt-2 text-muted-foreground">
+              Verifying your payment with Stripe. This takes just a moment.
+            </p>
+            <div className="mt-6 h-8 w-8 mx-auto animate-spin rounded-full border-2 border-primary border-t-transparent" />
+          </motion.div>
+        </section>
+      </PageLayout>
+    );
+  }
 
   const packageLabel = profile?.active_package
     ? profile.active_package.charAt(0).toUpperCase() + profile.active_package.slice(1)

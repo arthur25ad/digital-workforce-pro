@@ -269,7 +269,7 @@ serve(async (req) => {
       customer_email: customerId ? undefined : user.email,
       line_items: [{ price: priceId, quantity: 1 }],
       mode: "subscription",
-      success_url: `${req.headers.get("origin")}/dashboard?checkout=success`,
+      success_url: `${req.headers.get("origin")}/dashboard?checkout=success&plan=${planKey}`,
       cancel_url: `${req.headers.get("origin")}/pricing?checkout=cancelled${promoCode ? `&promo=${encodeURIComponent(promoCode)}` : ""}&plan=${planKey}`,
     };
 
