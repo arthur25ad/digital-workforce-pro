@@ -10,9 +10,9 @@ const PageLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <main className="pt-20 relative">
+      <main className="pt-16 md:pt-20 relative">
         {!isHome && (
-          <div className="absolute top-24 left-0 z-10 mx-auto w-full px-6 md:px-12 lg:px-16">
+          <div className="absolute top-20 md:top-24 left-0 z-10 mx-auto w-full px-4 md:px-12 lg:px-16">
             <div className="mx-auto max-w-[1600px]">
               <Link
                 to="/"

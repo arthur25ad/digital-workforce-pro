@@ -15,20 +15,20 @@ const industries = [
 const IndustriesSection = () => {
   return (
     <section id="industries" className="section-padding">
-      <div className="mx-auto max-w-[1600px] px-6 md:px-12 lg:px-16">
+      <div className="mx-auto max-w-[1600px] px-0 md:px-12 lg:px-16">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mb-14 text-center"
+          className="mb-8 md:mb-14 text-center"
         >
-          <h2 className="font-display text-3xl font-bold text-foreground md:text-4xl">
+          <h2 className="font-display text-2xl font-bold text-foreground md:text-4xl">
             Built for Small Businesses That Need More Output
           </h2>
-          <p className="mx-auto mt-4 max-w-xl text-muted-foreground">Without more headcount.</p>
+          <p className="mx-auto mt-3 md:mt-4 max-w-xl text-sm md:text-base text-muted-foreground">Without more headcount.</p>
         </motion.div>
 
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 md:gap-4 sm:grid-cols-4">
           {industries.map((item, i) => (
             <motion.div
               key={item.name}
@@ -36,7 +36,7 @@ const IndustriesSection = () => {
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: i * 0.05 }}
-              className="card-glass flex flex-col items-center gap-3 rounded-xl px-4 py-6 text-center"
+              className="card-glass flex flex-col items-center gap-2 md:gap-3 rounded-xl px-3 py-4 md:px-4 md:py-6 text-center"
             >
               <item.icon size={24} className={item.accent} />
               <span className="text-sm font-medium text-foreground">{item.name}</span>

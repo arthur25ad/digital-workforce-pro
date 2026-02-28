@@ -24,8 +24,8 @@ const footerLinks = [
 
 const Footer = () => {
   return (
-    <footer className="border-t border-border/40 bg-background px-6 py-12 md:px-12 lg:px-16">
-      <div className="mx-auto grid max-w-[1600px] gap-10 md:grid-cols-4">
+    <footer className="border-t border-border/40 bg-background px-4 py-8 md:px-12 md:py-12 lg:px-16">
+      <div className="mx-auto grid max-w-[1600px] gap-8 md:gap-10 md:grid-cols-4">
         <div className="md:col-span-2">
           <Link to="/" className="font-display text-xl font-bold tracking-tight">
             <span style={{
@@ -60,7 +60,7 @@ const Footer = () => {
           </div>
         ))}
       </div>
-      <div className="mx-auto mt-10 max-w-[1600px] border-t border-border/30 pt-6">
+      <div className="mx-auto mt-8 md:mt-10 max-w-[1600px] border-t border-border/30 pt-4 md:pt-6">
         <p className="text-center text-xs text-muted-foreground">
           © {new Date().getFullYear()} VANTORY. All rights reserved.
         </p>

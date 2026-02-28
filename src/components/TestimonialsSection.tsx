@@ -36,17 +36,17 @@ const TestimonialsSection = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mb-14 text-center"
+          className="mb-8 md:mb-14 text-center"
         >
-          <h2 className="font-display text-3xl font-bold text-foreground md:text-4xl">
+          <h2 className="font-display text-2xl font-bold text-foreground md:text-4xl">
             Made for Business Owners Who Need Help Now
           </h2>
-          <p className="mx-auto mt-4 max-w-xl text-muted-foreground">
+          <p className="mx-auto mt-3 md:mt-4 max-w-xl text-sm md:text-base text-muted-foreground">
             Real feedback from business owners using AI employees to save time every day.
           </p>
         </motion.div>
 
-        <div className="grid gap-6 md:grid-cols-3">
+        <div className="grid gap-4 md:gap-6 md:grid-cols-3">
           {testimonials.map((t, i) => (
             <motion.div
               key={t.name}
@@ -54,7 +54,7 @@ const TestimonialsSection = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: i * 0.1 }}
-              className={`card-glass rounded-xl border-t-2 ${t.accent} p-6`}
+              className={`card-glass rounded-xl border-t-2 ${t.accent} p-5 md:p-6`}
             >
               <Quote size={20} className={`mb-4 ${quoteColors[i]}`} />
               <p className="text-base leading-relaxed text-foreground">{t.quote}</p>

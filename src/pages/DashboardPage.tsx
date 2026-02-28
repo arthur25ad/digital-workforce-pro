@@ -127,12 +127,12 @@ const DashboardPage = () => {
 
   return (
     <PageLayout>
-      <section className="px-4 pt-28 pb-20 md:px-8">
+      <section className="px-4 pt-24 pb-16 md:px-8 md:pt-28 md:pb-20">
         <div className="mx-auto max-w-[1400px]">
 
           {/* ── Welcome header ── */}
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="mb-10">
-            <h1 className="font-display text-3xl font-bold text-foreground md:text-4xl">
+            <h1 className="font-display text-2xl font-bold text-foreground md:text-4xl">
               {workspace?.business_name
                 ? `Welcome back, ${workspace.business_name}`
                 : "Welcome back"}
@@ -143,7 +143,7 @@ const DashboardPage = () => {
           </motion.div>
 
           {/* ── Role stat cards (like the landing page preview) ── */}
-          <div className="mb-8 grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-5">
+          <div className="mb-6 md:mb-8 grid grid-cols-2 gap-3 md:gap-4 md:grid-cols-4 md:gap-5">
             {roleConfig.map((role, i) => {
               const unlocked = unlockedRoles.includes(role.slug);
               const colors = roleColors[role.slug];
@@ -160,7 +160,7 @@ const DashboardPage = () => {
                   {unlocked ? (
                     <Link
                       to={`/ai-employees/${role.slug}`}
-                      className={`group relative block overflow-hidden rounded-2xl border ${colors.border} p-5 transition-all duration-500 hover:scale-[1.02]`}
+                      className={`group relative block overflow-hidden rounded-xl md:rounded-2xl border ${colors.border} p-4 md:p-5 transition-all duration-500 hover:scale-[1.02]`}
                       style={{ background: `linear-gradient(160deg, ${colors.glow}, transparent 60%)` }}
                     >
                       <div
@@ -168,12 +168,12 @@ const DashboardPage = () => {
                         style={{ background: colors.accent }}
                       />
                       <div className="relative">
-                        <div className={`mb-4 flex h-12 w-12 items-center justify-center rounded-xl ${colors.bg} ${colors.text} transition-transform duration-300 group-hover:scale-110`}>
-                          <Icon size={22} />
+                        <div className={`mb-3 md:mb-4 flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-xl ${colors.bg} ${colors.text} transition-transform duration-300 group-hover:scale-110`}>
+                          <Icon size={18} />
                         </div>
                         <p className="font-display text-xs font-semibold uppercase tracking-wider text-muted-foreground/70">{role.label}</p>
                         <div className="mt-2 flex items-end gap-2">
-                          <span className="font-display text-3xl font-bold text-foreground">{summary.count}</span>
+                          <span className="font-display text-2xl md:text-3xl font-bold text-foreground">{summary.count}</span>
                           <span className="mb-1 text-xs text-muted-foreground">{summary.unit}</span>
                         </div>
                         {summary.trend && (
@@ -205,7 +205,7 @@ const DashboardPage = () => {
           </div>
 
           {/* ── Main content: Activity Feed + Sidebar ── */}
-          <div className="grid gap-5 lg:grid-cols-[1fr_340px] mb-12">
+          <div className="grid gap-4 md:gap-5 lg:grid-cols-[1fr_340px] mb-8 md:mb-12">
             {/* Activity feed */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}

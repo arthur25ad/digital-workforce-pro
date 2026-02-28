@@ -15,11 +15,11 @@ const PricingSection = () => {
 
   return (
     <section id="pricing" className="section-padding">
-      <div className="mx-auto max-w-[1600px] px-6 md:px-12 lg:px-16">
-        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-14 text-center">
-          <h2 className="font-display text-3xl font-bold text-foreground md:text-4xl">Simple Pricing for Your First AI Team</h2>
+      <div className="mx-auto max-w-[1600px] px-0 md:px-12 lg:px-16">
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-8 md:mb-14 text-center">
+          <h2 className="font-display text-2xl font-bold text-foreground md:text-4xl">Simple Pricing for Your First AI Team</h2>
           {topPromo && (
-            <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-emerald-500/10 border border-emerald-500/30 px-4 py-1.5 text-sm text-emerald-400">
+            <div className="mt-3 md:mt-4 inline-flex items-center gap-2 rounded-full bg-emerald-500/10 border border-emerald-500/30 px-3 md:px-4 py-1.5 text-xs md:text-sm text-emerald-400">
               <Tag size={14} />
               Use code "<span className="font-mono font-bold text-base">{topPromo.code}</span>" at checkout to save
               {topPromo.discount_type === "percentage"
@@ -31,7 +31,7 @@ const PricingSection = () => {
         </motion.div>
 
         {/* Promo code input */}
-        <div className="mx-auto max-w-xs mb-8">
+        <div className="mx-auto max-w-xs mb-6 md:mb-8">
           <PromoCodeInput
             onApply={setAppliedPromo}
             onClear={() => setAppliedPromo(null)}
@@ -39,7 +39,7 @@ const PricingSection = () => {
           />
         </div>
 
-        <div className="grid gap-6 md:grid-cols-3">
+        <div className="grid gap-4 md:gap-6 md:grid-cols-3">
           {plans.map((plan, i) => {
             const isPopular = plan.key === "growth";
             const priceNum = parseInt(plan.price.replace("$", ""));
@@ -54,7 +54,7 @@ const PricingSection = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: i * 0.1 }}
-                className={`relative rounded-2xl border p-6 transition-all duration-300 ${isPopular ? "border-primary/40 bg-card" : "border-border/50 bg-card"}`}
+                className={`relative rounded-xl md:rounded-2xl border p-5 md:p-6 transition-all duration-300 ${isPopular ? "border-primary/40 bg-card" : "border-border/50 bg-card"}`}
                 style={isPopular ? { boxShadow: "0 0 40px hsl(217 91% 60% / 0.1)" } : {}}
               >
                 {isPopular && (
@@ -62,7 +62,7 @@ const PricingSection = () => {
                 )}
                 <h3 className="font-display text-lg font-semibold text-foreground">{plan.name}</h3>
                 <p className="mt-1 text-sm text-muted-foreground">{plan.description}</p>
-                <div className="mt-5">
+                <div className="mt-4 md:mt-5">
                   {hasDiscount ? (
                     <>
                       <span className="font-display text-2xl font-bold text-muted-foreground line-through mr-2">{plan.price}</span>
@@ -106,7 +106,7 @@ const PricingSection = () => {
                     )}
                   </div>
                 </div>
-                <ul className="mt-6 space-y-3">
+                <ul className="mt-4 md:mt-6 space-y-2.5 md:space-y-3">
                   {plan.features.map((f) => (
                     <li key={f} className="flex items-center gap-2 text-sm text-muted-foreground"><Check size={16} className="text-primary" />{f}</li>
                   ))}

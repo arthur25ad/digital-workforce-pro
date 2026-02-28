@@ -27,8 +27,8 @@ const Navbar = () => {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-[1600px] items-center justify-between px-6 py-4 md:px-12 lg:px-16">
-        <Link to="/" className="font-display text-2xl font-bold tracking-tight">
+      <div className="mx-auto flex max-w-[1600px] items-center justify-between px-4 py-3 md:px-12 md:py-4 lg:px-16">
+        <Link to="/" className="font-display text-xl md:text-2xl font-bold tracking-tight">
           <span style={{
             backgroundImage: "linear-gradient(135deg, hsl(0 0% 100%), hsl(225 60% 82%), hsl(0 0% 100%), hsl(225 50% 78%))",
             WebkitBackgroundClip: "text",
@@ -86,7 +86,7 @@ const Navbar = () => {
         {open && (
           <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}
             className="overflow-hidden border-t border-border/50 bg-background/95 backdrop-blur-xl lg:hidden">
-            <div className="flex flex-col gap-4 px-4 py-6">
+            <div className="flex flex-col gap-3 px-4 py-4">
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
