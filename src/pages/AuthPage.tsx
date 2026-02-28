@@ -9,12 +9,12 @@ import {
 } from "lucide-react";
 
 const features = [
-  { icon: Sparkles, label: "AI Social Media Manager", desc: "Auto-generate posts & schedule content" },
-  { icon: MessageSquare, label: "AI Customer Support", desc: "Instant replies trained on your business" },
-  { icon: Mail, label: "AI Email Marketer", desc: "Campaigns that write & optimize themselves" },
-  { icon: Calendar, label: "AI Virtual Assistant", desc: "Scheduling, follow-ups & admin on autopilot" },
-  { icon: Brain, label: "VANTABRAIN Intelligence", desc: "Learns your brand and gets smarter over time" },
-  { icon: BarChart3, label: "Unified Dashboard", desc: "All your AI employees in one workspace" },
+  { icon: Sparkles, label: "AI Social Media Manager", desc: "Auto-generate posts & schedule content", color: "217 91% 60%", textClass: "text-blue-400", bgClass: "bg-blue-500/10" },
+  { icon: MessageSquare, label: "AI Customer Support", desc: "Instant replies trained on your business", color: "262 60% 58%", textClass: "text-violet-400", bgClass: "bg-violet-500/10" },
+  { icon: Mail, label: "AI Email Marketer", desc: "Campaigns that write & optimize themselves", color: "160 60% 45%", textClass: "text-emerald-400", bgClass: "bg-emerald-500/10" },
+  { icon: Calendar, label: "AI Virtual Assistant", desc: "Scheduling, follow-ups & admin on autopilot", color: "38 80% 55%", textClass: "text-amber-400", bgClass: "bg-amber-500/10" },
+  { icon: Brain, label: "VANTABRAIN Intelligence", desc: "Learns your brand and gets smarter over time", color: "280 70% 65%", textClass: "text-purple-400", bgClass: "bg-purple-500/10" },
+  { icon: BarChart3, label: "Unified Dashboard", desc: "All your AI employees in one workspace", color: "217 91% 60%", textClass: "text-blue-400", bgClass: "bg-blue-500/10" },
 ];
 
 const AuthPage = () => {
@@ -140,9 +140,12 @@ const AuthPage = () => {
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 + i * 0.08, duration: 0.4 }}
-                className="group flex items-start gap-3 rounded-xl border border-border/40 bg-secondary/30 backdrop-blur-sm p-3.5 transition-all duration-300 hover:border-primary/30 hover:bg-secondary/50"
+                className="group flex items-start gap-3 rounded-xl border border-border/40 bg-secondary/30 backdrop-blur-sm p-3.5 transition-all duration-300 hover:bg-secondary/50"
+                style={{ ["--card-color" as string]: f.color }}
+                onMouseEnter={(e) => e.currentTarget.style.borderColor = `hsl(${f.color} / 0.3)`}
+                onMouseLeave={(e) => e.currentTarget.style.borderColor = ""}
               >
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors group-hover:bg-primary/20">
+                <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${f.bgClass} ${f.textClass} transition-colors`}>
                   <f.icon size={18} />
                 </div>
                 <div className="min-w-0">
@@ -398,8 +401,8 @@ const AuthPage = () => {
           >
             <div className="flex flex-wrap justify-center gap-2">
               {features.slice(0, 4).map((f) => (
-                <div key={f.label} className="flex items-center gap-1.5 rounded-full border border-border/40 bg-secondary/30 px-3 py-1.5 text-xs text-muted-foreground">
-                  <f.icon size={12} className="text-primary" />
+                <div key={f.label} className={`flex items-center gap-1.5 rounded-full border border-border/40 bg-secondary/30 px-3 py-1.5 text-xs text-muted-foreground`}>
+                  <f.icon size={12} className={f.textClass} />
                   {f.label.replace("AI ", "")}
                 </div>
               ))}
