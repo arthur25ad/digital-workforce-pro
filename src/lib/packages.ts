@@ -34,7 +34,7 @@ export const PACKAGES: Record<string, PackageConfig> = {
     defaultRoles: [],
     stripePriceId: "price_1T5QmBK99ArQ30pFn7FGni9h",
     stripeProductId: "prod_U3XrEJudX0PqCB",
-    trialDays: 3,
+    trialDays: 30,
     features: [
       "1 AI employee of your choice",
       "Basic workflows",
@@ -53,7 +53,7 @@ export const PACKAGES: Record<string, PackageConfig> = {
     defaultRoles: [],
     stripePriceId: "price_1T5QmTK99ArQ30pFmRrxLr1w",
     stripeProductId: "prod_U3XsKaIFk0TD7K",
-    trialDays: 7,
+    trialDays: 30,
     features: [
       "Choose 3 AI employees",
       "Multi-role support",
