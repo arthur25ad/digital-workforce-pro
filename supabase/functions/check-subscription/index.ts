@@ -80,9 +80,15 @@ serve(async (req) => {
     let subscriptionEnd = null;
 
     if (activeSub) {
-      subscriptionEnd = new Date(activeSub.current_period_end * 1000).toISOString();
-      productId = activeSub.items.data[0].price.product;
-      priceId = activeSub.items.data[0].price.id;
+      try {
+        if (activeSub.current_period_end) {
+          subscriptionEnd = new Date(activeSub.current_period_end * 1000).toISOString();
+        }
+      } catch {
+        logStep("Could not parse current_period_end", { value: activeSub.current_period_end });
+      }
+      productId = activeSub.items.data[0]?.price?.product ?? null;
+      priceId = activeSub.items.data[0]?.price?.id ?? null;
       logStep("Active/trialing subscription found", { productId, priceId, status: activeSub.status });
     }
 
