@@ -3,7 +3,7 @@ import { useVantaBrainActions, useVantaBrainSuggestions } from "@/hooks/useVanta
 import SmartSuggestions from "@/components/SmartSuggestions";
 import { useAuth } from "@/hooks/useAuth";
 import { useCustomerSupportData, SupportTicket, SupportDraft } from "@/hooks/useCustomerSupportData";
-import ConnectPlatformModal from "@/components/ConnectPlatformModal";
+
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import WorkspaceShell from "@/components/workspace/WorkspaceShell";
@@ -37,7 +37,7 @@ const CustomerSupportDemo = () => {
     logSupportActivity, fetchActivities, fetchTickets, fetchDrafts,
   } = useCustomerSupportData();
 
-  const [connectModal, setConnectModal] = useState<string | null>(null);
+  
   const [activeTab, setActiveTab] = useState(0);
   const [foundationSaved, setFoundationSaved] = useState(false);
   const [newKnowledge, setNewKnowledge] = useState("");
@@ -175,7 +175,7 @@ const CustomerSupportDemo = () => {
             <div className="space-y-3">
               {supportChannels.map(p => {
                 const conn = getChannelConnection(p.name);
-                return <ConnectionCard key={p.name} name={p.name} icon={<p.icon size={20} />} connected={isChannelConnected(p.name)} accountName={conn?.account_name} connectedAt={conn?.connected_at} onConnect={() => setConnectModal(p.name)} onDisconnect={() => disconnectChannel(p.name)} />;
+                return <ConnectionCard key={p.name} name={p.name} icon={<p.icon size={20} />} connected={isChannelConnected(p.name)} accountName={conn?.account_name} connectedAt={conn?.connected_at} onDisconnect={() => disconnectChannel(p.name)} comingSoon />;
               })}
             </div>
           </WorkspaceSection>
@@ -305,8 +305,6 @@ const CustomerSupportDemo = () => {
         )}
       </WorkspaceShell>
 
-      <ConnectPlatformModal open={!!connectModal} onClose={() => setConnectModal(null)} platformName={connectModal || ""}
-        onConnect={(accountName) => { if (connectModal) { connectChannel(connectModal, accountName); toast({ title: "Connected" }); } setConnectModal(null); }} />
     </>
   );
 };

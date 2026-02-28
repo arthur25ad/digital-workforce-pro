@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import PageLayout from "@/components/PageLayout";
-import ConnectPlatformModal from "@/components/ConnectPlatformModal";
+
 import { useAppState } from "@/context/AppContext";
 import {
   Check, ChevronRight, ChevronLeft, Rocket, Loader2,
@@ -70,7 +70,7 @@ const GetStartedPage = () => {
   const [launching, setLaunching] = useState(false);
   const [launched, setLaunched] = useState(false);
   const [launchProgress, setLaunchProgress] = useState(0);
-  const [connectModal, setConnectModal] = useState<string | null>(null);
+  
 
   const canNext = () => {
     if (step === 0) return !!state.businessType;
@@ -192,7 +192,7 @@ const GetStartedPage = () => {
                               </div>
                               <div>
                                 <span className="text-sm font-medium text-foreground">{p.name}</span>
-                                <p className="text-xs text-muted-foreground">{connected ? conn?.accountName : "Not connected"}</p>
+                                <p className="text-xs text-amber-400/80">{connected ? conn?.accountName : "Integration coming soon"}</p>
                               </div>
                             </div>
                             {connected ? (
@@ -200,7 +200,7 @@ const GetStartedPage = () => {
                                 Disconnect
                               </button>
                             ) : (
-                              <button onClick={() => setConnectModal(p.name)} className="btn-glow !px-4 !py-1.5 text-xs">Connect</button>
+                              <span className="rounded-lg border border-border/40 bg-secondary/50 px-3 py-1.5 text-xs text-muted-foreground cursor-default select-none">Coming Soon</span>
                             )}
                           </div>
                         );
@@ -369,15 +369,6 @@ const GetStartedPage = () => {
         </div>
       </section>
 
-      <ConnectPlatformModal
-        open={!!connectModal}
-        onClose={() => setConnectModal(null)}
-        platformName={connectModal || ""}
-        onConnect={(accountName) => {
-          if (connectModal) addConnection({ platform: connectModal, accountName, connectedAt: new Date().toISOString() });
-          setConnectModal(null);
-        }}
-      />
     </PageLayout>
   );
 };

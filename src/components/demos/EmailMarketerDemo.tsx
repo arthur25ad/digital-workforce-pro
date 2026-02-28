@@ -3,7 +3,7 @@ import { useVantaBrainActions, useVantaBrainSuggestions } from "@/hooks/useVanta
 import SmartSuggestions from "@/components/SmartSuggestions";
 import { useEmailMarketingData } from "@/hooks/useEmailMarketingData";
 import { useAuth } from "@/hooks/useAuth";
-import ConnectPlatformModal from "@/components/ConnectPlatformModal";
+
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import WorkspaceShell from "@/components/workspace/WorkspaceShell";
@@ -39,7 +39,7 @@ const EmailMarketerDemo = () => {
   const { suggestions: brainSuggestions, loading: suggestionsLoading, sendFeedback } = useVantaBrainSuggestions("email-marketer");
 
   const [activeTab, setActiveTab] = useState(0);
-  const [connectModal, setConnectModal] = useState<string | null>(null);
+  
   const [generating, setGenerating] = useState(false);
   const [scheduleModal, setScheduleModal] = useState<string | null>(null);
   const [scheduleDate, setScheduleDate] = useState("");
@@ -206,7 +206,7 @@ const EmailMarketerDemo = () => {
         {/* Senders */}
         {activeTab === 4 && (
           <WorkspaceSection title="Email Senders" description="Connect the platforms where you send campaigns.">
-            <div className="space-y-3">{senderPlatforms.map(p => { const conn = getSenderConnection(p.name); return <ConnectionCard key={p.name} name={p.name} icon={<p.icon size={20} />} connected={isSenderConnected(p.name)} accountName={conn?.account_name} connectedAt={conn?.connected_at} onConnect={() => setConnectModal(p.name)} onDisconnect={() => disconnectSender(p.name)} />; })}</div>
+            <div className="space-y-3">{senderPlatforms.map(p => { const conn = getSenderConnection(p.name); return <ConnectionCard key={p.name} name={p.name} icon={<p.icon size={20} />} connected={isSenderConnected(p.name)} accountName={conn?.account_name} connectedAt={conn?.connected_at} onDisconnect={() => disconnectSender(p.name)} comingSoon />; })}</div>
           </WorkspaceSection>
         )}
 
@@ -267,8 +267,6 @@ const EmailMarketerDemo = () => {
         </div>
       )}
 
-      <ConnectPlatformModal open={!!connectModal} onClose={() => setConnectModal(null)} platformName={connectModal || ""}
-        onConnect={(accountName) => { if (connectModal) connectSender(connectModal, accountName); setConnectModal(null); }} />
     </>
   );
 };
