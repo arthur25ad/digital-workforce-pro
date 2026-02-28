@@ -233,7 +233,7 @@ const SocialMediaDemo = () => {
                       <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary"><Calendar size={18} /></div>
                       <div>
                         <p className="text-sm font-medium text-foreground">{d.idea_title}</p>
-                        <p className="text-xs text-muted-foreground">{d.platform} · {new Date(d.scheduled_date!).toLocaleDateString()}</p>
+                        <p className="text-xs text-muted-foreground">{d.platform} · {new Date(d.scheduled_date!).toLocaleDateString()} · {new Date(d.scheduled_date!).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
                       </div>
                     </div>
                     <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-medium text-primary">Scheduled</span>
