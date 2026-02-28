@@ -32,11 +32,8 @@ const HeroSection = () => {
             <h1 className="hero-flowing-text font-display text-[1.65rem] font-bold leading-tight tracking-tight md:text-5xl lg:text-6xl xl:text-7xl">
               AI Employees That Work While You Sleep
             </h1>
-            <p className="mx-auto mt-3 md:mt-6 max-w-xl text-sm md:text-lg leading-relaxed text-muted-foreground xl:text-xl lg:mx-0">
-              AI employees that handle social media, support, email, and admin{" "}
-              <span className="inline-block font-display font-bold text-primary drop-shadow-[0_0_12px_hsl(var(--primary)/0.6)]">
-                24/7
-              </span>
+            <p className="mx-auto mt-3 md:mt-6 max-w-2xl text-sm md:text-base leading-relaxed text-muted-foreground xl:text-lg lg:mx-0">
+              AI employees that handle social media, support, email, and admin <span className="font-display font-bold text-primary drop-shadow-[0_0_12px_hsl(var(--primary)/0.6)]">24/7</span>
             </p>
             <div className="mt-5 md:mt-8 flex flex-col sm:flex-row items-center justify-center gap-3 md:gap-4 lg:justify-start w-full">
               <Link to="/get-started" className="btn-glow w-full sm:w-auto text-center">Hire Your AI Team</Link>
