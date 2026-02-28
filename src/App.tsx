@@ -25,6 +25,7 @@ import ChooseRolesPage from "./pages/ChooseRolesPage";
 import VantaBrainPage from "./pages/VantaBrainPage";
 import StaffPortalPage from "./pages/StaffPortalPage";
 import SupportPage from "./pages/SupportPage";
+import FloatingBrainButton from "./components/FloatingBrainButton";
 
 const queryClient = new QueryClient();
 
@@ -66,6 +67,7 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <ScrollToTop />
+            <FloatingBrainButton />
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/features" element={<FeaturesPage />} />
