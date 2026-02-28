@@ -13,10 +13,10 @@ const PromoBanner = () => {
         <span>{homepagePromo.label || "Limited time offer"}</span>
         <span className="mx-1">—</span>
         <span>
-          Use <span className="font-bold font-mono tracking-wide">{homepagePromo.code}</span> at checkout
+          Use code "<span className="font-bold font-mono tracking-wide text-base">{homepagePromo.code}</span>" at checkout to save
           {homepagePromo.discount_type === "percentage"
-            ? ` to save ${homepagePromo.discount_value}%`
-            : ` to save $${homepagePromo.discount_value}`}
+            ? ` ${homepagePromo.discount_value}%`
+            : ` $${homepagePromo.discount_value}`}
         </span>
         {homepagePromo.first_billing_cycle_only && (
           <span className="text-emerald-200 text-xs">(first month only)</span>
