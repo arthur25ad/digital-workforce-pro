@@ -66,8 +66,8 @@ export interface ResolvedPromoResult {
 
 // Default plan trial days
 const DEFAULT_PLAN_TRIALS: Record<string, number> = {
-  starter: 3,
-  growth: 7,
+  starter: 30,
+  growth: 30,
   team: 0,
 };
 
