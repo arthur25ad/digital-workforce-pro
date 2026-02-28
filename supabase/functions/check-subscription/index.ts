@@ -78,14 +78,26 @@ serve(async (req) => {
     let productId = null;
     let priceId = null;
     let subscriptionEnd = null;
+    let subscriptionStart = null;
+    let currentPeriodStart = null;
+    let subscriptionStatus = null;
+    let cancelAtPeriodEnd = false;
 
     if (activeSub) {
+      subscriptionStatus = activeSub.status;
+      cancelAtPeriodEnd = activeSub.cancel_at_period_end ?? false;
       try {
         if (activeSub.current_period_end) {
           subscriptionEnd = new Date(activeSub.current_period_end * 1000).toISOString();
         }
+        if (activeSub.current_period_start) {
+          currentPeriodStart = new Date(activeSub.current_period_start * 1000).toISOString();
+        }
+        if (activeSub.start_date) {
+          subscriptionStart = new Date(activeSub.start_date * 1000).toISOString();
+        }
       } catch {
-        logStep("Could not parse current_period_end", { value: activeSub.current_period_end });
+        logStep("Could not parse date fields");
       }
       productId = activeSub.items.data[0]?.price?.product ?? null;
       priceId = activeSub.items.data[0]?.price?.id ?? null;
@@ -97,6 +109,10 @@ serve(async (req) => {
       product_id: productId,
       price_id: priceId,
       subscription_end: subscriptionEnd,
+      subscription_start: subscriptionStart,
+      current_period_start: currentPeriodStart,
+      subscription_status: subscriptionStatus,
+      cancel_at_period_end: cancelAtPeriodEnd,
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
