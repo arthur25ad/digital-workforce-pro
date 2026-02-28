@@ -57,33 +57,33 @@ const PricingPage = () => {
 
   return (
     <PageLayout>
-      <section className="section-padding blue-ambient pb-12 md:pb-16">
-        <div className="mx-auto max-w-[1600px]">
+      <section className="section-padding blue-ambient pb-8 md:pb-16">
+        <div className="mx-auto max-w-[1600px] px-5 md:px-8">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center">
-            <h1 className="font-display text-4xl font-bold text-foreground md:text-5xl">
+            <h1 className="font-display text-2xl font-bold text-foreground md:text-5xl">
               Simple Pricing for Your <span className="gradient-text">Digital Team</span>
             </h1>
-            <p className="mx-auto mt-5 max-w-xl text-muted-foreground">
-              Start small, scale when you're ready. Every plan includes full platform access.
+            <p className="mx-auto mt-3 md:mt-5 max-w-xl text-sm md:text-base text-muted-foreground">
+              Start small, scale when ready. Every plan includes full access.
             </p>
             {topPromo && !appliedPromo && (
-              <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-emerald-500/10 border border-emerald-500/30 px-4 py-1.5 text-sm text-emerald-400">
-                <Tag size={14} />
-                Use code "<span className="font-mono font-bold text-base">{topPromo.code}</span>" at checkout to save
+              <div className="mt-3 inline-flex items-center gap-1.5 md:gap-2 rounded-full bg-emerald-500/10 border border-emerald-500/30 px-3 py-1.5 text-xs md:text-sm text-emerald-400">
+                <Tag size={12} className="md:w-[14px] md:h-[14px]" />
+                Code "<span className="font-mono font-bold text-sm md:text-base">{topPromo.code}</span>" saves
                 {topPromo.discount_type === "percentage"
                   ? ` ${topPromo.discount_value}%`
                   : ` $${topPromo.discount_value}`}
-                {topPromo.first_billing_cycle_only && <span className="text-emerald-400/70 text-xs ml-1">(first month only)</span>}
+                {topPromo.first_billing_cycle_only && <span className="text-emerald-400/70 text-[10px] md:text-xs ml-1">(first month)</span>}
               </div>
             )}
           </motion.div>
         </div>
       </section>
 
-      <section className="px-4 pb-24 md:px-8 md:pb-32">
+      <section className="px-5 pb-16 md:px-8 md:pb-32">
         <div className="mx-auto max-w-[1200px]">
           {/* Promo code input */}
-          <div className="mx-auto max-w-xs mb-8">
+          <div className="mx-auto max-w-xs mb-5 md:mb-8">
             <PromoCodeInput
               onApply={setAppliedPromo}
               onClear={() => setAppliedPromo(null)}
@@ -91,7 +91,7 @@ const PricingPage = () => {
             />
           </div>
 
-          <div className="grid gap-8 md:grid-cols-3">
+          <div className="grid gap-4 md:gap-8 md:grid-cols-3">
             {plans.map((plan, i) => {
               const isPopular = plan.key === "growth";
               const isLoading = loadingPlan === plan.key;
@@ -107,7 +107,7 @@ const PricingPage = () => {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: i * 0.1 }}
-                  className={`relative rounded-2xl border p-8 transition-all duration-300 ${
+                  className={`relative rounded-xl md:rounded-2xl border p-5 md:p-8 transition-all duration-300 ${
                     isPopular ? "border-primary/40 bg-card" : "border-border/50 bg-card"
                   }`}
                   style={isPopular ? { boxShadow: "0 0 40px hsl(217 91% 60% / 0.1)" } : {}}

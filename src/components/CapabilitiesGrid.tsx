@@ -46,7 +46,7 @@ const CapabilitiesGrid = () => {
 
     let animationId: number;
     let scrollPos = 0;
-    const speed = 0.5; // px per frame
+    const speed = 0.7; // px per frame — slightly faster for more energy
 
     const step = () => {
       scrollPos += speed;
@@ -85,9 +85,9 @@ const CapabilitiesGrid = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mb-14 text-center"
+          className="mb-8 md:mb-14 text-center"
         >
-          <h2 className="font-display text-3xl font-bold text-foreground md:text-4xl">
+          <h2 className="font-display text-2xl font-bold text-foreground md:text-4xl">
             Built to Take Work Off Your Plate
           </h2>
         </motion.div>

@@ -7,19 +7,19 @@ const PromoBanner = () => {
   if (loading || !homepagePromo) return null;
 
   return (
-    <div className="w-full bg-emerald-600 text-white py-2.5 px-4 text-center text-sm font-medium">
-      <div className="flex items-center justify-center gap-2 flex-wrap">
-        <Tag size={14} className="shrink-0" />
+    <div className="w-full bg-emerald-600 text-white py-2 px-4 text-center text-xs md:text-sm font-medium">
+      <div className="flex items-center justify-center gap-1.5 md:gap-2 flex-wrap">
+        <Tag size={12} className="shrink-0 md:w-[14px] md:h-[14px]" />
         <span>{homepagePromo.label || "Limited time offer"}</span>
-        <span className="mx-1">—</span>
+        <span className="mx-0.5 md:mx-1">—</span>
         <span>
-          Use code "<span className="font-bold font-mono tracking-wide text-base">{homepagePromo.code}</span>" at checkout to save
+          Code "<span className="font-bold font-mono tracking-wide text-sm md:text-base">{homepagePromo.code}</span>" saves
           {homepagePromo.discount_type === "percentage"
             ? ` ${homepagePromo.discount_value}%`
             : ` $${homepagePromo.discount_value}`}
         </span>
         {homepagePromo.first_billing_cycle_only && (
-          <span className="text-emerald-200 text-xs">(first month only)</span>
+          <span className="text-emerald-200 text-[10px] md:text-xs">(first month)</span>
         )}
       </div>
     </div>
