@@ -46,9 +46,7 @@ export default function VantaBrainAssistant({ initialQuestion, variant = "defaul
     }
   }, [initialQuestion, initialSent, isStreaming, messages.length, sendMessage]);
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  // Auto-scroll removed — user has full control over scrolling
 
   const handleSend = () => {
     const text = input.trim();
