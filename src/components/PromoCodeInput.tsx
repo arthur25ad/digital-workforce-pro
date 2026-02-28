@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -9,12 +9,21 @@ interface PromoCodeInputProps {
   onApply: (promo: PromoCode) => void;
   onClear: () => void;
   appliedPromo: PromoCode | null;
+  initialCode?: string;
 }
 
-const PromoCodeInput = ({ onApply, onClear, appliedPromo }: PromoCodeInputProps) => {
-  const [code, setCode] = useState("");
+const PromoCodeInput = ({ onApply, onClear, appliedPromo, initialCode }: PromoCodeInputProps) => {
+  const [code, setCode] = useState(initialCode || "");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  // Auto-apply initial code from URL (e.g. after failed checkout return)
+  useEffect(() => {
+    if (initialCode && !appliedPromo && code === initialCode) {
+      handleApply();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialCode]);
 
   const handleApply = async () => {
     if (!code.trim()) return;

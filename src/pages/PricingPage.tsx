@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { Check, Loader2, Tag } from "lucide-react";
 import PageLayout from "@/components/PageLayout";
 import PromoCodeInput from "@/components/PromoCodeInput";
+import CheckoutFailedBanner from "@/components/CheckoutFailedBanner";
 import { useAuth } from "@/hooks/useAuth";
 import { PACKAGES, PACKAGE_ORDER } from "@/lib/packages";
 import { useActivePromos, type PromoCode } from "@/hooks/useActivePromos";
@@ -13,15 +14,42 @@ import { supabase } from "@/integrations/supabase/client";
 
 const PricingPage = () => {
   const { user, profile } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const [appliedPromo, setAppliedPromo] = useState<PromoCode | null>(null);
   const { pricingPromos } = useActivePromos();
+
+  const checkoutStatus = searchParams.get("checkout");
+  const returnedPlan = searchParams.get("plan");
+  const returnedPromo = searchParams.get("promo");
+  const declineReason = searchParams.get("reason");
+
+  // Auto-apply promo code from URL (returned after failed checkout)
+  useEffect(() => {
+    if (returnedPromo && !appliedPromo) {
+      // Trigger promo lookup — the PromoCodeInput will handle validation
+      // We set a flag so the input pre-fills with the code
+    }
+  }, [returnedPromo, appliedPromo]);
+
+  const handleDismissFailure = useCallback(() => {
+    // Clean up URL params without reloading
+    const newParams = new URLSearchParams(searchParams);
+    newParams.delete("checkout");
+    newParams.delete("reason");
+    newParams.delete("plan");
+    newParams.delete("promo");
+    setSearchParams(newParams, { replace: true });
+  }, [searchParams, setSearchParams]);
   const topPromo = pricingPromos[0] || null;
 
   const handleSelectPlan = async (planKey: string) => {
     if (!user) return;
     const pkg = PACKAGES[planKey];
     if (!pkg) return;
+
+    // Clear any failure state when retrying
+    handleDismissFailure();
 
     setLoadingPlan(planKey);
     try {
@@ -82,12 +110,24 @@ const PricingPage = () => {
 
       <section className="px-5 pb-16 md:px-8 md:pb-32">
         <div className="mx-auto max-w-[1200px]">
+          {/* Checkout failure banner */}
+          {checkoutStatus === "cancelled" && (
+            <div className="mb-6">
+              <CheckoutFailedBanner
+                reason={declineReason}
+                onRetry={returnedPlan ? () => handleSelectPlan(returnedPlan) : undefined}
+                onDismiss={handleDismissFailure}
+              />
+            </div>
+          )}
+
           {/* Promo code input */}
           <div className="mx-auto max-w-xs mb-5 md:mb-8">
             <PromoCodeInput
               onApply={setAppliedPromo}
               onClear={() => setAppliedPromo(null)}
               appliedPromo={appliedPromo}
+              initialCode={returnedPromo || undefined}
             />
           </div>
 
