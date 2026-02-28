@@ -3,7 +3,8 @@ import { motion } from "framer-motion";
 import { Check, Tag } from "lucide-react";
 import { Link } from "react-router-dom";
 import { PACKAGES, PACKAGE_ORDER } from "@/lib/packages";
-import { useActivePromos, getDiscountForPlan, applyDiscount, type PromoCode } from "@/hooks/useActivePromos";
+import { useActivePromos, type PromoCode } from "@/hooks/useActivePromos";
+import { resolvePromoRules } from "@/lib/promoRules";
 import PromoCodeInput from "@/components/PromoCodeInput";
 
 const PricingSection = () => {
@@ -11,7 +12,6 @@ const PricingSection = () => {
   const { pricingPromos } = useActivePromos();
   const topPromo = pricingPromos[0] || null;
   const [appliedPromo, setAppliedPromo] = useState<PromoCode | null>(null);
-  const activePromo = appliedPromo;
 
   return (
     <section id="pricing" className="section-padding">
@@ -19,7 +19,7 @@ const PricingSection = () => {
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-8 md:mb-14 text-center">
           <h2 className="font-display text-2xl font-bold text-foreground md:text-4xl">Simple Pricing for Your First AI Team</h2>
           {topPromo && (
-             <div className="mt-3 inline-flex items-center gap-1.5 md:gap-2 rounded-full bg-emerald-500/10 border border-emerald-500/30 px-3 py-1.5 text-xs md:text-sm text-emerald-400">
+            <div className="mt-3 inline-flex items-center gap-1.5 md:gap-2 rounded-full bg-emerald-500/10 border border-emerald-500/30 px-3 py-1.5 text-xs md:text-sm text-emerald-400">
               <Tag size={12} className="md:w-[14px] md:h-[14px]" />
               Code "<span className="font-mono font-bold text-sm md:text-base">{topPromo.code}</span>" saves
               {topPromo.discount_type === "percentage"
@@ -42,10 +42,7 @@ const PricingSection = () => {
         <div className="grid gap-3 md:gap-6 md:grid-cols-3">
           {plans.map((plan, i) => {
             const isPopular = plan.key === "growth";
-            const priceNum = parseInt(plan.price.replace("$", ""));
-            const discount = activePromo ? getDiscountForPlan(activePromo, plan.key) : 0;
-            const hasDiscount = discount > 0;
-            const discountedPrice = hasDiscount ? applyDiscount(priceNum, discount, activePromo!.discount_type) : priceNum;
+            const resolved = resolvePromoRules(appliedPromo as any, plan.key);
 
             return (
               <motion.div
@@ -63,42 +60,66 @@ const PricingSection = () => {
                 <h3 className="font-display text-lg font-semibold text-foreground">{plan.name}</h3>
                 <p className="mt-1 text-sm text-muted-foreground">{plan.description}</p>
                 <div className="mt-4 md:mt-5">
-                  {hasDiscount ? (
+                  {resolved.hasDiscount ? (
                     <>
                       <span className="font-display text-2xl font-bold text-muted-foreground line-through mr-2">{plan.price}</span>
-                      <span className="font-display text-4xl font-bold text-foreground">${discountedPrice.toFixed(2)}</span>
+                      <span className="font-display text-4xl font-bold text-foreground">${resolved.discountedPrice.toFixed(2)}</span>
                     </>
                   ) : (
                     <span className="font-display text-4xl font-bold text-foreground">{plan.price}</span>
                   )}
                   <span className="text-sm text-muted-foreground">{plan.period}</span>
 
-                  {/* Billing journey timeline */}
+                  {/* Billing journey timeline — driven by rules engine */}
                   <div className="mt-4 space-y-2 rounded-lg border border-border/40 bg-muted/30 px-3 py-2.5">
-                    {plan.trialDays && (
+                    {/* Trial line */}
+                    {resolved.removeTrial ? (
+                      <div className="flex items-start gap-2 text-sm">
+                        <span className="mt-0.5 h-2 w-2 shrink-0 rounded-full bg-amber-400" />
+                        <span className="text-amber-400 font-medium">No free trial — billing starts immediately</span>
+                      </div>
+                    ) : resolved.trialDays > 0 ? (
                       <div className="flex items-start gap-2 text-sm">
                         <span className="mt-0.5 h-2 w-2 shrink-0 rounded-full bg-emerald-400" />
-                        <span className="text-emerald-400 font-medium">Free for {plan.trialDays} days</span>
+                        <span className="text-emerald-400 font-medium">Free for {resolved.trialDays} days</span>
+                      </div>
+                    ) : null}
+
+                    {/* Billing delay */}
+                    {resolved.billingDelayDays > 0 && (
+                      <div className="flex items-start gap-2 text-sm">
+                        <span className="mt-0.5 h-2 w-2 shrink-0 rounded-full bg-blue-400" />
+                        <span className="text-blue-400 font-medium">First payment delayed by {resolved.billingDelayDays} days</span>
                       </div>
                     )}
-                    {hasDiscount && (
+
+                    {/* Discounted period */}
+                    {resolved.hasDiscount && (
                       <div className="flex items-start gap-2 text-sm">
                         <span className="mt-0.5 h-2 w-2 shrink-0 rounded-full bg-primary" />
                         <span className="text-foreground">
-                          {activePromo?.first_billing_cycle_only
-                            ? <>Then <span className="font-semibold">${discountedPrice.toFixed(2)}</span> first {plan.trialDays ? "paid " : ""}month</>
-                            : <>Then <span className="font-semibold">${discountedPrice.toFixed(2)}/mo</span> ongoing</>
+                          {resolved.isRecurringDiscount
+                            ? <><span className="font-semibold">${resolved.discountedPrice.toFixed(2)}/mo</span> ongoing</>
+                            : resolved.isFirstCycleOnly
+                              ? <><span className="font-semibold">${resolved.discountedPrice.toFixed(2)}</span> first {resolved.trialDays > 0 ? "paid " : ""}month</>
+                              : resolved.discountDurationMonths && resolved.discountDurationMonths > 1
+                                ? <><span className="font-semibold">${resolved.discountedPrice.toFixed(2)}/mo</span> for {resolved.discountDurationMonths} months</>
+                                : <>Then <span className="font-semibold">${resolved.discountedPrice.toFixed(2)}/mo</span> ongoing</>
                           }
                         </span>
                       </div>
                     )}
-                    {hasDiscount && activePromo?.first_billing_cycle_only && (
+
+                    {/* Normal price after discount ends */}
+                    {resolved.hasDiscount && (resolved.isFirstCycleOnly || (resolved.discountDurationMonths && resolved.discountDurationMonths > 0 && !resolved.isRecurringDiscount)) && (
                       <div className="flex items-start gap-2 text-sm">
                         <span className="mt-0.5 h-2 w-2 shrink-0 rounded-full bg-muted-foreground/50" />
                         <span className="text-muted-foreground">Then renews at {plan.price}/mo</span>
                       </div>
                     )}
-                    {!hasDiscount && plan.trialDays && (
+
+                    {/* Default: no promo, just show post-trial price */}
+                    {!resolved.hasDiscount && !resolved.removeTrial && resolved.trialDays > 0 && (
                       <div className="flex items-start gap-2 text-sm">
                         <span className="mt-0.5 h-2 w-2 shrink-0 rounded-full bg-muted-foreground/50" />
                         <span className="text-muted-foreground">Then {plan.price}/mo after trial</span>
@@ -112,7 +133,9 @@ const PricingSection = () => {
                   ))}
                 </ul>
                 <Link to="/pricing" className={`mt-6 block w-full rounded-lg py-3 text-center text-sm font-semibold transition-all duration-300 ${isPopular ? "btn-glow" : "btn-outline-glow"}`}>
-                  Get Started
+                  {resolved.removeTrial || resolved.trialDays === 0
+                    ? "Get Started"
+                    : `Start ${resolved.trialDays}-Day Free Trial`}
                 </Link>
               </motion.div>
             );
