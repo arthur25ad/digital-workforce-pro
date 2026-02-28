@@ -975,9 +975,11 @@ export type Database = {
       }
       promo_codes: {
         Row: {
+          billing_delay_days: number | null
           code: string
           created_at: string
           description: string | null
+          discount_duration_months: number | null
           discount_type: string
           discount_value: number
           end_date: string | null
@@ -991,16 +993,22 @@ export type Database = {
           is_visible_on_pricing: boolean | null
           label: string | null
           max_uses: number | null
+          new_customers_only: boolean | null
+          recurring_discount: boolean | null
+          remove_trial: boolean | null
           start_date: string | null
           starter_discount: number | null
           team_discount: number | null
+          trial_days: number | null
           updated_at: string
           usage_count: number
         }
         Insert: {
+          billing_delay_days?: number | null
           code: string
           created_at?: string
           description?: string | null
+          discount_duration_months?: number | null
           discount_type?: string
           discount_value?: number
           end_date?: string | null
@@ -1014,16 +1022,22 @@ export type Database = {
           is_visible_on_pricing?: boolean | null
           label?: string | null
           max_uses?: number | null
+          new_customers_only?: boolean | null
+          recurring_discount?: boolean | null
+          remove_trial?: boolean | null
           start_date?: string | null
           starter_discount?: number | null
           team_discount?: number | null
+          trial_days?: number | null
           updated_at?: string
           usage_count?: number
         }
         Update: {
+          billing_delay_days?: number | null
           code?: string
           created_at?: string
           description?: string | null
+          discount_duration_months?: number | null
           discount_type?: string
           discount_value?: number
           end_date?: string | null
@@ -1037,9 +1051,13 @@ export type Database = {
           is_visible_on_pricing?: boolean | null
           label?: string | null
           max_uses?: number | null
+          new_customers_only?: boolean | null
+          recurring_discount?: boolean | null
+          remove_trial?: boolean | null
           start_date?: string | null
           starter_discount?: number | null
           team_discount?: number | null
+          trial_days?: number | null
           updated_at?: string
           usage_count?: number
         }

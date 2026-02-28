@@ -1,26 +1,8 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-
-export interface PromoCode {
-  id: string;
-  code: string;
-  label: string;
-  description: string | null;
-  is_active: boolean;
-  is_visible_on_homepage: boolean;
-  is_visible_on_pricing: boolean;
-  is_private: boolean;
-  discount_type: string;
-  discount_value: number;
-  starter_discount: number;
-  growth_discount: number;
-  team_discount: number;
-  first_billing_cycle_only: boolean;
-  start_date: string | null;
-  end_date: string | null;
-  max_uses: number | null;
-  usage_count: number;
-}
+import type { PromoCodeData } from "@/lib/promoRules";
+export type { PromoCodeData };
+export type PromoCode = PromoCodeData;
 
 /** Check if a promo is currently eligible for display */
 function isPromoEligible(p: PromoCode): boolean {
@@ -37,7 +19,7 @@ export function useActivePromos() {
 
   useEffect(() => {
     const fetch = async () => {
-      // RLS now only returns non-private, publicly visible, active promos
+      // RLS only returns non-private, publicly visible, active promos
       const { data } = await supabase
         .from("promo_codes")
         .select("*")
@@ -48,7 +30,6 @@ export function useActivePromos() {
     fetch();
   }, []);
 
-  // Further filter by date/usage eligibility on the client for display
   const eligible = promos.filter(isPromoEligible);
 
   const homepagePromo = eligible.find(
@@ -61,21 +42,18 @@ export function useActivePromos() {
   return { promos: eligible, homepagePromo, pricingPromos, loading };
 }
 
+export { resolvePromoRules, generateAdminSummary } from "@/lib/promoRules";
+
 export function getDiscountForPlan(
   promo: PromoCode,
   planKey: string
 ): number {
   const planDiscount =
-    planKey === "starter"
-      ? promo.starter_discount
-      : planKey === "growth"
-      ? promo.growth_discount
-      : planKey === "team"
-      ? promo.team_discount
-      : 0;
-  // Plan-specific override takes priority
+    planKey === "starter" ? promo.starter_discount
+    : planKey === "growth" ? promo.growth_discount
+    : planKey === "team" ? promo.team_discount
+    : 0;
   if (planDiscount > 0) return planDiscount;
-  // Only Starter & Growth get the global fallback; Team requires an explicit override
   if (planKey === "team") return 0;
   return promo.discount_value;
 }
