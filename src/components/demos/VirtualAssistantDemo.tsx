@@ -13,6 +13,7 @@ import StatCard from "@/components/workspace/StatCard";
 import EmptyState from "@/components/workspace/EmptyState";
 import ActivityFeed from "@/components/workspace/ActivityFeed";
 import ConnectionCard from "@/components/workspace/ConnectionCard";
+import SlackSettingsPanel from "@/components/workspace/SlackSettingsPanel";
 import {
   Check, Loader2, Sparkles, Plus, Calendar, FileText, Clock,
   Inbox, ListChecks, PenLine, Bell, Slack, HardDrive, Play, Pause, Archive,
@@ -352,9 +353,14 @@ const VirtualAssistantDemo = () => {
 
         {/* Tools */}
         {activeTab === 6 && (
-          <WorkspaceSection title="Connected Tools" description="Link calendars, booking platforms, and communication tools.">
-            <div className="space-y-3">{toolPlatforms.map(p => { const conn = getToolConnection(p.name); return <ConnectionCard key={p.name} name={p.name} icon={<p.icon size={20} />} connected={isToolConnected(p.name)} accountName={conn?.account_name} connectedAt={conn?.connected_at} onDisconnect={() => disconnectTool(p.name)} comingSoon />; })}</div>
-          </WorkspaceSection>
+          <div className="space-y-6">
+            <WorkspaceSection title="Slack Integration" description="Receive scheduling reminders and booking alerts in Slack.">
+              <SlackSettingsPanel />
+            </WorkspaceSection>
+            <WorkspaceSection title="Connected Tools" description="Link calendars, booking platforms, and communication tools.">
+              <div className="space-y-3">{toolPlatforms.map(p => { const conn = getToolConnection(p.name); return <ConnectionCard key={p.name} name={p.name} icon={<p.icon size={20} />} connected={isToolConnected(p.name)} accountName={conn?.account_name} connectedAt={conn?.connected_at} onDisconnect={() => disconnectTool(p.name)} comingSoon />; })}</div>
+            </WorkspaceSection>
+          </div>
         )}
 
         {/* Scheduling Overview */}

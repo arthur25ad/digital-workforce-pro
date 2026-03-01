@@ -13,10 +13,11 @@ import StatCard from "@/components/workspace/StatCard";
 import EmptyState from "@/components/workspace/EmptyState";
 import ActivityFeed from "@/components/workspace/ActivityFeed";
 import ConnectionCard from "@/components/workspace/ConnectionCard";
+import SlackSettingsPanel from "@/components/workspace/SlackSettingsPanel";
 import {
   Check, ThumbsUp, X, Calendar, PenLine, Send, Copy,
   MailOpen, Mail, Loader2, Sparkles, Plus, Trash2, Clock, Users, FileText,
-  TrendingUp, Zap, Target,
+  TrendingUp, Zap, Target, Slack,
 } from "lucide-react";
 
 const senderPlatforms = [
@@ -205,9 +206,14 @@ const EmailMarketerDemo = () => {
 
         {/* Senders */}
         {activeTab === 4 && (
-          <WorkspaceSection title="Email Senders" description="Connect the platforms where you send campaigns.">
-            <div className="space-y-3">{senderPlatforms.map(p => { const conn = getSenderConnection(p.name); return <ConnectionCard key={p.name} name={p.name} icon={<p.icon size={20} />} connected={isSenderConnected(p.name)} accountName={conn?.account_name} connectedAt={conn?.connected_at} onDisconnect={() => disconnectSender(p.name)} comingSoon />; })}</div>
-          </WorkspaceSection>
+          <div className="space-y-6">
+            <WorkspaceSection title="Slack Integration" description="Receive campaign and approval notifications in Slack.">
+              <SlackSettingsPanel />
+            </WorkspaceSection>
+            <WorkspaceSection title="Email Senders" description="Connect the platforms where you send campaigns.">
+              <div className="space-y-3">{senderPlatforms.map(p => { const conn = getSenderConnection(p.name); return <ConnectionCard key={p.name} name={p.name} icon={<p.icon size={20} />} connected={isSenderConnected(p.name)} accountName={conn?.account_name} connectedAt={conn?.connected_at} onDisconnect={() => disconnectSender(p.name)} comingSoon />; })}</div>
+            </WorkspaceSection>
+          </div>
         )}
 
         {/* Audiences */}

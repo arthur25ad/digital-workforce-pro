@@ -13,10 +13,11 @@ import StatCard from "@/components/workspace/StatCard";
 import EmptyState from "@/components/workspace/EmptyState";
 import ActivityFeed from "@/components/workspace/ActivityFeed";
 import ConnectionCard from "@/components/workspace/ConnectionCard";
+import SlackSettingsPanel from "@/components/workspace/SlackSettingsPanel";
 import {
   Check, ThumbsUp, X, PenLine, Calendar, Eye,
   Instagram, Facebook, Linkedin, Twitter, Music2, Loader2, Sparkles, Plus, Clock,
-  BarChart3, Zap, FileText, TrendingUp, Edit3, Trash2, ChevronDown,
+  BarChart3, Zap, FileText, TrendingUp, Edit3, Trash2, ChevronDown, Slack,
 } from "lucide-react";
 
 const platformIcon: Record<string, any> = { Instagram, Facebook, LinkedIn: Linkedin, "X / Twitter": Twitter, TikTok: Music2 };
@@ -151,19 +152,24 @@ const SocialMediaDemo = () => {
 
         {/* Platforms */}
         {activeTab === 1 && (
-          <WorkspaceSection title="Connected Platforms" description="Link the accounts where you want content managed.">
-            <div className="space-y-3">
-              {socialPlatforms.map(p => {
-                const Icon = platformIcon[p] || Instagram;
-                const conn = getConnection(p);
-                return (
-                  <ConnectionCard key={p} name={p} icon={<Icon size={20} />} connected={isConnected(p)}
-                    accountName={conn?.account_name} connectedAt={conn?.connected_at}
-                    onDisconnect={() => disconnectPlatform(p)} comingSoon />
-                );
-              })}
-            </div>
-          </WorkspaceSection>
+          <div className="space-y-6">
+            <WorkspaceSection title="Slack Integration" description="Get notified when content is ready for review or approval.">
+              <SlackSettingsPanel />
+            </WorkspaceSection>
+            <WorkspaceSection title="Connected Platforms" description="Link the accounts where you want content managed.">
+              <div className="space-y-3">
+                {socialPlatforms.map(p => {
+                  const Icon = platformIcon[p] || Instagram;
+                  const conn = getConnection(p);
+                  return (
+                    <ConnectionCard key={p} name={p} icon={<Icon size={20} />} connected={isConnected(p)}
+                      accountName={conn?.account_name} connectedAt={conn?.connected_at}
+                      onDisconnect={() => disconnectPlatform(p)} comingSoon />
+                  );
+                })}
+              </div>
+            </WorkspaceSection>
+          </div>
         )}
 
         {/* Generate */}

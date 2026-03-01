@@ -1149,6 +1149,96 @@ export type Database = {
           },
         ]
       }
+      slack_workspace_settings: {
+        Row: {
+          access_alerts_enabled: boolean
+          billing_alerts_enabled: boolean
+          content_approvals_enabled: boolean
+          created_at: string
+          daily_summary_enabled: boolean
+          default_channel_id: string | null
+          default_channel_name: string | null
+          id: string
+          installed_by_user_id: string | null
+          last_test_sent_at: string | null
+          marketing_updates_enabled: boolean
+          notifications_enabled: boolean
+          platform_connection_id: string | null
+          scheduling_alerts_enabled: boolean
+          slack_bot_user_id: string | null
+          slack_team_id: string | null
+          slack_team_name: string | null
+          slack_workspace_name: string | null
+          support_alerts_enabled: boolean
+          updated_at: string
+          weekly_summary_enabled: boolean
+          workspace_id: string
+        }
+        Insert: {
+          access_alerts_enabled?: boolean
+          billing_alerts_enabled?: boolean
+          content_approvals_enabled?: boolean
+          created_at?: string
+          daily_summary_enabled?: boolean
+          default_channel_id?: string | null
+          default_channel_name?: string | null
+          id?: string
+          installed_by_user_id?: string | null
+          last_test_sent_at?: string | null
+          marketing_updates_enabled?: boolean
+          notifications_enabled?: boolean
+          platform_connection_id?: string | null
+          scheduling_alerts_enabled?: boolean
+          slack_bot_user_id?: string | null
+          slack_team_id?: string | null
+          slack_team_name?: string | null
+          slack_workspace_name?: string | null
+          support_alerts_enabled?: boolean
+          updated_at?: string
+          weekly_summary_enabled?: boolean
+          workspace_id: string
+        }
+        Update: {
+          access_alerts_enabled?: boolean
+          billing_alerts_enabled?: boolean
+          content_approvals_enabled?: boolean
+          created_at?: string
+          daily_summary_enabled?: boolean
+          default_channel_id?: string | null
+          default_channel_name?: string | null
+          id?: string
+          installed_by_user_id?: string | null
+          last_test_sent_at?: string | null
+          marketing_updates_enabled?: boolean
+          notifications_enabled?: boolean
+          platform_connection_id?: string | null
+          scheduling_alerts_enabled?: boolean
+          slack_bot_user_id?: string | null
+          slack_team_id?: string | null
+          slack_team_name?: string | null
+          slack_workspace_name?: string | null
+          support_alerts_enabled?: boolean
+          updated_at?: string
+          weekly_summary_enabled?: boolean
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "slack_workspace_settings_platform_connection_id_fkey"
+            columns: ["platform_connection_id"]
+            isOneToOne: false
+            referencedRelation: "platform_connections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "slack_workspace_settings_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: true
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       social_drafts: {
         Row: {
           caption: string | null

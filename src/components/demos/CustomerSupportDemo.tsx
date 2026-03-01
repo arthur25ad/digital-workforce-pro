@@ -13,10 +13,11 @@ import StatCard from "@/components/workspace/StatCard";
 import EmptyState from "@/components/workspace/EmptyState";
 import ActivityFeed from "@/components/workspace/ActivityFeed";
 import ConnectionCard from "@/components/workspace/ConnectionCard";
+import SlackSettingsPanel from "@/components/workspace/SlackSettingsPanel";
 import {
   Check, ThumbsUp, AlertTriangle, MessageSquare, PenLine, Send, X, Clock,
   MailOpen, Facebook, Instagram, Globe, Upload, FileText, Plus, Loader2, Sparkles,
-  Shield, BookOpen, Inbox, TrendingUp, Trash2,
+  Shield, BookOpen, Inbox, TrendingUp, Trash2, Slack,
 } from "lucide-react";
 
 const supportChannels = [
@@ -171,14 +172,19 @@ const CustomerSupportDemo = () => {
 
         {/* Channels */}
         {activeTab === 2 && (
-          <WorkspaceSection title="Support Channels" description="Connect the channels where customers reach you.">
-            <div className="space-y-3">
-              {supportChannels.map(p => {
-                const conn = getChannelConnection(p.name);
-                return <ConnectionCard key={p.name} name={p.name} icon={<p.icon size={20} />} connected={isChannelConnected(p.name)} accountName={conn?.account_name} connectedAt={conn?.connected_at} onDisconnect={() => disconnectChannel(p.name)} comingSoon />;
-              })}
-            </div>
-          </WorkspaceSection>
+          <div className="space-y-6">
+            <WorkspaceSection title="Slack Integration" description="Receive support alerts and escalation notifications in Slack.">
+              <SlackSettingsPanel />
+            </WorkspaceSection>
+            <WorkspaceSection title="Support Channels" description="Connect the channels where customers reach you.">
+              <div className="space-y-3">
+                {supportChannels.map(p => {
+                  const conn = getChannelConnection(p.name);
+                  return <ConnectionCard key={p.name} name={p.name} icon={<p.icon size={20} />} connected={isChannelConnected(p.name)} accountName={conn?.account_name} connectedAt={conn?.connected_at} onDisconnect={() => disconnectChannel(p.name)} comingSoon />;
+                })}
+              </div>
+            </WorkspaceSection>
+          </div>
         )}
 
         {/* Queue */}
