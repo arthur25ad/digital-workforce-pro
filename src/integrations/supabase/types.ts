@@ -1149,6 +1149,117 @@ export type Database = {
           },
         ]
       }
+      shopify_oauth_states: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          shop_domain: string
+          state: string
+          user_id: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          shop_domain: string
+          state: string
+          user_id: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          shop_domain?: string
+          state?: string
+          user_id?: string
+          workspace_id?: string
+        }
+        Relationships: []
+      }
+      shopify_store_settings: {
+        Row: {
+          access_token_encrypted: string | null
+          created_at: string
+          currency: string | null
+          enable_collection_context: boolean
+          enable_product_context: boolean
+          id: string
+          last_synced_at: string | null
+          platform_connection_id: string | null
+          scopes: string | null
+          shop_domain: string
+          shop_name: string | null
+          store_metadata: Json | null
+          synced_collections: Json | null
+          synced_products: Json | null
+          updated_at: string
+          use_for_email_marketing: boolean
+          use_for_social_content: boolean
+          use_for_support_ai: boolean
+          workspace_id: string
+        }
+        Insert: {
+          access_token_encrypted?: string | null
+          created_at?: string
+          currency?: string | null
+          enable_collection_context?: boolean
+          enable_product_context?: boolean
+          id?: string
+          last_synced_at?: string | null
+          platform_connection_id?: string | null
+          scopes?: string | null
+          shop_domain?: string
+          shop_name?: string | null
+          store_metadata?: Json | null
+          synced_collections?: Json | null
+          synced_products?: Json | null
+          updated_at?: string
+          use_for_email_marketing?: boolean
+          use_for_social_content?: boolean
+          use_for_support_ai?: boolean
+          workspace_id: string
+        }
+        Update: {
+          access_token_encrypted?: string | null
+          created_at?: string
+          currency?: string | null
+          enable_collection_context?: boolean
+          enable_product_context?: boolean
+          id?: string
+          last_synced_at?: string | null
+          platform_connection_id?: string | null
+          scopes?: string | null
+          shop_domain?: string
+          shop_name?: string | null
+          store_metadata?: Json | null
+          synced_collections?: Json | null
+          synced_products?: Json | null
+          updated_at?: string
+          use_for_email_marketing?: boolean
+          use_for_social_content?: boolean
+          use_for_support_ai?: boolean
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shopify_store_settings_platform_connection_id_fkey"
+            columns: ["platform_connection_id"]
+            isOneToOne: false
+            referencedRelation: "platform_connections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shopify_store_settings_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: true
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       slack_workspace_settings: {
         Row: {
           access_alerts_enabled: boolean
