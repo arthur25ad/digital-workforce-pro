@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Shield, Users, Zap, Clock, Share2, Mail, Headphones, CalendarCheck, TrendingUp } from "lucide-react";
+import { Shield, Users, Zap, Clock, Share2, Mail, Headphones, CalendarCheck, TrendingUp, ShoppingBag, Store, Briefcase, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 import BookDemoModal from "./BookDemoModal";
 import PromoBanner from "./PromoBanner";
@@ -16,8 +16,15 @@ const summaryItems = [
 const trustItems = [
   { icon: Clock, label: "24/7 Availability" },
   { icon: Users, label: "No Extra Headcount" },
-  { icon: Shield, label: "Built for Small Businesses" },
+  { icon: ShoppingBag, label: "E-Commerce Ready" },
   { icon: Zap, label: "Fast Setup" },
+];
+
+const industryTags = [
+  { icon: Store, label: "Shopify Stores" },
+  { icon: ShoppingBag, label: "E-Commerce Brands" },
+  { icon: Briefcase, label: "Service Businesses" },
+  { icon: Sparkles, label: "Agencies & Clinics" },
 ];
 
 const HeroSection = () => {
@@ -33,8 +40,19 @@ const HeroSection = () => {
               AI Employees That Work While You Sleep
             </h1>
             <p className="mx-auto mt-3 md:mt-6 max-w-2xl text-sm md:text-base leading-relaxed text-muted-foreground xl:text-lg lg:mx-0">
-              AI employees that handle social media, support, email, and admin <span className="font-display font-bold text-primary drop-shadow-[0_0_12px_hsl(var(--primary)/0.6)]">24/7</span>
+              AI employees that handle support, email, social media, and admin for e-commerce brands, Shopify stores, and service businesses — <span className="font-display font-bold text-primary drop-shadow-[0_0_12px_hsl(var(--primary)/0.6)]">24/7</span>
             </p>
+
+            {/* Industry tags */}
+            <div className="mt-4 md:mt-5 flex flex-wrap items-center justify-center gap-2 lg:justify-start">
+              {industryTags.map((tag) => (
+                <span key={tag.label} className="inline-flex items-center gap-1.5 rounded-full border border-border/40 bg-secondary/60 px-3 py-1 text-[11px] md:text-xs font-medium text-muted-foreground">
+                  <tag.icon size={12} className="text-primary" />
+                  {tag.label}
+                </span>
+              ))}
+            </div>
+
             <div className="mt-5 md:mt-8 flex flex-col sm:flex-row items-center justify-center gap-3 md:gap-4 lg:justify-start w-full">
               <Link to="/get-started" className="btn-glow w-full sm:w-auto text-center">Hire Your AI Team</Link>
               <button onClick={() => setDemoOpen(true)} className="btn-outline-glow w-full sm:w-auto">Book a Demo</button>
