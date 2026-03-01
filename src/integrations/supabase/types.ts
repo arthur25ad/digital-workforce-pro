@@ -962,6 +962,100 @@ export type Database = {
           },
         ]
       }
+      notion_connections: {
+        Row: {
+          access_token_encrypted: string
+          bot_id: string | null
+          connected_at: string
+          created_at: string
+          id: string
+          last_synced_at: string | null
+          notion_workspace_id: string | null
+          notion_workspace_name: string | null
+          status: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          access_token_encrypted: string
+          bot_id?: string | null
+          connected_at?: string
+          created_at?: string
+          id?: string
+          last_synced_at?: string | null
+          notion_workspace_id?: string | null
+          notion_workspace_name?: string | null
+          status?: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          access_token_encrypted?: string
+          bot_id?: string | null
+          connected_at?: string
+          created_at?: string
+          id?: string
+          last_synced_at?: string | null
+          notion_workspace_id?: string | null
+          notion_workspace_name?: string | null
+          status?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notion_connections_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: true
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notion_synced_pages: {
+        Row: {
+          content_plain: string | null
+          created_at: string
+          id: string
+          last_synced_at: string
+          notion_page_id: string
+          page_url: string | null
+          title: string | null
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          content_plain?: string | null
+          created_at?: string
+          id?: string
+          last_synced_at?: string
+          notion_page_id: string
+          page_url?: string | null
+          title?: string | null
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          content_plain?: string | null
+          created_at?: string
+          id?: string
+          last_synced_at?: string
+          notion_page_id?: string
+          page_url?: string | null
+          title?: string | null
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notion_synced_pages_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       platform_connections: {
         Row: {
           account_name: string | null

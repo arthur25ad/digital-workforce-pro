@@ -27,6 +27,7 @@ import StaffPortalPage from "./pages/StaffPortalPage";
 import SupportPage from "./pages/SupportPage";
 import SubscriptionDetailsPage from "./pages/SubscriptionDetailsPage";
 import ChangePlanPage from "./pages/ChangePlanPage";
+import NotionCallbackPage from "./pages/NotionCallbackPage";
 import FloatingBrainButton from "./components/FloatingBrainButton";
 
 const queryClient = new QueryClient();
@@ -90,6 +91,7 @@ const App = () => (
               <Route path="/subscription-details" element={<ProtectedRoute><SubscriptionDetailsPage /></ProtectedRoute>} />
               <Route path="/change-plan" element={<ProtectedRoute><ChangePlanPage /></ProtectedRoute>} />
               <Route path="/privacy" element={<PrivacyPage />} />
+              <Route path="/notion-callback" element={<NotionCallbackPage />} />
               <Route path="/terms" element={<TermsPage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
