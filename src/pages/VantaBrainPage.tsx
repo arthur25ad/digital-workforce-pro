@@ -13,7 +13,6 @@ import {
   ChevronDown,
 } from "lucide-react";
 import N8nSettingsPanel from "@/components/workspace/N8nSettingsPanel";
-import NotionBusinessNotes from "@/components/workspace/NotionBusinessNotes";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -144,7 +143,6 @@ const AuthenticatedView = ({ initialQuestion }: { initialQuestion?: string }) =>
   const { memories, patterns, loading, refresh } = useVantaBrainMemories();
   const { deleteMemory, deletePattern } = useVantaBrainActions();
   const { settings, update: updateSettings, clearRoleMemory, clearAllMemory } = useBrainSettings();
-  const { workspace } = useAuth();
   const [showPatterns, setShowPatterns] = useState(true);
   const [activeRoleTab, setActiveRoleTab] = useState<string | null>(null);
   const [activePanel, setActivePanel] = useState<"learning" | "context" | "activity">("learning");
@@ -294,30 +292,23 @@ const AuthenticatedView = ({ initialQuestion }: { initialQuestion?: string }) =>
             )}
 
             {activePanel === "context" && (
-              <div className="rounded-xl border border-border/40 bg-card p-5 space-y-4">
-                {/* Notion — primary integration */}
-                <NotionBusinessNotes workspaceId={workspace?.id || null} />
-                
-                {/* Other context sources — secondary */}
-                <div className="border-t border-border/30 pt-4">
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">Other context sources</p>
-                  <div className="space-y-1.5">
-                    {[
-                      { name: "Google Account", context: "Calendar, contacts", icon: Globe },
-                      { name: "Gmail", context: "Email patterns", icon: Mail },
-                      { name: "Social Accounts", context: "Posting patterns", icon: Globe },
-                      { name: "Support Inbox", context: "Ticket history", icon: MessageSquare },
-                    ].map((t) => (
-                      <div key={t.name} className="flex items-center gap-3 rounded-lg border border-border/30 bg-background/50 p-2.5">
-                        <t.icon size={13} className="text-muted-foreground shrink-0" />
-                        <div className="flex-1">
-                          <p className="text-[11px] font-medium text-foreground">{t.name}</p>
-                          <p className="text-[10px] text-muted-foreground">{t.context}</p>
-                        </div>
-                        <span className="text-[10px] text-muted-foreground/50 rounded-full border border-border/20 px-1.5 py-0.5">Coming soon</span>
+              <div className="rounded-xl border border-border/40 bg-card p-5">
+                <div className="space-y-2">
+                  {[
+                    { name: "Google Account", context: "Calendar, contacts", icon: Globe },
+                    { name: "Gmail", context: "Email patterns", icon: Mail },
+                    { name: "Social Accounts", context: "Posting patterns", icon: Globe },
+                    { name: "Support Inbox", context: "Ticket history", icon: MessageSquare },
+                  ].map((t) => (
+                    <div key={t.name} className="flex items-center gap-3 rounded-lg border border-border/30 bg-background/50 p-3">
+                      <t.icon size={14} className="text-muted-foreground shrink-0" />
+                      <div className="flex-1">
+                        <p className="text-xs font-medium text-foreground">{t.name}</p>
+                        <p className="text-[10px] text-muted-foreground">{t.context}</p>
                       </div>
-                    ))}
-                  </div>
+                      <span className="text-[10px] text-muted-foreground/50 rounded-full border border-border/20 px-1.5 py-0.5">Ready</span>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
