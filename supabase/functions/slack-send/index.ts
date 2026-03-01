@@ -8,6 +8,34 @@ const corsHeaders = {
 
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/slack/api";
 
+const VALID_ACTIONS = ["connect", "disconnect", "send_message", "test_message", "list_channels", "update_settings"] as const;
+
+function validatePayload(body: Record<string, unknown>) {
+  if (!body.action || typeof body.action !== "string") {
+    throw new Error("Missing or invalid 'action' field");
+  }
+  if (!VALID_ACTIONS.includes(body.action as any)) {
+    throw new Error(`Unknown action: ${body.action}`);
+  }
+  if (!body.workspaceId || typeof body.workspaceId !== "string") {
+    throw new Error("Missing or invalid 'workspaceId' field");
+  }
+}
+
+async function verifyWorkspaceOwnership(
+  supabase: ReturnType<typeof createClient>,
+  workspaceId: string,
+  userId: string
+): Promise<boolean> {
+  const { data } = await supabase
+    .from("workspaces")
+    .select("id")
+    .eq("id", workspaceId)
+    .eq("user_id", userId)
+    .single();
+  return !!data;
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -20,9 +48,10 @@ serve(async (req) => {
     const SLACK_API_KEY = Deno.env.get("SLACK_API_KEY");
     if (!SLACK_API_KEY) throw new Error("SLACK_API_KEY is not configured");
 
+    // Auth check
     const authHeader = req.headers.get("Authorization");
     if (!authHeader?.startsWith("Bearer ")) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: corsHeaders });
+      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     const supabase = createClient(
@@ -34,27 +63,47 @@ serve(async (req) => {
     const token = authHeader.replace("Bearer ", "");
     const { data: claimsData, error: claimsError } = await supabase.auth.getClaims(token);
     if (claimsError || !claimsData?.claims) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: corsHeaders });
+      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    const { action, workspaceId, channel, text, blocks } = await req.json();
+    const userId = claimsData.claims.sub as string;
 
-    // Verify workspace ownership
-    const { data: ws } = await supabase.from("workspaces").select("id").eq("id", workspaceId).single();
-    if (!ws) {
-      return new Response(JSON.stringify({ error: "Workspace not found" }), { status: 404, headers: corsHeaders });
+    // Parse and validate body
+    let body: Record<string, unknown>;
+    try {
+      body = await req.json();
+    } catch {
+      return new Response(JSON.stringify({ error: "Invalid JSON body" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    if (action === "send_message") {
-      // Get slack settings for workspace
-      const { data: settings } = await supabase
+    validatePayload(body);
+
+    const { action, workspaceId, channel, text, blocks, settings: settingsUpdate } = body as any;
+
+    // Verify workspace ownership - critical security check
+    const isOwner = await verifyWorkspaceOwnership(supabase, workspaceId, userId);
+    if (!isOwner) {
+      return new Response(JSON.stringify({ error: "Forbidden: you do not own this workspace" }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
+    // Helper: get slack settings
+    const getSlackSettings = async () => {
+      const { data } = await supabase
         .from("slack_workspace_settings")
         .select("*")
         .eq("workspace_id", workspaceId)
         .single();
+      return data;
+    };
 
-      const targetChannel = channel || settings?.default_channel_id || settings?.default_channel_name || "#general";
+    // Helper: resolve target channel
+    const resolveChannel = async (overrideChannel?: string) => {
+      const settings = await getSlackSettings();
+      return overrideChannel || settings?.default_channel_id || settings?.default_channel_name || "#general";
+    };
 
+    // Helper: send Slack message
+    const postSlackMessage = async (targetChannel: string, messageText: string, opts?: { icon_emoji?: string; messageBlocks?: any }) => {
       const response = await fetch(`${GATEWAY_URL}/chat.postMessage`, {
         method: "POST",
         headers: {
@@ -64,19 +113,28 @@ serve(async (req) => {
         },
         body: JSON.stringify({
           channel: targetChannel,
-          text: text || "",
-          blocks: blocks || undefined,
+          text: messageText,
+          blocks: opts?.messageBlocks || undefined,
           username: "VANTORY",
-          icon_emoji: ":robot_face:",
+          icon_emoji: opts?.icon_emoji || ":robot_face:",
         }),
       });
-
       const data = await response.json();
       if (!response.ok || !data.ok) {
         throw new Error(`Slack API error [${response.status}]: ${JSON.stringify(data)}`);
       }
+      return data;
+    };
 
-      // Log activity
+    // ─── ACTIONS ────────────────────────────────────────────
+
+    if (action === "send_message") {
+      if (!text || typeof text !== "string" || text.trim().length === 0) {
+        return new Response(JSON.stringify({ error: "Missing 'text' for send_message" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+      const targetChannel = await resolveChannel(channel);
+      const data = await postSlackMessage(targetChannel, text, { messageBlocks: blocks });
+
       await supabase.from("activity_logs").insert({
         workspace_id: workspaceId,
         type: "slack_notification_sent",
@@ -89,35 +147,10 @@ serve(async (req) => {
     }
 
     if (action === "test_message") {
-      const { data: settings } = await supabase
-        .from("slack_workspace_settings")
-        .select("*")
-        .eq("workspace_id", workspaceId)
-        .single();
+      const targetChannel = await resolveChannel(channel);
+      await postSlackMessage(targetChannel, "✅ VANTORY is now connected to this Slack workspace. Your AI Employees can now send updates here.", { icon_emoji: ":rocket:" });
 
-      const targetChannel = channel || settings?.default_channel_id || settings?.default_channel_name || "#general";
-
-      const response = await fetch(`${GATEWAY_URL}/chat.postMessage`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
-          "X-Connection-Api-Key": SLACK_API_KEY,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          channel: targetChannel,
-          text: "✅ VANTORY is now connected to this Slack workspace. Your AI Employees can now send updates here.",
-          username: "VANTORY",
-          icon_emoji: ":rocket:",
-        }),
-      });
-
-      const data = await response.json();
-      if (!response.ok || !data.ok) {
-        throw new Error(`Slack API error [${response.status}]: ${JSON.stringify(data)}`);
-      }
-
-      // Update last_test_sent_at
+      const settings = await getSlackSettings();
       if (settings) {
         await supabase
           .from("slack_workspace_settings")
@@ -125,7 +158,6 @@ serve(async (req) => {
           .eq("id", settings.id);
       }
 
-      // Log activity
       await supabase.from("activity_logs").insert({
         workspace_id: workspaceId,
         type: "slack_test_sent",
@@ -164,7 +196,6 @@ serve(async (req) => {
     }
 
     if (action === "connect") {
-      // Fetch Slack team info
       const response = await fetch(`${GATEWAY_URL}/auth.test`, {
         method: "POST",
         headers: {
@@ -179,9 +210,6 @@ serve(async (req) => {
         throw new Error(`Slack API error [${response.status}]: ${JSON.stringify(data)}`);
       }
 
-      const userId = claimsData.claims.sub;
-
-      // Upsert platform_connections
       const now = new Date().toISOString();
       const { data: connData } = await supabase
         .from("platform_connections")
@@ -196,7 +224,6 @@ serve(async (req) => {
         .select()
         .single();
 
-      // Upsert slack_workspace_settings
       await supabase
         .from("slack_workspace_settings")
         .upsert({
@@ -211,7 +238,6 @@ serve(async (req) => {
         .select()
         .single();
 
-      // Log activity
       await supabase.from("activity_logs").insert({
         workspace_id: workspaceId,
         type: "slack_connected",
@@ -229,24 +255,56 @@ serve(async (req) => {
     }
 
     if (action === "disconnect") {
-      // Update platform_connections
       await supabase
         .from("platform_connections")
         .update({ connected: false, status: "disconnected" })
         .eq("workspace_id", workspaceId)
         .eq("platform", "Slack");
 
-      // Delete slack settings
       await supabase
         .from("slack_workspace_settings")
         .delete()
         .eq("workspace_id", workspaceId);
 
-      // Log activity
       await supabase.from("activity_logs").insert({
         workspace_id: workspaceId,
         type: "slack_disconnected",
         message: "Disconnected Slack workspace",
+      });
+
+      return new Response(JSON.stringify({ success: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    if (action === "update_settings") {
+      if (!settingsUpdate || typeof settingsUpdate !== "object") {
+        return new Response(JSON.stringify({ error: "Missing 'settings' object" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+
+      // Whitelist allowed fields
+      const allowed = [
+        "default_channel_id", "default_channel_name", "notifications_enabled",
+        "daily_summary_enabled", "weekly_summary_enabled", "support_alerts_enabled",
+        "content_approvals_enabled", "marketing_updates_enabled", "scheduling_alerts_enabled",
+        "billing_alerts_enabled", "access_alerts_enabled",
+      ];
+      const sanitized: Record<string, unknown> = {};
+      for (const key of allowed) {
+        if (key in settingsUpdate) sanitized[key] = settingsUpdate[key];
+      }
+
+      const { error } = await supabase
+        .from("slack_workspace_settings")
+        .update(sanitized)
+        .eq("workspace_id", workspaceId);
+
+      if (error) throw error;
+
+      await supabase.from("activity_logs").insert({
+        workspace_id: workspaceId,
+        type: "slack_settings_updated",
+        message: "Updated Slack notification settings",
       });
 
       return new Response(JSON.stringify({ success: true }), {

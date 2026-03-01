@@ -6,6 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { useSlackNotifications } from "@/hooks/useSlackNotifications";
 import WorkspaceShell from "@/components/workspace/WorkspaceShell";
 import WorkspaceSection from "@/components/workspace/WorkspaceSection";
 import FormFieldGroup from "@/components/workspace/FormFieldGroup";
@@ -38,6 +39,7 @@ const EmailMarketerDemo = () => {
   const { session, workspace } = useAuth();
   const { recordInteraction } = useVantaBrainActions();
   const { suggestions: brainSuggestions, loading: suggestionsLoading, sendFeedback } = useVantaBrainSuggestions("email-marketer");
+  const { notifyCampaignDraftReady } = useSlackNotifications();
 
   const [activeTab, setActiveTab] = useState(0);
   
@@ -88,8 +90,12 @@ const EmailMarketerDemo = () => {
     try {
       const { data, error } = await supabase.functions.invoke("generate-email-draft", { body: { brandProfile, campaign, count: 3, workspaceId: workspace?.id } });
       if (error) throw error;
-      for (const d of (data?.drafts || [])) { await addDraft({ campaign_id: campaignId, subject_line: d.subjectLine || "", preview_text: d.previewText || "", body_copy: d.bodyCopy || "", call_to_action: d.callToAction || "", email_type: d.emailType || "promotional" }); }
-      toast({ title: `${(data?.drafts || []).length} email draft(s) generated` });
+      const generatedDrafts = data?.drafts || [];
+      for (const d of generatedDrafts) { await addDraft({ campaign_id: campaignId, subject_line: d.subjectLine || "", preview_text: d.previewText || "", body_copy: d.bodyCopy || "", call_to_action: d.callToAction || "", email_type: d.emailType || "promotional" }); }
+      toast({ title: `${generatedDrafts.length} email draft(s) generated` });
+      if (generatedDrafts.length > 0) {
+        notifyCampaignDraftReady(campaign.name, generatedDrafts.length);
+      }
     } catch (e: any) { toast({ title: "Generation failed", description: e.message, variant: "destructive" }); }
     finally { setGenerating(false); }
   };

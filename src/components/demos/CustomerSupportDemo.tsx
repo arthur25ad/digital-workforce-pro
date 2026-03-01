@@ -6,6 +6,7 @@ import { useCustomerSupportData, SupportTicket, SupportDraft } from "@/hooks/use
 
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { useSlackNotifications } from "@/hooks/useSlackNotifications";
 import WorkspaceShell from "@/components/workspace/WorkspaceShell";
 import WorkspaceSection from "@/components/workspace/WorkspaceSection";
 import FormFieldGroup from "@/components/workspace/FormFieldGroup";
@@ -30,6 +31,7 @@ const CustomerSupportDemo = () => {
   const { workspace } = useAuth();
   const { recordInteraction } = useVantaBrainActions();
   const { suggestions: brainSuggestions, loading: suggestionsLoading, sendFeedback } = useVantaBrainSuggestions("customer-support");
+  const { notifySupportEscalation } = useSlackNotifications();
   const {
     knowledgeBase, knowledgeItems, tickets, drafts, connections, activities, loading,
     updateKnowledgeBase, addKnowledgeItem, removeKnowledgeItem,
@@ -105,7 +107,17 @@ const CustomerSupportDemo = () => {
   };
 
   const handleApproveDraft = async (draft: SupportDraft) => { await updateDraftStatus(draft.id, "approved"); if (draft.ticket_id) await updateTicketStatus(draft.ticket_id, "pending"); toast({ title: "Draft approved" }); };
-  const handleEscalateDraft = async (draft: SupportDraft) => { await updateDraftStatus(draft.id, "escalated"); if (draft.ticket_id) await updateTicketStatus(draft.ticket_id, "escalated"); toast({ title: "Ticket escalated" }); };
+  const handleEscalateDraft = async (draft: SupportDraft) => {
+    await updateDraftStatus(draft.id, "escalated");
+    if (draft.ticket_id) {
+      await updateTicketStatus(draft.ticket_id, "escalated");
+      const ticket = tickets.find(t => t.id === draft.ticket_id);
+      if (ticket) {
+        notifySupportEscalation(ticket.customer_name, draft.issue_summary || "Ticket escalated for review");
+      }
+    }
+    toast({ title: "Ticket escalated" });
+  };
   const handleMarkSent = async (draft: SupportDraft) => { await updateDraftStatus(draft.id, "sent"); if (draft.ticket_id) await updateTicketStatus(draft.ticket_id, "resolved"); toast({ title: "Marked as sent" }); };
   const handleSaveEdit = async (draftId: string) => { await updateDraftReply(draftId, editText); setEditingDraft(null); setEditText(""); toast({ title: "Draft updated" }); };
 

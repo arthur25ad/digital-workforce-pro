@@ -24,7 +24,6 @@ const toolPlatforms = [
   { name: "Google Calendar", icon: Calendar },
   { name: "Outlook Calendar", icon: CalendarDays },
   { name: "Gmail", icon: FileText },
-  { name: "Slack", icon: Slack },
   { name: "Website Booking Form", icon: Inbox },
   { name: "Google Drive", icon: HardDrive },
 ];

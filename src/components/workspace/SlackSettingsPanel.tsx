@@ -1,35 +1,51 @@
 import { useState, useEffect } from "react";
-import { useSlackIntegration, SlackChannel } from "@/hooks/useSlackIntegration";
+import { useSlackIntegration } from "@/hooks/useSlackIntegration";
 import {
-  Slack, Send, Settings, Hash, Bell, BellOff, Check, Loader2, ChevronDown,
-  MessageSquare, Calendar, Mail, Shield, TrendingUp, CreditCard,
+  Slack, Send, Hash, Bell, BellOff, Check, Loader2, ChevronDown,
+  MessageSquare, Calendar, Mail, Shield, TrendingUp, CreditCard, AlertCircle,
 } from "lucide-react";
 
 const notificationToggles = [
-  { key: "support_alerts_enabled", label: "Support escalation alerts", description: "When a support issue needs human attention", icon: Shield },
-  { key: "content_approvals_enabled", label: "Content approval requests", description: "When social or email content is ready for review", icon: MessageSquare },
-  { key: "scheduling_alerts_enabled", label: "Scheduling reminders", description: "Calendar reminders and booking notifications", icon: Calendar },
-  { key: "marketing_updates_enabled", label: "Marketing campaign updates", description: "Campaign completion and performance alerts", icon: Mail },
-  { key: "daily_summary_enabled", label: "Daily summary", description: "Brief daily recap of what your AI Employees completed", icon: TrendingUp },
-  { key: "weekly_summary_enabled", label: "Weekly summary", description: "Weekly overview of workspace activity", icon: TrendingUp },
-  { key: "billing_alerts_enabled", label: "Billing & account alerts", description: "Subscription changes and account notices", icon: CreditCard },
-  { key: "access_alerts_enabled", label: "Access alerts", description: "Login and security-related notifications", icon: Shield },
+  { key: "support_alerts_enabled", label: "Send support alerts to Slack", description: "When a support issue needs human attention", icon: Shield },
+  { key: "content_approvals_enabled", label: "Send content approval requests", description: "When social or email content is ready for review", icon: MessageSquare },
+  { key: "scheduling_alerts_enabled", label: "Send scheduling reminders", description: "Calendar reminders and booking notifications", icon: Calendar },
+  { key: "marketing_updates_enabled", label: "Send marketing campaign updates", description: "Campaign completion and performance alerts", icon: Mail },
+  { key: "daily_summary_enabled", label: "Send daily summary", description: "Brief daily recap of what your AI Employees completed", icon: TrendingUp },
+  { key: "weekly_summary_enabled", label: "Send weekly summary", description: "Weekly overview of workspace activity", icon: TrendingUp },
+  { key: "billing_alerts_enabled", label: "Send billing & account alerts", description: "Subscription changes and account notices", icon: CreditCard },
+  { key: "access_alerts_enabled", label: "Send access alerts", description: "Login and security-related notifications", icon: Shield },
 ] as const;
 
 const SlackSettingsPanel = () => {
   const {
-    settings, channels, isConnected, connecting, testingSend, loadingChannels,
+    settings, channels, isConnected, loading, connecting, testingSend, loadingChannels, savingSettings,
     connectSlack, disconnectSlack, sendTestMessage, fetchChannels,
     updateSettings, setDefaultChannel,
   } = useSlackIntegration();
 
   const [showChannels, setShowChannels] = useState(false);
+  const [testSuccess, setTestSuccess] = useState(false);
 
   useEffect(() => {
     if (isConnected && showChannels && channels.length === 0) {
       fetchChannels();
     }
   }, [isConnected, showChannels]);
+
+  const handleTestMessage = async () => {
+    await sendTestMessage();
+    setTestSuccess(true);
+    setTimeout(() => setTestSuccess(false), 3000);
+  };
+
+  if (loading) {
+    return (
+      <div className="rounded-xl border border-border/50 bg-card p-6 flex items-center justify-center">
+        <Loader2 size={16} className="animate-spin text-muted-foreground" />
+        <span className="ml-2 text-sm text-muted-foreground">Loading Slack status...</span>
+      </div>
+    );
+  }
 
   if (!isConnected) {
     return (
@@ -39,7 +55,7 @@ const SlackSettingsPanel = () => {
             <Slack size={22} className="text-[#E01E5A]" />
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-foreground">Connect Slack</h3>
+            <h3 className="text-sm font-semibold text-foreground">Enable Slack Notifications</h3>
             <p className="text-xs text-muted-foreground">Send workspace notifications directly to your Slack channels</p>
           </div>
         </div>
@@ -76,25 +92,25 @@ const SlackSettingsPanel = () => {
               </h3>
               <p className="text-xs text-muted-foreground">
                 {settings?.slack_team_name || "Workspace"}
-                {settings?.default_channel_name && <span className="ml-1">· Default: {settings.default_channel_name}</span>}
+                {settings?.default_channel_name && <span className="ml-1">· Sending to {settings.default_channel_name}</span>}
               </p>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <button
-              onClick={() => sendTestMessage()}
+              onClick={handleTestMessage}
               disabled={testingSend}
-              className="flex items-center gap-1.5 rounded-lg bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary hover:bg-primary/20 transition-colors"
+              className="flex items-center gap-1.5 rounded-lg bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary hover:bg-primary/20 transition-colors disabled:opacity-50"
             >
-              {testingSend ? <Loader2 size={12} className="animate-spin" /> : <Send size={12} />}
-              Test Message
+              {testingSend ? <Loader2 size={12} className="animate-spin" /> : testSuccess ? <Check size={12} className="text-emerald-400" /> : <Send size={12} />}
+              {testingSend ? "Sending..." : testSuccess ? "Sent!" : "Test Message"}
             </button>
             <button
               onClick={disconnectSlack}
               disabled={connecting}
-              className="rounded-lg border border-border px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+              className="rounded-lg border border-border px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground hover:border-destructive/50 transition-colors disabled:opacity-50"
             >
-              Disconnect
+              {connecting ? "..." : "Disconnect"}
             </button>
           </div>
         </div>
@@ -105,11 +121,12 @@ const SlackSettingsPanel = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Hash size={14} className="text-primary" />
-            <h4 className="text-sm font-semibold text-foreground">Default Channel</h4>
+            <h4 className="text-sm font-semibold text-foreground">Choose where VANTORY sends Slack updates</h4>
           </div>
           <button
             onClick={() => { setShowChannels(!showChannels); if (!showChannels) fetchChannels(); }}
-            className="flex items-center gap-1 text-xs text-primary hover:underline"
+            disabled={loadingChannels}
+            className="flex items-center gap-1 text-xs text-primary hover:underline disabled:opacity-50"
           >
             {showChannels ? "Hide" : "Change"} <ChevronDown size={12} className={`transition-transform ${showChannels ? "rotate-180" : ""}`} />
           </button>
@@ -120,9 +137,15 @@ const SlackSettingsPanel = () => {
         {showChannels && (
           <div className="max-h-48 overflow-y-auto space-y-1 rounded-lg border border-border/50 bg-secondary/30 p-2">
             {loadingChannels ? (
-              <div className="flex items-center justify-center py-4"><Loader2 size={16} className="animate-spin text-primary" /></div>
+              <div className="flex items-center justify-center py-4">
+                <Loader2 size={16} className="animate-spin text-primary" />
+                <span className="ml-2 text-xs text-muted-foreground">Loading channels...</span>
+              </div>
             ) : channels.length === 0 ? (
-              <p className="text-xs text-muted-foreground text-center py-3">No channels found</p>
+              <div className="text-center py-3 space-y-1">
+                <AlertCircle size={16} className="mx-auto text-muted-foreground" />
+                <p className="text-xs text-muted-foreground">No public channels found. Make sure the bot has access.</p>
+              </div>
             ) : (
               channels.map((ch) => (
                 <button
@@ -144,7 +167,7 @@ const SlackSettingsPanel = () => {
         )}
       </div>
 
-      {/* Notifications master toggle */}
+      {/* Notifications */}
       <div className="rounded-xl border border-border/50 bg-card p-5 space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -156,11 +179,18 @@ const SlackSettingsPanel = () => {
               type="checkbox"
               checked={settings?.notifications_enabled ?? true}
               onChange={(e) => updateSettings({ notifications_enabled: e.target.checked })}
+              disabled={savingSettings}
               className="sr-only peer"
             />
             <div className="w-9 h-5 bg-secondary rounded-full peer peer-checked:bg-primary transition-colors after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-background after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-4" />
           </label>
         </div>
+
+        {!settings?.notifications_enabled && (
+          <p className="text-xs text-muted-foreground bg-secondary/50 rounded-lg px-3 py-2">
+            All Slack notifications are paused. Enable to start receiving updates.
+          </p>
+        )}
 
         {settings?.notifications_enabled && (
           <div className="space-y-2">
@@ -178,6 +208,7 @@ const SlackSettingsPanel = () => {
                     type="checkbox"
                     checked={(settings as any)?.[key] ?? false}
                     onChange={(e) => updateSettings({ [key]: e.target.checked } as any)}
+                    disabled={savingSettings}
                     className="sr-only peer"
                   />
                   <div className="w-8 h-4 bg-secondary rounded-full peer peer-checked:bg-primary transition-colors after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-background after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:after:translate-x-4" />
