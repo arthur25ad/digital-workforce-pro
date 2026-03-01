@@ -5,6 +5,7 @@ import CapabilitiesGrid from "@/components/CapabilitiesGrid";
 import HowItWorks from "@/components/HowItWorks";
 import DashboardPreview from "@/components/DashboardPreview";
 import IndustriesSection from "@/components/IndustriesSection";
+import EcommerceCallout from "@/components/EcommerceCallout";
 import ComparisonSection from "@/components/ComparisonSection";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import PricingSection from "@/components/PricingSection";
@@ -26,6 +27,7 @@ const Index = () => {
       <CapabilitiesGrid />
       <AITeamSection />
       <IndustriesSection />
+      <EcommerceCallout />
       <ComparisonSection />
       <TestimonialsSection />
       <PricingSection />

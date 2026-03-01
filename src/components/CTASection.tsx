@@ -14,7 +14,10 @@ const CTASection = () => {
             Build Your AI Team Today
           </h2>
           <p className="mx-auto mt-4 md:mt-5 max-w-lg text-base md:text-lg text-muted-foreground">
-            Stop doing repetitive work manually. Put a digital team in place that works around the clock.
+            Whether you run a Shopify store, a service business, or a growing brand — put a digital team in place that works around the clock.
+          </p>
+          <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground/60">
+            Designed for e-commerce brands, local businesses, agencies, clinics, and more.
           </p>
           <div className="mt-6 md:mt-8 flex flex-wrap justify-center gap-3 md:gap-4">
             <Link to="/get-started" className="btn-glow">Hire Your AI Team</Link>

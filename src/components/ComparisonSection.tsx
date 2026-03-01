@@ -30,6 +30,9 @@ const ComparisonSection = () => {
           <h2 className="font-display text-2xl font-bold text-foreground md:text-4xl">
             Grow Without Adding Immediate Payroll
           </h2>
+          <p className="mx-auto mt-3 max-w-xl text-sm text-muted-foreground">
+            Whether you're scaling an online store or a service business — VANTORY gives you the output of a full team without the overhead.
+          </p>
         </motion.div>
 
         <div className="grid gap-4 md:gap-6 md:grid-cols-2">
