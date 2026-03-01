@@ -34,7 +34,7 @@ const LogoCarousel = () => {
         <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-background to-transparent md:w-32" />
         <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-background to-transparent md:w-32" />
 
-        <div className="flex w-max animate-[logo-scroll_50s_linear_infinite] hover:[animation-play-state:paused]">
+        <div className="flex w-max animate-[logo-scroll_25s_linear_infinite] hover:[animation-play-state:paused]">
           {allBrands.map((brand, i) => (
             <div
               key={`${brand.name}-${i}`}
