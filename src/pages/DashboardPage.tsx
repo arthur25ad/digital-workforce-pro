@@ -341,11 +341,11 @@ const DashboardPage = () => {
                     <Workflow size={16} className={n8nConnected ? "text-primary" : "text-muted-foreground"} />
                   </div>
                   <div>
-                    <span className="font-display text-sm font-semibold text-foreground">Automate Repetitive Tasks</span>
+                    <span className="font-display text-sm font-semibold text-foreground">Automatic Follow-Up</span>
                     <p className="text-[11px] text-muted-foreground">
                       {n8nConnected
-                        ? "Connected — automatically handling follow-up for you"
-                        : "Save time by letting VANTORY handle the next step automatically"}
+                        ? "Connected — handling follow-up for you"
+                        : "Leads, forms, support — the next step starts automatically"}
                     </p>
                   </div>
                 </div>
