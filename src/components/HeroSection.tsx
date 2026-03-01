@@ -40,7 +40,7 @@ const HeroSection = () => {
               AI Employees That Work While You Sleep
             </h1>
             <p className="mx-auto mt-3 md:mt-6 max-w-2xl text-sm md:text-base leading-relaxed text-muted-foreground xl:text-lg lg:mx-0">
-              AI employees that handle support, email, social media, and admin for e-commerce brands, Shopify stores, and service businesses — <span className="font-display font-bold text-primary drop-shadow-[0_0_12px_hsl(var(--primary)/0.6)]">24/7</span>
+              AI employees that handle support, email, social media, and admin for e-commerce brands, Shopify stores, and service businesses — connect your store and let them work <span className="font-display font-bold text-primary drop-shadow-[0_0_12px_hsl(var(--primary)/0.6)]">24/7</span>
             </p>
 
             {/* Industry tags */}
