@@ -1,83 +1,54 @@
 import { motion } from "framer-motion";
-import {
-  SiOpenai,
-  SiGoogle,
-  SiShopify,
-  SiSlack,
-  SiStripe,
-  SiSupabase,
-  SiMeta,
-  SiLinkedin,
-  SiNotion,
-  SiInstagram,
-  SiWhatsapp,
-  SiTiktok,
-  SiYoutube,
-  SiZoom,
-  SiX,
-  SiHubspot,
-  SiGmail,
-} from "react-icons/si";
-import { Heart } from "lucide-react";
 
 const brands = [
-  { name: "OpenAI", Icon: SiOpenai },
-  { name: "Google", Icon: SiGoogle },
-  { name: "Stripe", Icon: SiStripe },
-  { name: "Slack", Icon: SiSlack },
-  { name: "Shopify", Icon: SiShopify },
-  { name: "Supabase", Icon: SiSupabase },
-  { name: "Meta", Icon: SiMeta },
-  { name: "LinkedIn", Icon: SiLinkedin },
-  { name: "Gmail", Icon: SiGmail },
-  { name: "Notion", Icon: SiNotion },
-  { name: "Lovable", Icon: Heart },
-  { name: "HubSpot", Icon: SiHubspot },
-  { name: "Instagram", Icon: SiInstagram },
-  { name: "YouTube", Icon: SiYoutube },
-  { name: "WhatsApp", Icon: SiWhatsapp },
-  { name: "TikTok", Icon: SiTiktok },
-  { name: "Zoom", Icon: SiZoom },
-  { name: "X", Icon: SiX },
+  { name: "OpenAI", src: "/brand-logos/openai.svg", logoClass: "h-7 md:h-9" },
+  { name: "Google", src: "/brand-logos/google.svg", logoClass: "h-7 md:h-9" },
+  { name: "Stripe", src: "/brand-logos/stripe.svg", logoClass: "h-7 md:h-9" },
+  { name: "Slack", src: "/brand-logos/slack.svg", logoClass: "h-7 md:h-9" },
+  { name: "Shopify", src: "/brand-logos/shopify.svg", logoClass: "h-7 md:h-9" },
+  { name: "Supabase", src: "/brand-logos/supabase.svg", logoClass: "h-7 md:h-9" },
+  { name: "Meta", src: "/brand-logos/meta.png", logoClass: "h-6 md:h-8" },
+  { name: "LinkedIn", src: "/brand-logos/linkedin.svg", logoClass: "h-7 md:h-9" },
+  { name: "Gmail", src: "/brand-logos/gmail.svg", logoClass: "h-7 md:h-9" },
+  { name: "Zoom", src: "/brand-logos/zoom.svg", logoClass: "h-7 md:h-9" },
+  { name: "X", src: "/brand-logos/x.svg", logoClass: "h-7 md:h-9" },
+  { name: "HubSpot", src: "/brand-logos/hubspot.svg", logoClass: "h-7 md:h-9" },
 ];
 
 const LogoCarousel = () => {
-  // Duplicate for seamless loop
   const allBrands = [...brands, ...brands];
 
   return (
-    <section className="relative py-12 md:py-16 overflow-hidden">
-      {/* Heading */}
+    <section className="relative overflow-hidden py-12 md:py-16">
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.6 }}
-        className="text-center mb-10 md:mb-12 px-4"
+        className="mb-10 px-4 text-center md:mb-12"
       >
-        <h2 className="font-display text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight gradient-text mb-3">
+        <h2 className="gradient-text font-display text-2xl font-bold tracking-tight md:text-3xl lg:text-4xl">
           Integrated with industry leaders
         </h2>
       </motion.div>
 
-      {/* Carousel wrapper */}
       <div className="relative">
-        {/* Edge fades */}
-        <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 md:w-32 bg-gradient-to-r from-background to-transparent" />
-        <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 md:w-32 bg-gradient-to-l from-background to-transparent" />
+        <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-background to-transparent md:w-32" />
+        <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-background to-transparent md:w-32" />
 
-        {/* Scrolling track */}
         <div className="flex w-max animate-[logo-scroll_50s_linear_infinite] hover:[animation-play-state:paused]">
           {allBrands.map((brand, i) => (
             <div
               key={`${brand.name}-${i}`}
-              className="group flex items-center justify-center gap-2.5 px-7 md:px-11 shrink-0"
-              title={brand.name}
+              className="group flex h-16 shrink-0 items-center justify-center px-8 md:h-20 md:px-12"
             >
-              <brand.Icon className="h-8 w-8 md:h-10 md:w-10 text-muted-foreground/40 transition-all duration-300 group-hover:text-foreground/70 group-hover:scale-110" />
-              <span className="text-sm md:text-base font-semibold tracking-tight text-muted-foreground/40 transition-colors duration-300 group-hover:text-foreground/70 whitespace-nowrap">
-                {brand.name}
-              </span>
+              <img
+                src={brand.src}
+                alt={`${brand.name} logo`}
+                loading="lazy"
+                decoding="async"
+                className={`w-auto ${brand.logoClass} opacity-35 grayscale brightness-0 invert transition-all duration-300 group-hover:scale-[1.03] group-hover:opacity-80`}
+              />
             </div>
           ))}
         </div>
@@ -87,3 +58,4 @@ const LogoCarousel = () => {
 };
 
 export default LogoCarousel;
+
