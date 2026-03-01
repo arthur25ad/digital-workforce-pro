@@ -185,6 +185,49 @@ const DashboardPage = () => {
             </p>
           </motion.div>
 
+          {/* ── Slack Integration ── */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.08 }}
+            className="mb-6 md:mb-8"
+          >
+            <div className="overflow-hidden rounded-2xl border border-border/40 bg-card/60 backdrop-blur-sm">
+              <button
+                onClick={() => setShowSlackSettings(!showSlackSettings)}
+                className="flex w-full items-center justify-between px-6 py-4 text-left transition-colors hover:bg-secondary/20"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#4A154B]/20">
+                    <Slack size={16} className={slackConnected ? "text-[#E01E5A]" : "text-muted-foreground"} />
+                  </div>
+                  <div>
+                    <span className="font-display text-sm font-semibold text-foreground">Workspace Slack Integration</span>
+                    <p className="text-[11px] text-muted-foreground">
+                      {slackConnected
+                        ? "Connected — your AI Employees send updates here"
+                        : "Connect once, all AI Employees can send updates"}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  {slackConnected && (
+                    <span className="flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-400">
+                      <CheckCircle2 size={10} /> Active
+                    </span>
+                  )}
+                  <ArrowRight size={14} className={`text-muted-foreground transition-transform ${showSlackSettings ? "rotate-90" : ""}`} />
+                </div>
+              </button>
+
+              {showSlackSettings && (
+                <div className="border-t border-border/30 p-6">
+                  <SlackSettingsPanel />
+                </div>
+              )}
+            </div>
+          </motion.div>
+
           {/* ── Role stat cards (like the landing page preview) ── */}
           <div className="mb-6 md:mb-8 grid grid-cols-2 gap-3 md:gap-4 md:grid-cols-4 md:gap-5">
             {roleConfig.map((role, i) => {
@@ -372,48 +415,6 @@ const DashboardPage = () => {
             </div>
           </div>
 
-          {/* ── Slack Integration ── */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.25 }}
-            className="mb-8 md:mb-12"
-          >
-            <div className="overflow-hidden rounded-2xl border border-border/40 bg-card/60 backdrop-blur-sm">
-              <button
-                onClick={() => setShowSlackSettings(!showSlackSettings)}
-                className="flex w-full items-center justify-between border-b border-border/30 px-6 py-4 text-left transition-colors hover:bg-secondary/20"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#4A154B]/20">
-                    <Slack size={16} className={slackConnected ? "text-[#E01E5A]" : "text-muted-foreground"} />
-                  </div>
-                  <div>
-                    <span className="font-display text-sm font-semibold text-foreground">Workspace Slack Integration</span>
-                    <p className="text-[11px] text-muted-foreground">
-                      {slackConnected
-                        ? "Connected — your AI Employees send updates here"
-                        : "Connect once, all AI Employees can send updates"}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  {slackConnected && (
-                    <span className="flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-400">
-                      <CheckCircle2 size={10} /> Active
-                    </span>
-                  )}
-                  <ArrowRight size={14} className={`text-muted-foreground transition-transform ${showSlackSettings ? "rotate-90" : ""}`} />
-                </div>
-              </button>
-
-              {showSlackSettings && (
-                <div className="p-6">
-                  <SlackSettingsPanel />
-                </div>
-              )}
-            </div>
-          </motion.div>
 
           {/* ── Ask VANTABRAIN ── */}
           <motion.div
