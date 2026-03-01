@@ -884,6 +884,84 @@ export type Database = {
           },
         ]
       }
+      n8n_workspace_settings: {
+        Row: {
+          created_at: string
+          enable_form_automations: boolean
+          enable_lead_automations: boolean
+          enable_support_automations: boolean
+          enable_task_automations: boolean
+          id: string
+          instance_url: string
+          last_triggered_at: string | null
+          platform_connection_id: string | null
+          total_triggers: number
+          updated_at: string
+          webhook_secret: string | null
+          webhook_url_forms: string | null
+          webhook_url_general: string | null
+          webhook_url_leads: string | null
+          webhook_url_support: string | null
+          webhook_url_tasks: string | null
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          enable_form_automations?: boolean
+          enable_lead_automations?: boolean
+          enable_support_automations?: boolean
+          enable_task_automations?: boolean
+          id?: string
+          instance_url?: string
+          last_triggered_at?: string | null
+          platform_connection_id?: string | null
+          total_triggers?: number
+          updated_at?: string
+          webhook_secret?: string | null
+          webhook_url_forms?: string | null
+          webhook_url_general?: string | null
+          webhook_url_leads?: string | null
+          webhook_url_support?: string | null
+          webhook_url_tasks?: string | null
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          enable_form_automations?: boolean
+          enable_lead_automations?: boolean
+          enable_support_automations?: boolean
+          enable_task_automations?: boolean
+          id?: string
+          instance_url?: string
+          last_triggered_at?: string | null
+          platform_connection_id?: string | null
+          total_triggers?: number
+          updated_at?: string
+          webhook_secret?: string | null
+          webhook_url_forms?: string | null
+          webhook_url_general?: string | null
+          webhook_url_leads?: string | null
+          webhook_url_support?: string | null
+          webhook_url_tasks?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "n8n_workspace_settings_platform_connection_id_fkey"
+            columns: ["platform_connection_id"]
+            isOneToOne: false
+            referencedRelation: "platform_connections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "n8n_workspace_settings_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: true
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       platform_connections: {
         Row: {
           account_name: string | null
