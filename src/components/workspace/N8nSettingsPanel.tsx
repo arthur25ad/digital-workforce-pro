@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useN8n } from "@/hooks/useN8n";
 import {
   Brain, Unplug, PlayCircle, Users, Headphones, FileText, ListChecks,
@@ -28,6 +28,7 @@ const N8nSettingsPanel = () => {
     connect, disconnect, testWebhook, updateSettings,
   } = useN8n();
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const advancedRef = useRef<HTMLDivElement>(null);
   const [showGuide, setShowGuide] = useState(false);
   const [webhookUrl, setWebhookUrl] = useState("");
   const [connecting, setConnecting] = useState(false);
@@ -90,7 +91,10 @@ const N8nSettingsPanel = () => {
             </p>
           </div>
           <button
-            onClick={() => setShowAdvanced(true)}
+            onClick={() => {
+              setShowAdvanced(true);
+              setTimeout(() => advancedRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
+            }}
             className="btn-glow !px-4 !py-2 text-xs shrink-0"
           >
             Enable
@@ -196,7 +200,7 @@ const N8nSettingsPanel = () => {
       )}
 
       {/* ── Advanced Admin Setup ── */}
-      <div className="border-t border-border/20 pt-4">
+      <div ref={advancedRef} className="border-t border-border/20 pt-4">
         <button
           onClick={() => setShowAdvanced(!showAdvanced)}
           className="flex items-center gap-1.5 text-[11px] text-muted-foreground/40 hover:text-muted-foreground transition-colors"
