@@ -9,8 +9,9 @@ import {
   Lightbulb, Clock, Shield, Database,
   Activity, Network, BarChart3, Layers, ArrowRight,
   Globe, Lock, Cpu, Mail, MessageSquare,
-  Users, Plug, Settings, History, AlertCircle,
+  Users, Plug, Settings, History, AlertCircle, Zap,
 } from "lucide-react";
+import N8nSettingsPanel from "@/components/workspace/N8nSettingsPanel";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -348,6 +349,17 @@ const AuthenticatedView = ({ initialQuestion }: { initialQuestion?: string }) =>
         <div className="mx-auto max-w-[1400px]">
           <motion.div {...fadeUp} transition={{ delay: 0.1 }}>
             <VantaBrainAssistant initialQuestion={initialQuestion} variant="flagship" />
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ── Automatic Next Steps ── */}
+      <section className="px-6 pb-6 md:px-12 lg:px-16">
+        <div className="mx-auto max-w-[1400px]">
+          <motion.div {...fadeUp} transition={{ delay: 0.12 }}>
+            <div className="rounded-2xl border border-border/40 bg-card p-5 md:p-6">
+              <N8nSettingsPanel />
+            </div>
           </motion.div>
         </div>
       </section>
