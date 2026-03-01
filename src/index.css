@@ -163,3 +163,12 @@
     background-position: -200% 0;
   }
 }
+
+@keyframes logo-scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}

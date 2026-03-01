@@ -12,12 +12,14 @@ import FAQSection from "@/components/FAQSection";
 import CTASection from "@/components/CTASection";
 import Footer from "@/components/Footer";
 import BrandDivider from "@/components/BrandDivider";
+import LogoCarousel from "@/components/LogoCarousel";
 
 const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
       <HeroSection />
+      <LogoCarousel />
       <BrandDivider />
       <DashboardPreview />
       <HowItWorks />
