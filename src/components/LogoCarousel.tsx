@@ -8,8 +8,6 @@ const brands = [
   { name: "Shopify", src: "/brand-logos/shopify.svg", logoClass: "h-7 md:h-9" },
   { name: "Supabase", src: "/brand-logos/supabase.svg", logoClass: "h-7 md:h-9" },
   { name: "Meta", src: "/brand-logos/meta.png", logoClass: "h-6 md:h-8" },
-  { name: "LinkedIn", src: "/brand-logos/linkedin.png", logoClass: "h-7 md:h-9" },
-  { name: "Gmail", src: "/brand-logos/gmail.svg", logoClass: "h-7 md:h-9" },
   { name: "Zoom", src: "/brand-logos/zoom.svg", logoClass: "h-7 md:h-9" },
   { name: "X", src: "/brand-logos/x.svg", logoClass: "h-7 md:h-9" },
   { name: "HubSpot", src: "/brand-logos/hubspot.svg", logoClass: "h-7 md:h-9" },
