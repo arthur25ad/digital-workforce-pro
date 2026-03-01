@@ -71,10 +71,11 @@ const LogoCarousel = () => {
           {allBrands.map((brand, i) => (
             <div
               key={`${brand.name}-${i}`}
-              className="group flex flex-col items-center justify-center gap-2 px-6 md:px-10 shrink-0"
+              className="group flex items-center justify-center gap-2.5 px-7 md:px-11 shrink-0"
+              title={brand.name}
             >
-              <brand.Icon className="h-7 w-7 md:h-8 md:w-8 text-muted-foreground/50 transition-all duration-300 group-hover:text-foreground/80 group-hover:scale-110" />
-              <span className="text-[11px] md:text-xs font-medium tracking-wide text-muted-foreground/40 transition-colors duration-300 group-hover:text-muted-foreground/70">
+              <brand.Icon className="h-8 w-8 md:h-10 md:w-10 text-muted-foreground/40 transition-all duration-300 group-hover:text-foreground/70 group-hover:scale-110" />
+              <span className="text-sm md:text-base font-semibold tracking-tight text-muted-foreground/40 transition-colors duration-300 group-hover:text-foreground/70 whitespace-nowrap">
                 {brand.name}
               </span>
             </div>
