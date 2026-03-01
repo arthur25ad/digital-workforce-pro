@@ -94,7 +94,23 @@ const DashboardPage = () => {
   const { syncSubscription } = useSubscriptionSync();
   const { isConnected: slackConnected } = useSlackIntegration();
   const [askInput, setAskInput] = useState("");
-  const [showSlackSettings, setShowSlackSettings] = useState(false);
+  const [showSlackSettings, setShowSlackSettings] = useState(() => {
+    const stored = localStorage.getItem("vantory_slack_panel_closed");
+    // Open by default if user has never explicitly closed it
+    return stored !== "true";
+  });
+
+  const toggleSlackSettings = () => {
+    setShowSlackSettings((prev) => {
+      const next = !prev;
+      if (!next) {
+        localStorage.setItem("vantory_slack_panel_closed", "true");
+      } else {
+        localStorage.removeItem("vantory_slack_panel_closed");
+      }
+      return next;
+    });
+  };
   const [checkoutSyncing, setCheckoutSyncing] = useState(() => searchParams.get("checkout") === "success");
 
   // Sync subscription after checkout or on first load
@@ -194,7 +210,7 @@ const DashboardPage = () => {
           >
             <div className="overflow-hidden rounded-2xl border border-border/40 bg-card/60 backdrop-blur-sm">
               <button
-                onClick={() => setShowSlackSettings(!showSlackSettings)}
+                onClick={toggleSlackSettings}
                 className="flex w-full items-center justify-between px-6 py-4 text-left transition-colors hover:bg-secondary/20"
               >
                 <div className="flex items-center gap-3">
