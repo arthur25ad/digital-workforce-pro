@@ -56,7 +56,7 @@ const LogoCarousel = () => {
         className="text-center mb-10 md:mb-12 px-4"
       >
         <h2 className="font-display text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight gradient-text mb-3">
-          Powered by industry leaders
+          Integrated with industry leaders
         </h2>
         <p className="text-muted-foreground text-sm md:text-base max-w-md mx-auto">
           Built on the modern business stack
