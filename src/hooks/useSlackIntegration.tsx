@@ -2,29 +2,9 @@ import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 import { toast } from "@/hooks/use-toast";
+import type { Tables } from "@/integrations/supabase/types";
 
-export interface SlackSettings {
-  id: string;
-  workspace_id: string;
-  slack_team_id: string | null;
-  slack_team_name: string | null;
-  slack_bot_user_id: string | null;
-  slack_workspace_name: string | null;
-  default_channel_id: string | null;
-  default_channel_name: string | null;
-  notifications_enabled: boolean;
-  daily_summary_enabled: boolean;
-  weekly_summary_enabled: boolean;
-  support_alerts_enabled: boolean;
-  content_approvals_enabled: boolean;
-  marketing_updates_enabled: boolean;
-  scheduling_alerts_enabled: boolean;
-  billing_alerts_enabled: boolean;
-  access_alerts_enabled: boolean;
-  last_test_sent_at: string | null;
-  created_at: string;
-  updated_at: string;
-}
+export type SlackSettings = Tables<"slack_workspace_settings">;
 
 export interface SlackChannel {
   id: string;
@@ -38,35 +18,44 @@ export const useSlackIntegration = () => {
   const [settings, setSettings] = useState<SlackSettings | null>(null);
   const [channels, setChannels] = useState<SlackChannel[]>([]);
   const [isConnected, setIsConnected] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [connecting, setConnecting] = useState(false);
   const [testingSend, setTestingSend] = useState(false);
   const [loadingChannels, setLoadingChannels] = useState(false);
+  const [savingSettings, setSavingSettings] = useState(false);
 
   const workspaceId = workspace?.id;
 
   const fetchSlackStatus = useCallback(async () => {
-    if (!workspaceId) return;
-    // Check platform_connections for Slack
-    const { data: conn } = await supabase
-      .from("platform_connections")
-      .select("*")
-      .eq("workspace_id", workspaceId)
-      .eq("platform", "Slack")
-      .single();
-
-    const connected = conn?.connected === true;
-    setIsConnected(connected);
-
-    if (connected) {
-      const { data: slackSettings } = await supabase
-        .from("slack_workspace_settings" as any)
+    if (!workspaceId) { setLoading(false); return; }
+    setLoading(true);
+    try {
+      const { data: conn } = await supabase
+        .from("platform_connections")
         .select("*")
         .eq("workspace_id", workspaceId)
+        .eq("platform", "Slack")
         .single();
-      if (slackSettings) setSettings(slackSettings as unknown as SlackSettings);
-    } else {
+
+      const connected = conn?.connected === true;
+      setIsConnected(connected);
+
+      if (connected) {
+        const { data: slackSettings } = await supabase
+          .from("slack_workspace_settings")
+          .select("*")
+          .eq("workspace_id", workspaceId)
+          .single();
+        setSettings(slackSettings ?? null);
+      } else {
+        setSettings(null);
+      }
+    } catch {
+      // Table may not exist yet or no data
+      setIsConnected(false);
       setSettings(null);
+    } finally {
+      setLoading(false);
     }
   }, [workspaceId]);
 
@@ -133,8 +122,18 @@ export const useSlackIntegration = () => {
     }
   };
 
-  const sendNotification = async (text: string, channel?: string) => {
-    if (!workspaceId || !session?.access_token || !isConnected) return false;
+  const sendNotification = async (text: string, notificationType?: string, channel?: string): Promise<boolean> => {
+    if (!workspaceId || !session?.access_token || !isConnected || !settings) return false;
+
+    // Check if notifications are enabled globally
+    if (!settings.notifications_enabled) return false;
+
+    // Check if the specific notification type is enabled
+    if (notificationType) {
+      const toggleKey = `${notificationType}_enabled` as keyof SlackSettings;
+      if (settings[toggleKey] === false) return false;
+    }
+
     try {
       const { data, error } = await supabase.functions.invoke("slack-send", {
         body: { action: "send_message", workspaceId, text, channel },
@@ -166,19 +165,25 @@ export const useSlackIntegration = () => {
 
   const updateSettings = async (updates: Partial<SlackSettings>) => {
     if (!workspaceId || !settings) return;
-    const { error } = await supabase
-      .from("slack_workspace_settings" as any)
-      .update(updates as any)
-      .eq("workspace_id", workspaceId);
-    if (!error) {
+    setSavingSettings(true);
+    try {
+      const { error } = await supabase
+        .from("slack_workspace_settings")
+        .update(updates)
+        .eq("workspace_id", workspaceId);
+      if (error) throw error;
+
       setSettings({ ...settings, ...updates } as SlackSettings);
-      // Log activity
       await supabase.from("activity_logs").insert({
         workspace_id: workspaceId,
         type: "slack_settings_updated",
         message: "Updated Slack notification settings",
       });
       toast({ title: "Slack settings saved" });
+    } catch (err: any) {
+      toast({ title: "Failed to save settings", description: err.message, variant: "destructive" });
+    } finally {
+      setSavingSettings(false);
     }
   };
 
@@ -186,6 +191,11 @@ export const useSlackIntegration = () => {
     await updateSettings({
       default_channel_id: channelId,
       default_channel_name: channelName,
+    });
+    await supabase.from("activity_logs").insert({
+      workspace_id: workspaceId!,
+      type: "slack_channel_changed",
+      message: `Changed default Slack channel to ${channelName}`,
     });
   };
 
@@ -197,6 +207,7 @@ export const useSlackIntegration = () => {
     connecting,
     testingSend,
     loadingChannels,
+    savingSettings,
     connectSlack,
     disconnectSlack,
     sendTestMessage,

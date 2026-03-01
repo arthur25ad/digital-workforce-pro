@@ -6,6 +6,7 @@ import { useWorkspaceData, SocialDraft } from "@/hooks/useWorkspaceData";
 
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { useSlackNotifications } from "@/hooks/useSlackNotifications";
 import WorkspaceShell from "@/components/workspace/WorkspaceShell";
 import WorkspaceSection from "@/components/workspace/WorkspaceSection";
 import FormFieldGroup from "@/components/workspace/FormFieldGroup";
@@ -33,6 +34,7 @@ const SocialMediaDemo = () => {
   
   const { recordInteraction } = useVantaBrainActions();
   const { suggestions: brainSuggestions, loading: suggestionsLoading, sendFeedback } = useVantaBrainSuggestions("social-media-manager");
+  const { notifyContentReady } = useSlackNotifications();
   const [activeTab, setActiveTab] = useState(0);
   const [generating, setGenerating] = useState(false);
   const [ideas, setIdeas] = useState<GeneratedIdea[]>([]);
@@ -94,7 +96,11 @@ const SocialMediaDemo = () => {
   const handleDraftFromIdea = async (idea: GeneratedIdea, index: number) => {
     if (!workspace) return;
     const draft = await addDraft({ workspace_id: workspace.id, platform: idea.platform, idea_title: idea.ideaTitle, hook: idea.hook, caption: idea.caption, cta: idea.cta, format: idea.format, status: "draft", scheduled_date: null });
-    if (draft) { setIdeas(prev => prev.map((p, i) => (i === index ? { ...p, drafted: true } : p))); toast({ title: "Draft created" }); }
+    if (draft) {
+      setIdeas(prev => prev.map((p, i) => (i === index ? { ...p, drafted: true } : p)));
+      toast({ title: "Draft created" });
+      notifyContentReady(idea.ideaTitle, idea.platform);
+    }
   };
 
   const scheduledDrafts = drafts.filter(d => d.status === "scheduled" && d.scheduled_date);
