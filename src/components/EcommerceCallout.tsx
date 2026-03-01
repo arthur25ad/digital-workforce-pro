@@ -35,7 +35,7 @@ const EcommerceCallout = () => (
               Brands
             </h3>
             <p className="mt-4 max-w-lg text-sm leading-relaxed text-muted-foreground md:text-base">
-              Whether you run a Shopify store, a DTC brand, or a growing online business — VANTORY gives you an AI workforce that handles support, content, campaigns, and customer follow-up so you can focus on growth.
+              Whether you run a Shopify store, a DTC brand, or a growing online business — connect your store and let VANTORY's AI workforce handle support, content, campaigns, and customer follow-up with real product context.
             </p>
             <Link
               to="/industries"

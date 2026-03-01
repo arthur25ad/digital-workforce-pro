@@ -9,7 +9,9 @@ import { useVirtualAssistantData } from "@/hooks/useVirtualAssistantData";
 import { useVantaBrainStats } from "@/hooks/useVantaBrain";
 import { useSubscriptionSync } from "@/hooks/useSubscriptionSync";
 import { useSlackIntegration } from "@/hooks/useSlackIntegration";
+import { useShopify } from "@/hooks/useShopify";
 import SlackSettingsPanel from "@/components/workspace/SlackSettingsPanel";
+import ShopifySettingsPanel from "@/components/workspace/ShopifySettingsPanel";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
@@ -17,7 +19,7 @@ import { packageNeedsRoleSelection } from "@/lib/packages";
 import {
   Share2, Headphones, Mail, CalendarCheck, Lock,
   ArrowRight, Sparkles, CheckCircle2, Brain,
-  MessageSquare, Zap, Search, TrendingUp, BarChart3, Clock4, Slack,
+  MessageSquare, Zap, Search, TrendingUp, BarChart3, Clock4, Slack, ShoppingBag,
 } from "lucide-react";
 
 const roleColors = {
@@ -93,10 +95,14 @@ const DashboardPage = () => {
   const { stats: brainStats } = useVantaBrainStats();
   const { syncSubscription } = useSubscriptionSync();
   const { isConnected: slackConnected } = useSlackIntegration();
+  const { isConnected: shopifyConnected } = useShopify();
   const [askInput, setAskInput] = useState("");
   const [showSlackSettings, setShowSlackSettings] = useState(() => {
     const stored = localStorage.getItem("vantory_slack_panel_closed");
-    // Open by default if user has never explicitly closed it
+    return stored !== "true";
+  });
+  const [showShopifySettings, setShowShopifySettings] = useState(() => {
+    const stored = localStorage.getItem("vantory_shopify_panel_closed");
     return stored !== "true";
   });
 
@@ -107,6 +113,18 @@ const DashboardPage = () => {
         localStorage.setItem("vantory_slack_panel_closed", "true");
       } else {
         localStorage.removeItem("vantory_slack_panel_closed");
+      }
+      return next;
+    });
+  };
+
+  const toggleShopifySettings = () => {
+    setShowShopifySettings((prev) => {
+      const next = !prev;
+      if (!next) {
+        localStorage.setItem("vantory_shopify_panel_closed", "true");
+      } else {
+        localStorage.removeItem("vantory_shopify_panel_closed");
       }
       return next;
     });
@@ -244,7 +262,49 @@ const DashboardPage = () => {
             </div>
           </motion.div>
 
-          {/* ── Role stat cards (like the landing page preview) ── */}
+          {/* ── Shopify Integration ── */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.12 }}
+            className="mb-6 md:mb-8"
+          >
+            <div className="overflow-hidden rounded-2xl border border-border/40 bg-card/60 backdrop-blur-sm">
+              <button
+                onClick={toggleShopifySettings}
+                className="flex w-full items-center justify-between px-6 py-4 text-left transition-colors hover:bg-secondary/20"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#96bf48]/20">
+                    <ShoppingBag size={16} className={shopifyConnected ? "text-[#96bf48]" : "text-muted-foreground"} />
+                  </div>
+                  <div>
+                    <span className="font-display text-sm font-semibold text-foreground">Shopify Integration</span>
+                    <p className="text-[11px] text-muted-foreground">
+                      {shopifyConnected
+                        ? "Connected — store data powers your AI workforce"
+                        : "Connect your Shopify store to enhance AI context"}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  {shopifyConnected && (
+                    <span className="flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-400">
+                      <CheckCircle2 size={10} /> Active
+                    </span>
+                  )}
+                  <ArrowRight size={14} className={`text-muted-foreground transition-transform ${showShopifySettings ? "rotate-90" : ""}`} />
+                </div>
+              </button>
+
+              {showShopifySettings && (
+                <div className="border-t border-border/30 p-6">
+                  <ShopifySettingsPanel />
+                </div>
+              )}
+            </div>
+          </motion.div>
+
           <div className="mb-6 md:mb-8 grid grid-cols-2 gap-3 md:gap-4 md:grid-cols-4 md:gap-5">
             {roleConfig.map((role, i) => {
               const unlocked = unlockedRoles.includes(role.slug);

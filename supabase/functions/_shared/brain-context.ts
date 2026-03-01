@@ -19,6 +19,7 @@ export async function fetchBrainIntelligence(
     patternsRes,
     activityRes,
     connectionsRes,
+    shopifyRes,
   ] = await Promise.all([
     supabase.from("workspaces").select("*").eq("id", workspaceId).maybeSingle(),
     supabase
@@ -47,6 +48,11 @@ export async function fetchBrainIntelligence(
       .select("platform, connected, status")
       .eq("workspace_id", workspaceId)
       .eq("connected", true),
+    supabase
+      .from("shopify_store_settings")
+      .select("shop_name, shop_domain, currency, use_for_support_ai, use_for_email_marketing, use_for_social_content, enable_product_context, enable_collection_context, synced_products, synced_collections")
+      .eq("workspace_id", workspaceId)
+      .maybeSingle(),
   ]);
 
   const ws = workspaceRes.data;
@@ -54,6 +60,36 @@ export async function fetchBrainIntelligence(
   const patterns = patternsRes.data || [];
   const activity = activityRes.data || [];
   const connections = connectionsRes.data || [];
+  const shopify = shopifyRes.data;
+
+  // Build Shopify context based on role toggles
+  let shopifyContext = "";
+  if (shopify && connections.some((c: any) => c.platform === "shopify")) {
+    const useForRole =
+      (roleScope === "customer-support" && shopify.use_for_support_ai) ||
+      (roleScope === "email-marketer" && shopify.use_for_email_marketing) ||
+      (roleScope === "social-media-manager" && shopify.use_for_social_content) ||
+      roleScope === "shared";
+
+    if (useForRole) {
+      const parts = [
+        `Store: ${shopify.shop_name || shopify.shop_domain}`,
+        shopify.currency ? `Currency: ${shopify.currency}` : "",
+      ];
+
+      if (shopify.enable_product_context && Array.isArray(shopify.synced_products) && shopify.synced_products.length > 0) {
+        const productNames = shopify.synced_products.slice(0, 30).map((p: any) => p.title).join(", ");
+        parts.push(`Products (${shopify.synced_products.length}): ${productNames}`);
+      }
+
+      if (shopify.enable_collection_context && Array.isArray(shopify.synced_collections) && shopify.synced_collections.length > 0) {
+        const collNames = shopify.synced_collections.map((c: any) => c.title).join(", ");
+        parts.push(`Collections: ${collNames}`);
+      }
+
+      shopifyContext = `SHOPIFY STORE CONTEXT:\n${parts.filter(Boolean).join("\n")}`;
+    }
+  }
 
   // Build shared workspace context
   const sharedParts = [
@@ -100,7 +136,7 @@ export async function fetchBrainIntelligence(
     : "";
 
   // Full prompt block
-  const fullPromptBlock = [sharedContext, roleContext, recentActivity].filter(Boolean).join("\n\n");
+  const fullPromptBlock = [sharedContext, shopifyContext, roleContext, recentActivity].filter(Boolean).join("\n\n");
 
   return { sharedContext, roleContext, recentActivity, fullPromptBlock };
 }
