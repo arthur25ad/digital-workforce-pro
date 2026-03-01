@@ -14,7 +14,7 @@ import StatCard from "@/components/workspace/StatCard";
 import EmptyState from "@/components/workspace/EmptyState";
 import ActivityFeed from "@/components/workspace/ActivityFeed";
 import ConnectionCard from "@/components/workspace/ConnectionCard";
-import SlackSettingsPanel from "@/components/workspace/SlackSettingsPanel";
+import SlackStatusIndicator from "@/components/workspace/SlackStatusIndicator";
 import {
   Check, ThumbsUp, AlertTriangle, MessageSquare, PenLine, Send, X, Clock,
   MailOpen, Facebook, Instagram, Globe, Upload, FileText, Plus, Loader2, Sparkles,
@@ -185,9 +185,7 @@ const CustomerSupportDemo = () => {
         {/* Channels */}
         {activeTab === 2 && (
           <div className="space-y-6">
-            <WorkspaceSection title="Slack Integration" description="Receive support alerts and escalation notifications in Slack.">
-              <SlackSettingsPanel />
-            </WorkspaceSection>
+            <SlackStatusIndicator context="Receives support escalation alerts" />
             <WorkspaceSection title="Support Channels" description="Connect the channels where customers reach you.">
               <div className="space-y-3">
                 {supportChannels.map(p => {

@@ -8,6 +8,8 @@ import { useEmailMarketingData } from "@/hooks/useEmailMarketingData";
 import { useVirtualAssistantData } from "@/hooks/useVirtualAssistantData";
 import { useVantaBrainStats } from "@/hooks/useVantaBrain";
 import { useSubscriptionSync } from "@/hooks/useSubscriptionSync";
+import { useSlackIntegration } from "@/hooks/useSlackIntegration";
+import SlackSettingsPanel from "@/components/workspace/SlackSettingsPanel";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
@@ -15,7 +17,7 @@ import { packageNeedsRoleSelection } from "@/lib/packages";
 import {
   Share2, Headphones, Mail, CalendarCheck, Lock,
   ArrowRight, Sparkles, CheckCircle2, Brain,
-  MessageSquare, Zap, Search, TrendingUp, BarChart3, Clock4,
+  MessageSquare, Zap, Search, TrendingUp, BarChart3, Clock4, Slack,
 } from "lucide-react";
 
 const roleColors = {
@@ -90,7 +92,9 @@ const DashboardPage = () => {
   const recentActivity = useMergedActivity();
   const { stats: brainStats } = useVantaBrainStats();
   const { syncSubscription } = useSubscriptionSync();
+  const { isConnected: slackConnected } = useSlackIntegration();
   const [askInput, setAskInput] = useState("");
+  const [showSlackSettings, setShowSlackSettings] = useState(false);
   const [checkoutSyncing, setCheckoutSyncing] = useState(() => searchParams.get("checkout") === "success");
 
   // Sync subscription after checkout or on first load
@@ -367,6 +371,49 @@ const DashboardPage = () => {
               </motion.div>
             </div>
           </div>
+
+          {/* ── Slack Integration ── */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25 }}
+            className="mb-8 md:mb-12"
+          >
+            <div className="overflow-hidden rounded-2xl border border-border/40 bg-card/60 backdrop-blur-sm">
+              <button
+                onClick={() => setShowSlackSettings(!showSlackSettings)}
+                className="flex w-full items-center justify-between border-b border-border/30 px-6 py-4 text-left transition-colors hover:bg-secondary/20"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#4A154B]/20">
+                    <Slack size={16} className={slackConnected ? "text-[#E01E5A]" : "text-muted-foreground"} />
+                  </div>
+                  <div>
+                    <span className="font-display text-sm font-semibold text-foreground">Workspace Slack Integration</span>
+                    <p className="text-[11px] text-muted-foreground">
+                      {slackConnected
+                        ? "Connected — your AI Employees send updates here"
+                        : "Connect once, all AI Employees can send updates"}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  {slackConnected && (
+                    <span className="flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-400">
+                      <CheckCircle2 size={10} /> Active
+                    </span>
+                  )}
+                  <ArrowRight size={14} className={`text-muted-foreground transition-transform ${showSlackSettings ? "rotate-90" : ""}`} />
+                </div>
+              </button>
+
+              {showSlackSettings && (
+                <div className="p-6">
+                  <SlackSettingsPanel />
+                </div>
+              )}
+            </div>
+          </motion.div>
 
           {/* ── Ask VANTABRAIN ── */}
           <motion.div
