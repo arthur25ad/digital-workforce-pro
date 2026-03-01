@@ -11,7 +11,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const NOTION_CLIENT_ID = Deno.env.get("NOTION_CLIENT_ID");
+    const NOTION_CLIENT_ID = Deno.env.get("NOTION_OAUTH_CLIENT_ID");
     if (!NOTION_CLIENT_ID) {
       return new Response(JSON.stringify({ error: "Notion integration not configured" }), {
         status: 500,
