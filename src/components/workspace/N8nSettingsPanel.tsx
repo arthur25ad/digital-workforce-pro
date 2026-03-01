@@ -79,14 +79,22 @@ const N8nSettingsPanel = () => {
           </button>
         </div>
       ) : (
-        <div className="rounded-xl border border-border/30 bg-secondary/20 px-4 py-3">
-          <div className="flex items-center gap-2">
-            <Sparkles size={14} className="text-primary" />
-            <p className="text-sm font-medium text-foreground">Not enabled yet</p>
+        <div className="flex items-center justify-between rounded-xl border border-border/30 bg-secondary/20 px-4 py-3">
+          <div>
+            <div className="flex items-center gap-2">
+              <Sparkles size={14} className="text-primary" />
+              <p className="text-sm font-medium text-foreground">Not enabled yet</p>
+            </div>
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              Enable this feature to save time on repeated follow-up.
+            </p>
           </div>
-          <p className="mt-1 text-[11px] text-muted-foreground">
-            Enable this feature to save time on repeated follow-up.
-          </p>
+          <button
+            onClick={() => setShowAdvanced(true)}
+            className="btn-glow !px-4 !py-2 text-xs shrink-0"
+          >
+            Enable
+          </button>
         </div>
       )}
 
