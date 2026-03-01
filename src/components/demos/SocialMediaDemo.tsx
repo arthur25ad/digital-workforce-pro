@@ -14,7 +14,7 @@ import StatCard from "@/components/workspace/StatCard";
 import EmptyState from "@/components/workspace/EmptyState";
 import ActivityFeed from "@/components/workspace/ActivityFeed";
 import ConnectionCard from "@/components/workspace/ConnectionCard";
-import SlackSettingsPanel from "@/components/workspace/SlackSettingsPanel";
+import SlackStatusIndicator from "@/components/workspace/SlackStatusIndicator";
 import {
   Check, ThumbsUp, X, PenLine, Calendar, Eye,
   Instagram, Facebook, Linkedin, Twitter, Music2, Loader2, Sparkles, Plus, Clock,
@@ -159,9 +159,7 @@ const SocialMediaDemo = () => {
         {/* Platforms */}
         {activeTab === 1 && (
           <div className="space-y-6">
-            <WorkspaceSection title="Slack Integration" description="Get notified when content is ready for review or approval.">
-              <SlackSettingsPanel />
-            </WorkspaceSection>
+            <SlackStatusIndicator context="Sends content approval requests" />
             <WorkspaceSection title="Connected Platforms" description="Link the accounts where you want content managed.">
               <div className="space-y-3">
                 {socialPlatforms.map(p => {
