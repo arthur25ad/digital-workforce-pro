@@ -98,7 +98,7 @@ export const useN8n = () => {
             connected: true,
             status: "active",
             connected_at: new Date().toISOString(),
-            account_name: "Automation Engine",
+            account_name: "Automatic Next Steps",
           })
           .eq("id", existingConn.id);
         connectionId = existingConn.id;
@@ -111,7 +111,7 @@ export const useN8n = () => {
             connected: true,
             status: "active",
             connected_at: new Date().toISOString(),
-            account_name: "Automation Engine",
+            account_name: "Automatic Next Steps",
           })
           .select("id")
           .single();
@@ -144,12 +144,12 @@ export const useN8n = () => {
       }
 
       setIsConnected(true);
-      toast({ title: "Automation connected", description: "Your workflow engine is now active." });
+      toast({ title: "Automatic Next Steps enabled", description: "VANTABRAIN is now watching for repeated patterns." });
       await fetchSettings();
     } catch (error) {
       toast({
         title: "Connection failed",
-        description: error instanceof Error ? error.message : "Could not connect to your automation engine",
+        description: error instanceof Error ? error.message : "Could not enable Automatic Next Steps",
         variant: "destructive",
       });
     }
@@ -165,7 +165,7 @@ export const useN8n = () => {
         .eq("platform", "n8n");
 
       setIsConnected(false);
-      toast({ title: "Automation disconnected" });
+      toast({ title: "Automatic Next Steps turned off" });
       await fetchSettings();
     } catch (error) {
       toast({
@@ -192,12 +192,12 @@ export const useN8n = () => {
       });
 
       if (res.ok) {
-        toast({ title: "Test successful", description: "Your automation engine responded." });
+        toast({ title: "Test successful", description: "VANTABRAIN can reach your workflow — everything looks good." });
       } else {
-        toast({ title: "Test failed", description: `Webhook responded with status ${res.status}`, variant: "destructive" });
+        toast({ title: "Test failed", description: `Connection responded with status ${res.status}`, variant: "destructive" });
       }
     } catch (error) {
-      toast({ title: "Test failed", description: "Could not reach the webhook URL", variant: "destructive" });
+      toast({ title: "Test failed", description: "Could not reach the connection", variant: "destructive" });
     } finally {
       setTesting(false);
     }

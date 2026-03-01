@@ -324,7 +324,7 @@ const DashboardPage = () => {
             </div>
           </motion.div>
 
-          {/* ── n8n / Automation Engine Integration ── */}
+          {/* ── Automatic Next Steps (VANTABRAIN) ── */}
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
@@ -338,14 +338,14 @@ const DashboardPage = () => {
               >
                 <div className="flex items-center gap-3">
                   <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/20">
-                    <Workflow size={16} className={n8nConnected ? "text-primary" : "text-muted-foreground"} />
+                    <Brain size={16} className={n8nConnected ? "text-primary" : "text-muted-foreground"} />
                   </div>
                   <div>
-                    <span className="font-display text-sm font-semibold text-foreground">Automatic Follow-Up</span>
+                    <span className="font-display text-sm font-semibold text-foreground">Automatic Next Steps</span>
                     <p className="text-[11px] text-muted-foreground">
                       {n8nConnected
-                        ? "Connected — handling follow-up for you"
-                        : "Leads, forms, support — the next step starts automatically"}
+                        ? "VANTABRAIN is handling repeated next steps for you"
+                        : "VANTABRAIN helps with the next step when common events happen"}
                     </p>
                   </div>
                 </div>
