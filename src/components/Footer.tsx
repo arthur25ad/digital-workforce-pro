@@ -1,32 +1,7 @@
 import { Link } from "react-router-dom";
+import { getFooterGroups } from "@/config/siteNav";
 
-const footerLinks = [
-  {
-    title: "Product",
-    links: [
-      { label: "How It Works", href: "/how-it-works" },
-      { label: "Pricing", href: "/pricing" },
-      { label: "FAQ", href: "/faq" },
-      { label: "Support", href: "/support" },
-    ],
-  },
-  {
-    title: "Explore",
-    links: [
-      { label: "AI Employees", href: "/ai-employees" },
-      { label: "Features", href: "/features" },
-      { label: "Industries", href: "/industries" },
-      { label: "Subscription Details", href: "/subscription-details" },
-    ],
-  },
-  {
-    title: "Company",
-    links: [
-      { label: "Privacy Policy", href: "/privacy" },
-      { label: "Terms", href: "/terms" },
-    ],
-  },
-];
+const footerGroups = getFooterGroups();
 
 const Footer = () => {
   return (
@@ -45,7 +20,7 @@ const Footer = () => {
             Your AI scheduling assistant for service businesses. Fewer missed bookings, better follow-ups.
           </p>
         </div>
-        {footerLinks.map((group) => (
+        {footerGroups.map((group) => (
           <div key={group.title}>
             <h4 className="mb-3 font-display text-sm font-semibold text-foreground">{group.title}</h4>
             <ul className="space-y-2">
