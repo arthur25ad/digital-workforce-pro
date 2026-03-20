@@ -8,28 +8,28 @@ import {
 
 const faqs = [
   {
-    q: "What is an AI employee?",
-    a: "An AI employee is a specialized digital worker designed to handle specific business tasks — like managing social media, responding to customers, or running email campaigns — autonomously and around the clock.",
-  },
-  {
-    q: "How quickly can I set this up?",
-    a: "Most businesses are up and running within minutes. Choose your AI roles, customize their workflows, and they start working immediately.",
-  },
-  {
     q: "Do I need technical experience?",
-    a: "Not at all. The platform is built for non-technical business owners. No coding, no complex setup — just pick your roles and go.",
+    a: "Not at all. You describe how your business works — scheduling preferences, follow-up style, and tone — and the assistant handles the rest. No code, no complex setup.",
   },
   {
-    q: "Can I customize how each AI role works?",
-    a: "Yes. You can tailor each AI employee's tasks, tone, business rules, and workflows to match how your business operates.",
-  },
-  {
-    q: "Is this built for small businesses?",
-    a: "Absolutely. This platform is designed specifically for small businesses that need more output without the overhead of additional hires.",
+    q: "Do I stay in control?",
+    a: "Always. The assistant drafts, organizes, and prepares — but you review and approve before anything goes out. You can also set it to auto-handle routine tasks once you're comfortable.",
   },
   {
     q: "What kinds of businesses is this best for?",
-    a: "Service businesses like cleaning companies, med spas, salons, realtors, home services, consultants, and local agencies see the fastest results.",
+    a: "Service businesses that run on appointments: med spas, salons, barbers, cleaning companies, consultants, agencies, coaches, home services, and similar industries.",
+  },
+  {
+    q: "Does this replace my calendar?",
+    a: "No. It works alongside your existing process. Think of it as an intelligent layer that captures requests, organizes bookings, and prepares reminders and follow-ups around your calendar.",
+  },
+  {
+    q: "How are reminders and follow-ups handled?",
+    a: "The assistant prepares reminders before appointments and drafts follow-ups after visits. You can review them or let them send automatically based on your preferences.",
+  },
+  {
+    q: "What integrations are live today?",
+    a: "The core scheduling assistant works within the platform right away. We're actively adding direct integrations with popular tools — contact us for the latest availability, or we can help with custom setup.",
   },
 ];
 
@@ -40,11 +40,12 @@ const FAQSection = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           className="mb-8 md:mb-14 text-center"
         >
           <h2 className="font-display text-2xl font-bold text-foreground md:text-4xl">
-            FAQ
+            Questions & Answers
           </h2>
         </motion.div>
 

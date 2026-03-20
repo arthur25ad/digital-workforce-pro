@@ -4,19 +4,24 @@ const footerLinks = [
   {
     title: "Product",
     links: [
-      { label: "Features", href: "/features" },
-      { label: "AI Employees", href: "/ai-employees" },
+      { label: "How It Works", href: "/how-it-works" },
       { label: "Pricing", href: "/pricing" },
       { label: "FAQ", href: "/faq" },
       { label: "Support", href: "/support" },
+    ],
+  },
+  {
+    title: "Explore",
+    links: [
+      { label: "AI Employees", href: "/ai-employees" },
+      { label: "Features", href: "/features" },
+      { label: "Industries", href: "/industries" },
       { label: "Subscription Details", href: "/subscription-details" },
     ],
   },
   {
     title: "Company",
     links: [
-      { label: "How It Works", href: "/how-it-works" },
-      { label: "Industries", href: "/industries" },
       { label: "Privacy Policy", href: "/privacy" },
       { label: "Terms", href: "/terms" },
     ],
@@ -27,7 +32,7 @@ const Footer = () => {
   return (
     <footer className="border-t border-border/40 bg-background px-4 py-8 md:px-12 md:py-12 lg:px-16">
       <div className="mx-auto grid max-w-[1600px] gap-8 md:gap-10 md:grid-cols-4">
-        <div className="md:col-span-2">
+        <div>
           <Link to="/" className="font-display text-xl font-bold tracking-tight">
             <span style={{
               backgroundImage: "linear-gradient(135deg, hsl(0 0% 100%), hsl(225 60% 82%), hsl(0 0% 100%), hsl(225 50% 78%))",
@@ -36,8 +41,8 @@ const Footer = () => {
               backgroundClip: "text",
             }}>VANTORY</span>
           </Link>
-          <p className="mt-3 max-w-sm text-sm text-white">
-            AI Employees that work while you sleep. Built for small businesses that need real help.
+          <p className="mt-3 max-w-sm text-sm text-muted-foreground">
+            Your AI scheduling assistant for service businesses. Fewer missed bookings, better follow-ups.
           </p>
         </div>
         {footerLinks.map((group) => (
@@ -46,15 +51,9 @@ const Footer = () => {
             <ul className="space-y-2">
               {group.links.map((link) => (
                 <li key={link.label}>
-                  {link.href.startsWith("/") ? (
-                    <Link to={link.href} className="text-sm text-muted-foreground transition-colors hover:text-foreground">
-                      {link.label}
-                    </Link>
-                  ) : (
-                    <a href={link.href} className="text-sm text-muted-foreground transition-colors hover:text-foreground">
-                      {link.label}
-                    </a>
-                  )}
+                  <Link to={link.href} className="text-sm text-muted-foreground transition-colors hover:text-foreground">
+                    {link.label}
+                  </Link>
                 </li>
               ))}
             </ul>

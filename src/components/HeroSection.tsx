@@ -1,20 +1,22 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Shield, Users, Zap, Clock, Share2, Mail, Headphones, CalendarCheck, TrendingUp, ShoppingBag, Store, Briefcase, Sparkles } from "lucide-react";
+import { CalendarCheck, Bell, RefreshCw, ClipboardList, Scissors, Sparkles, Home, Briefcase, Heart } from "lucide-react";
 import { Link } from "react-router-dom";
 import BookDemoModal from "./BookDemoModal";
 import PromoBanner from "./PromoBanner";
 
 const summaryItems = [
-  { icon: Headphones, text: "Refund request resolved — rated 5★", color: "text-violet-400", bg: "bg-violet-500/10", status: "Resolved" },
-  { icon: Mail, text: "Reminder emails sent to 41 clients", color: "text-emerald-400", bg: "bg-emerald-500/10", status: "Sent" },
-  { icon: Share2, text: "Instagram campaign launched", color: "text-blue-400", bg: "bg-blue-500/10", status: "Live" },
+  { icon: CalendarCheck, text: "New appointment request organized", color: "text-emerald-400", bg: "bg-emerald-500/10", status: "Booked" },
+  { icon: Bell, text: "Reminder sent to 3 upcoming clients", color: "text-amber-400", bg: "bg-amber-500/10", status: "Sent" },
+  { icon: RefreshCw, text: "Reschedule handled — client confirmed", color: "text-blue-400", bg: "bg-blue-500/10", status: "Done" },
 ];
 
 const industryTags = [
-  { icon: Store, label: "Shopify Stores" },
-  { icon: ShoppingBag, label: "E-Commerce" },
-  { icon: Briefcase, label: "Service Businesses" },
+  { icon: Sparkles, label: "Med Spas" },
+  { icon: Scissors, label: "Salons" },
+  { icon: Home, label: "Home Services" },
+  { icon: Briefcase, label: "Consultants" },
+  { icon: Heart, label: "Wellness" },
 ];
 
 const HeroSection = () => {
@@ -26,11 +28,11 @@ const HeroSection = () => {
       <div className="mx-auto max-w-[1600px] px-5 md:px-12 lg:px-16">
         <div className="grid items-center gap-6 md:gap-12 lg:grid-cols-2 lg:gap-20 xl:gap-28">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }} className="text-center lg:text-left">
-            <h1 className="hero-flowing-text font-display text-[1.65rem] font-bold leading-tight tracking-tight md:text-5xl lg:text-6xl xl:text-7xl">
-              AI Employees That Work While You Sleep
+            <h1 className="font-display text-[1.65rem] font-bold leading-[1.1] tracking-tight md:text-5xl lg:text-[3.4rem] xl:text-[3.8rem]" style={{ textWrap: "balance" } as any}>
+              Your AI Scheduling Assistant for Service Businesses
             </h1>
-            <p className="mx-auto mt-3 md:mt-5 max-w-xl text-sm md:text-base leading-relaxed text-muted-foreground lg:mx-0">
-              Handle support, email, social media, and admin — connect your store and let them work <span className="font-display font-bold text-primary drop-shadow-[0_0_12px_hsl(var(--primary)/0.6)]">24/7</span>
+            <p className="mx-auto mt-3 md:mt-5 max-w-xl text-sm md:text-base leading-relaxed text-muted-foreground lg:mx-0" style={{ textWrap: "pretty" } as any}>
+              Capture requests, organize appointments, send reminders, and keep follow-ups moving — without living in your calendar all day.
             </p>
 
             <div className="mt-4 flex flex-wrap items-center justify-center gap-2 lg:justify-start">
@@ -43,21 +45,23 @@ const HeroSection = () => {
             </div>
 
             <div className="mt-5 md:mt-7 flex flex-col sm:flex-row items-center justify-center gap-3 md:gap-4 lg:justify-start w-full">
-              <Link to="/get-started" className="btn-glow w-full sm:w-auto text-center">Hire Your AI Team</Link>
+              <Link to="/how-it-works" className="btn-glow w-full sm:w-auto text-center">See How It Works</Link>
               <button onClick={() => setDemoOpen(true)} className="btn-outline-glow w-full sm:w-auto">Book a Demo</button>
             </div>
+
+            <p className="mt-3 text-[11px] text-muted-foreground/50">Built for appointment-based and booked-call businesses</p>
           </motion.div>
 
           <motion.div initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, delay: 0.2 }} className="relative">
             <div className="card-glass rounded-2xl p-4 md:p-5">
               <div className="mb-3 flex items-center justify-between">
-                <span className="font-display text-sm font-semibold text-foreground">Today's AI Summary</span>
+                <span className="font-display text-sm font-semibold text-foreground">Today's Activity</span>
                 <span className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
                   <span className="relative flex h-2 w-2">
                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
                     <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
                   </span>
-                  Active now
+                  Assistant active
                 </span>
               </div>
               <div className="space-y-1.5">
@@ -81,8 +85,8 @@ const HeroSection = () => {
               </div>
               <div className="mt-3 flex items-center justify-between rounded-xl border border-border/20 bg-background/30 px-3 py-2">
                 <div className="flex items-center gap-2">
-                  <TrendingUp size={13} className="text-emerald-400" />
-                  <span className="text-[11px] text-muted-foreground"><span className="font-semibold text-foreground">34 hrs</span> saved this week</span>
+                  <ClipboardList size={13} className="text-emerald-400" />
+                  <span className="text-[11px] text-muted-foreground"><span className="font-semibold text-foreground">0 missed</span> follow-ups this week</span>
                 </div>
               </div>
             </div>

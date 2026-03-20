@@ -9,18 +9,20 @@ const CTASection = () => {
   return (
     <section id="cta" className="section-padding blue-ambient">
       <div className="mx-auto max-w-4xl text-center">
-        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-          <h2 className="font-display text-2xl font-bold text-foreground md:text-5xl">
-            Build Your AI Team Today
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <h2 className="font-display text-2xl font-bold text-foreground md:text-5xl" style={{ textWrap: "balance" } as any}>
+            Never miss a booking, reminder, or follow-up again.
           </h2>
           <p className="mx-auto mt-4 md:mt-5 max-w-lg text-base md:text-lg text-muted-foreground">
-            Whether you run a Shopify store, a service business, or a growing brand — put a digital team in place that works around the clock.
-          </p>
-          <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground/60">
-            Designed for e-commerce brands, local businesses, agencies, clinics, and more.
+            Set up your AI scheduling assistant and start saving hours every week.
           </p>
           <div className="mt-6 md:mt-8 flex flex-wrap justify-center gap-3 md:gap-4">
-            <Link to="/get-started" className="btn-glow">Hire Your AI Team</Link>
+            <Link to="/get-started" className="btn-glow">Get Started</Link>
             <button onClick={() => setDemoOpen(true)} className="btn-outline-glow">Book a Demo</button>
           </div>
         </motion.div>

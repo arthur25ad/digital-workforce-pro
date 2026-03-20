@@ -1,26 +1,26 @@
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
+import PainSection from "@/components/PainSection";
 import HowItWorks from "@/components/HowItWorks";
-import DashboardPreview from "@/components/DashboardPreview";
-import CapabilitiesGrid from "@/components/CapabilitiesGrid";
-import AITeamSection from "@/components/AITeamSection";
+import CoreOutcomes from "@/components/CoreOutcomes";
+import ProofWorkflow from "@/components/ProofWorkflow";
+import WhoItsFor from "@/components/WhoItsFor";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import PricingSection from "@/components/PricingSection";
 import FAQSection from "@/components/FAQSection";
 import CTASection from "@/components/CTASection";
 import Footer from "@/components/Footer";
-import LogoCarousel from "@/components/LogoCarousel";
 
 const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
       <HeroSection />
-      <LogoCarousel />
+      <PainSection />
       <HowItWorks />
-      <DashboardPreview />
-      <CapabilitiesGrid />
-      <AITeamSection />
+      <CoreOutcomes />
+      <ProofWorkflow />
+      <WhoItsFor />
       <TestimonialsSection />
       <PricingSection />
       <FAQSection />
