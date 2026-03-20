@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Check, Loader2 } from "lucide-react";
-import { useAppState } from "@/context/AppContext";
+import { X, Check, Loader2, AlertCircle } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface BookDemoModalProps {
   open: boolean;
@@ -9,24 +9,40 @@ interface BookDemoModalProps {
 }
 
 const BookDemoModal = ({ open, onClose }: BookDemoModalProps) => {
-  const { addDemoRequest } = useAppState();
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [form, setForm] = useState({ name: "", businessName: "", email: "", phone: "", businessType: "", helpWith: "" });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+    setError(null);
+
+    const { error: insertError } = await supabase.from("demo_requests").insert({
+      name: form.name.trim(),
+      email: form.email.trim(),
+      phone: form.phone.trim(),
+      business_name: form.businessName.trim(),
+      business_type: form.businessType,
+      help_with: form.helpWith.trim(),
+    });
+
+    setLoading(false);
+    if (insertError) {
+      setError("Something went wrong. Please try again or email support@aivantory.com.");
+    } else {
       setSubmitted(true);
-      addDemoRequest({ name: form.name, email: form.email });
-    }, 1500);
+    }
   };
 
   const handleClose = () => {
     onClose();
-    setTimeout(() => { setSubmitted(false); setForm({ name: "", businessName: "", email: "", phone: "", businessType: "", helpWith: "" }); }, 300);
+    setTimeout(() => {
+      setSubmitted(false);
+      setError(null);
+      setForm({ name: "", businessName: "", email: "", phone: "", businessType: "", helpWith: "" });
+    }, 300);
   };
 
   return (
@@ -51,6 +67,12 @@ const BookDemoModal = ({ open, onClose }: BookDemoModalProps) => {
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
+                {error && (
+                  <div className="flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive">
+                    <AlertCircle size={16} className="mt-0.5 shrink-0" />
+                    {error}
+                  </div>
+                )}
                 {[
                   { key: "name", label: "Name", type: "text" },
                   { key: "businessName", label: "Business Name", type: "text" },
@@ -69,7 +91,7 @@ const BookDemoModal = ({ open, onClose }: BookDemoModalProps) => {
                   <select required value={form.businessType} onChange={(e) => setForm({ ...form, businessType: e.target.value })}
                     className="w-full rounded-lg border border-border bg-secondary px-4 py-2.5 text-sm text-foreground focus:border-primary/50 focus:outline-none">
                     <option value="">Select...</option>
-                    {["Cleaning Company", "Realtor", "Med Spa", "Salon", "Home Services", "Agency", "Consultant", "Other"].map((t) => (
+                    {["Med Spa", "Salon", "Cleaning Company", "Home Services", "Consultant", "Agency", "Realtor", "Wellness / Coach", "Other"].map((t) => (
                       <option key={t} value={t}>{t}</option>
                     ))}
                   </select>
