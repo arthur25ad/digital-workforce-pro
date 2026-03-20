@@ -1,29 +1,28 @@
 import { motion } from "framer-motion";
-import { Users, Sliders, Zap, ArrowRight } from "lucide-react";
-import { Link } from "react-router-dom";
+import { MessageSquare, Sparkles, CheckCircle2 } from "lucide-react";
 
 const steps = [
   {
-    icon: Users,
+    icon: MessageSquare,
     number: "1",
-    title: "Pick Your Team",
-    desc: "Choose the AI employees your business needs.",
+    title: "Tell It How You Work",
+    desc: "Describe how your business schedules and follows up — no code required.",
     color: "text-blue-400",
     bg: "bg-blue-500/10",
   },
   {
-    icon: Sliders,
+    icon: Sparkles,
     number: "2",
-    title: "Tell Them About You",
-    desc: "Share your tone, goals, and preferences.",
+    title: "It Organizes Requests",
+    desc: "Incoming requests become clear next steps, suggested times, reminders, and follow-ups.",
     color: "text-emerald-400",
     bg: "bg-emerald-500/10",
   },
   {
-    icon: Zap,
+    icon: CheckCircle2,
     number: "3",
-    title: "They Start Working",
-    desc: "Your AI team runs 24/7 so you don't have to.",
+    title: "Review & Approve",
+    desc: "You stay in control while the assistant keeps everything moving forward.",
     color: "text-violet-400",
     bg: "bg-violet-500/10",
   },
@@ -36,11 +35,12 @@ const HowItWorks = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           className="mb-8 md:mb-14 text-center"
         >
           <h2 className="font-display text-2xl font-bold text-foreground md:text-4xl">
-            3 Simple Steps to Get Started
+            How It Works
           </h2>
         </motion.div>
 
@@ -50,10 +50,10 @@ const HowItWorks = () => {
           {steps.map((step, i) => (
             <motion.div
               key={step.number}
-              initial={{ opacity: 0, y: 25 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: i * 0.15 }}
+              initial={{ opacity: 0, y: 20, filter: "blur(4px)" }}
+              whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.6, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
               className="relative text-center"
             >
               <div className={`relative z-10 mx-auto mb-3 md:mb-5 flex h-12 w-12 md:h-16 md:w-16 items-center justify-center rounded-2xl ${step.bg} ${step.color}`}>
@@ -65,22 +65,6 @@ const HowItWorks = () => {
             </motion.div>
           ))}
         </div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.4 }}
-          className="mt-10 text-center"
-        >
-          <Link
-            to="/how-it-works"
-            className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-5 py-2.5 text-sm font-medium text-primary transition-all hover:bg-primary/10 hover:gap-3"
-          >
-            Learn More
-            <ArrowRight size={15} />
-          </Link>
-        </motion.div>
       </div>
     </section>
   );
