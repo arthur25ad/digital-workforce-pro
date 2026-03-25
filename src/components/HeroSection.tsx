@@ -4,7 +4,7 @@ import { CalendarCheck, Bell, RefreshCw, ClipboardList, Scissors, Sparkles, Home
 import { Link } from "react-router-dom";
 import BookDemoModal from "./BookDemoModal";
 import PromoBanner from "./PromoBanner";
-import { FloatingPaths } from "./ui/background-paths";
+import AnimatedShaderBackground from "./ui/animated-shader-background";
 
 const summaryItems = [
   { icon: CalendarCheck, text: "New appointment request organized", color: "text-emerald-400", bg: "bg-emerald-500/10", status: "Booked" },
@@ -25,8 +25,7 @@ const HeroSection = () => {
 
   return (
     <section className="blue-ambient relative overflow-hidden pt-10 pb-8 md:pt-20 md:pb-16">
-      <FloatingPaths position={1} />
-      <FloatingPaths position={-1} />
+      <AnimatedShaderBackground />
       <PromoBanner />
       <div className="mx-auto max-w-[1600px] px-5 md:px-12 lg:px-16">
         <div className="grid items-center gap-6 md:gap-12 lg:grid-cols-2 lg:gap-20 xl:gap-28">
