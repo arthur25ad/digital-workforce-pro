@@ -149,7 +149,7 @@ const FloatingPaths = memo(function FloatingPaths({
             <motion.path
               animate={{
                 ...sharedAnimationProps,
-                y: [0, -15, 0],
+                y: [0, -80, 0],
               }}
               d={path.d}
               initial={{ opacity: 0, scale: 0.8 }}
@@ -161,7 +161,7 @@ const FloatingPaths = memo(function FloatingPaths({
               transition={{
                 ...sharedAnimationProps.transition,
                 y: {
-                  duration: 8,
+                  duration: 10,
                   repeat: Infinity,
                   ease: "easeInOut",
                   repeatType: "reverse",
@@ -176,7 +176,7 @@ const FloatingPaths = memo(function FloatingPaths({
             <motion.path
               animate={{
                 ...sharedAnimationProps,
-                y: [0, -10, 0],
+                y: [0, -50, 0],
               }}
               d={path.d}
               initial={{ opacity: 0, scale: 0.9 }}
@@ -188,7 +188,7 @@ const FloatingPaths = memo(function FloatingPaths({
               transition={{
                 ...sharedAnimationProps.transition,
                 y: {
-                  duration: 6,
+                  duration: 7,
                   repeat: Infinity,
                   ease: "easeInOut",
                   repeatType: "reverse",
@@ -203,7 +203,7 @@ const FloatingPaths = memo(function FloatingPaths({
             <motion.path
               animate={{
                 ...sharedAnimationProps,
-                y: [0, -5, 0],
+                y: [0, -30, 0],
               }}
               d={path.d}
               initial={{ opacity: 0, scale: 0.95 }}
@@ -215,7 +215,7 @@ const FloatingPaths = memo(function FloatingPaths({
               transition={{
                 ...sharedAnimationProps.transition,
                 y: {
-                  duration: 4,
+                  duration: 5,
                   repeat: Infinity,
                   ease: "easeInOut",
                   repeatType: "reverse",
