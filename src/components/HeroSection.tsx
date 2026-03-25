@@ -4,7 +4,7 @@ import { CalendarCheck, Bell, RefreshCw, ClipboardList, Scissors, Sparkles, Home
 import { Link } from "react-router-dom";
 import BookDemoModal from "./BookDemoModal";
 import PromoBanner from "./PromoBanner";
-import { FloatingPaths } from "./ui/background-paths";
+import AnimatedShaderBackground from "./ui/animated-shader-background";
 
 const summaryItems = [
   { icon: CalendarCheck, text: "New appointment request organized", color: "text-emerald-400", bg: "bg-emerald-500/10", status: "Booked" },
