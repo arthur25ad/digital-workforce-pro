@@ -27,7 +27,7 @@ const HeroSection = () => {
     <section className="blue-ambient relative overflow-hidden pt-10 pb-8 md:pt-20 md:pb-16">
       <AnimatedShaderBackground />
       <PromoBanner />
-      <div className="mx-auto max-w-[1600px] px-5 md:px-12 lg:px-16">
+      <div className="relative z-10 mx-auto max-w-[1600px] px-5 md:px-12 lg:px-16">
         <div className="grid items-center gap-6 md:gap-12 lg:grid-cols-2 lg:gap-20 xl:gap-28">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }} className="text-center lg:text-left">
             <h1 className="font-display text-[1.65rem] font-bold leading-[1.1] tracking-tight md:text-5xl lg:text-[3.4rem] xl:text-[3.8rem]" style={{ textWrap: "balance" } as any}>
