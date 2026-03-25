@@ -24,7 +24,7 @@ const HeroSection = () => {
   const [demoOpen, setDemoOpen] = useState(false);
 
   return (
-    <section className="blue-ambient relative overflow-hidden pt-10 pb-8 md:pt-20 md:pb-16">
+    <section className="blue-ambient relative overflow-hidden pt-20 pb-8 md:pt-24 md:pb-16">
       <AnimatedShaderBackground />
       <PromoBanner />
       <div className="relative z-10 mx-auto max-w-[1600px] px-5 md:px-12 lg:px-16">
