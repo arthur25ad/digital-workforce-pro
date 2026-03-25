@@ -203,7 +203,7 @@ const FloatingPaths = memo(function FloatingPaths({
             <motion.path
               animate={{
                 ...sharedAnimationProps,
-                y: [0, -5, 0],
+                y: [0, -30, 0],
               }}
               d={path.d}
               initial={{ opacity: 0, scale: 0.95 }}
@@ -215,7 +215,7 @@ const FloatingPaths = memo(function FloatingPaths({
               transition={{
                 ...sharedAnimationProps.transition,
                 y: {
-                  duration: 4,
+                  duration: 5,
                   repeat: Infinity,
                   ease: "easeInOut",
                   repeatType: "reverse",
