@@ -118,7 +118,7 @@ const AnimatedShaderBackground = () => {
   }, []);
 
   return (
-    <div ref={containerRef} className="absolute inset-0 overflow-hidden">
+    <div ref={containerRef} className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
       <div className="relative z-10" />
     </div>
   );
