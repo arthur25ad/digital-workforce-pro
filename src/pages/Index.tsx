@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
-import { CalendarCheck, Bell, RefreshCw, MessageSquare, Sparkles, Scissors, Home, Briefcase, Heart, Stethoscope } from "lucide-react";
+import { CalendarCheck, Bell, RefreshCw, MessageSquare, Sparkles, Scissors, Home, Briefcase, Heart, Stethoscope, Volume2, VolumeX } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { MeshGradient } from "@paper-design/shaders-react";
 import BookDemoModal from "@/components/BookDemoModal";
@@ -44,6 +44,7 @@ const Index = () => {
   const navigate = useNavigate();
   const [demoOpen, setDemoOpen] = useState(false);
   const [showNav, setShowNav] = useState(false);
+  const [muted, setMuted] = useState(false);
 
   // Music only for non-logged-in users
   const heroRef = useRef<HTMLDivElement>(null);
@@ -118,6 +119,13 @@ const Index = () => {
     };
   }, [user, loading]);
 
+  const toggleMute = () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.muted = !muted;
+    setMuted(!muted);
+  };
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => setShowNav(!entry.isIntersecting),
@@ -162,6 +170,19 @@ const Index = () => {
           ref={heroRef}
           className="relative h-screen w-full snap-start snap-always flex items-center justify-center overflow-hidden"
         >
+          {/* Mute button */}
+          {!user && (
+            <motion.button
+              onClick={toggleMute}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 2, duration: 1 }}
+              className="absolute bottom-8 right-8 z-20 p-2.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm text-white/40 hover:text-white/70 hover:bg-white/10 transition-all duration-300"
+              aria-label={muted ? "Unmute" : "Mute"}
+            >
+              {muted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+            </motion.button>
+          )}
           <motion.div
             initial={{ opacity: 0, scale: 0.92 }}
             animate={{ opacity: 1, scale: 1 }}
