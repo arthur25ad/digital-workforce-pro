@@ -22,12 +22,12 @@ const steps = [
 ];
 
 const industries = [
-  { icon: Sparkles, label: "Med Spas" },
-  { icon: Scissors, label: "Salons" },
-  { icon: Stethoscope, label: "Clinics" },
-  { icon: Home, label: "Home Services" },
-  { icon: Briefcase, label: "Consultants" },
-  { icon: Heart, label: "Agencies" },
+  { icon: Sparkles, label: "Med Spas", benefits: ["Captures consultation requests", "Confirms appointments", "Sends reminders and post-visit follow-up"] },
+  { icon: Scissors, label: "Salons", benefits: ["Books appointments faster", "Fills openings", "Sends reminder texts so fewer clients miss their slot"] },
+  { icon: Stethoscope, label: "Clinics", benefits: ["Organizes appointment requests", "Confirms visit details", "Keeps follow-up and reminders moving"] },
+  { icon: Home, label: "Home Services", benefits: ["Captures estimate or service requests", "Schedules jobs clearly", "Handles reminders and reschedules"] },
+  { icon: Briefcase, label: "Consultants", benefits: ["Organizes discovery calls", "Confirms booked calls", "Follows up after meetings"] },
+  { icon: Heart, label: "Agencies", benefits: ["Captures new leads", "Books intro calls", "Keeps follow-up from slipping"] },
 ];
 
 const sectionVariants = {
