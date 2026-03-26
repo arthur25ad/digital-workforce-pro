@@ -59,7 +59,7 @@ const Index = () => {
     if (loading || user) return;
     const maxVol = 0.045;
     const fadeInSeconds = 5.5;
-    const playAtMaxSeconds = 30;
+    const playAtMaxSeconds = 19;
     const fadeOutSeconds = 8;
     const plannedFadeOutStart = fadeInSeconds + playAtMaxSeconds;
 
