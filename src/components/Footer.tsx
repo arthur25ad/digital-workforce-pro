@@ -1,47 +1,92 @@
+import { ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import { getFooterGroups } from "@/config/siteNav";
 
-const footerGroups = getFooterGroups();
+const groups = [
+  {
+    title: "Platform",
+    links: [
+      { label: "Capabilities", href: "/features" },
+      { label: "How It Works", href: "/how-it-works" },
+      { label: "Pricing", href: "/pricing" },
+      { label: "AI Roles", href: "/ai-employees" },
+    ],
+  },
+  {
+    title: "Use Cases",
+    links: [
+      { label: "Industries", href: "/industries" },
+      { label: "FAQ", href: "/faq" },
+      { label: "Support", href: "/support" },
+      { label: "VANTABRAIN", href: "/vantabrain" },
+    ],
+  },
+  {
+    title: "Company",
+    links: [
+      { label: "Privacy", href: "/privacy" },
+      { label: "Terms", href: "/terms" },
+      { label: "Log In", href: "/auth" },
+      { label: "Get Started", href: "/get-started" },
+    ],
+  },
+];
 
-const Footer = () => {
+export default function Footer() {
   return (
-    <footer className="border-t border-border/40 bg-background px-4 py-8 md:px-12 md:py-12 lg:px-16">
-      <div className="mx-auto grid max-w-[1600px] gap-8 md:gap-10 md:grid-cols-4">
-        <div>
-          <Link to="/" className="font-display text-xl font-bold tracking-tight">
-            <span style={{
-              backgroundImage: "linear-gradient(135deg, hsl(0 0% 100%), hsl(225 60% 82%), hsl(0 0% 100%), hsl(225 50% 78%))",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-            }}>VANTORY</span>
-          </Link>
-          <p className="mt-3 max-w-sm text-sm text-muted-foreground">
-            Your AI scheduling assistant for service businesses. Fewer missed bookings, better follow-ups.
-          </p>
-        </div>
-        {footerGroups.map((group) => (
-          <div key={group.title}>
-            <h4 className="mb-3 font-display text-sm font-semibold text-foreground">{group.title}</h4>
-            <ul className="space-y-2">
-              {group.links.map((link) => (
-                <li key={link.label}>
-                  <Link to={link.href} className="text-sm text-muted-foreground transition-colors hover:text-foreground">
-                    {link.label}
-                  </Link>
-                </li>
+    <footer className="px-5 pb-8 pt-12 md:px-10 md:pb-10 md:pt-16 lg:px-16">
+      <div className="site-container">
+        <div className="surface-panel overflow-hidden px-6 py-8 md:px-10 md:py-10">
+          <div className="grid gap-10 lg:grid-cols-[1.2fr_1fr]">
+            <div>
+              <p className="font-display text-3xl font-semibold tracking-[-0.08em] text-foreground md:text-4xl">
+                VANTORY
+              </p>
+              <p className="mt-4 max-w-xl text-sm leading-7 text-muted-foreground md:text-base">
+                A premium AI operations assistant for appointment-based businesses that need a calmer calendar,
+                faster follow-up, and a more reliable booking flow.
+              </p>
+
+              <div className="mt-6 flex flex-wrap gap-3">
+                <Link to="/pricing" className="btn-outline-glow">
+                  View Pricing
+                </Link>
+                <Link to="/#final-cta" className="btn-glow">
+                  Book a Demo
+                  <ArrowUpRight size={16} />
+                </Link>
+              </div>
+            </div>
+
+            <div className="grid gap-8 sm:grid-cols-3">
+              {groups.map((group) => (
+                <div key={group.title}>
+                  <p className="font-mono text-[11px] uppercase tracking-[0.24em] text-muted-foreground">
+                    {group.title}
+                  </p>
+                  <div className="mt-4 flex flex-col gap-3">
+                    {group.links.map((link) => (
+                      <Link
+                        key={link.href}
+                        to={link.href}
+                        className="text-sm text-foreground/78 hover:text-foreground"
+                      >
+                        {link.label}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
               ))}
-            </ul>
+            </div>
           </div>
-        ))}
-      </div>
-      <div className="mx-auto mt-8 md:mt-10 max-w-[1600px] border-t border-border/30 pt-4 md:pt-6">
-        <p className="text-center text-xs text-muted-foreground">
-          © {new Date().getFullYear()} VANTORY. All rights reserved.
-        </p>
+
+          <div className="premium-rule my-8" />
+
+          <div className="flex flex-col gap-3 text-xs text-muted-foreground md:flex-row md:items-center md:justify-between">
+            <p>Designed for teams where availability, response time, and follow-up directly affect revenue.</p>
+            <p>&copy; {new Date().getFullYear()} VANTORY. All rights reserved.</p>
+          </div>
+        </div>
       </div>
     </footer>
   );
-};
-
-export default Footer;
+}
