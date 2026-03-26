@@ -58,13 +58,20 @@ const Index = () => {
   useEffect(() => {
     if (loading || user) return;
     const maxVol = 0.045;
+    const fadeInSeconds = 5.5;
+    const playAtMaxSeconds = 30;
+    const fadeOutSeconds = 8;
+    const plannedFadeOutStart = fadeInSeconds + playAtMaxSeconds;
+
     const audio = new Audio("/audio/background-music.mp3");
     audio.crossOrigin = "anonymous";
     audio.loop = false;
     audioRef.current = audio;
     let fadeInInterval: ReturnType<typeof setInterval> | null = null;
-    let fadeOutTimer: ReturnType<typeof setTimeout> | null = null;
+    let fadeOutStartTimer: ReturnType<typeof setTimeout> | null = null;
+    let pauseAfterFadeTimer: ReturnType<typeof setTimeout> | null = null;
     let fadeOutInterval: ReturnType<typeof setInterval> | null = null;
+    let hasStartedFadeOut = false;
 
     const setupWebAudio = () => {
       if (audioCtxRef.current) return;
@@ -95,10 +102,10 @@ const Index = () => {
         const gain = gainNodeRef.current;
         gain.gain.cancelScheduledValues(ctx.currentTime);
         gain.gain.setValueAtTime(0, ctx.currentTime);
-        gain.gain.linearRampToValueAtTime(maxVol, ctx.currentTime + 5.5);
+        gain.gain.linearRampToValueAtTime(maxVol, ctx.currentTime + fadeInSeconds);
         currentVol = maxVol;
       } else {
-        const steps = 55;
+        const steps = Math.round(fadeInSeconds * 10);
         const increment = maxVol / steps;
         fadeInInterval = setInterval(() => {
           if (currentVol < maxVol - 0.001) {
@@ -112,20 +119,28 @@ const Index = () => {
     };
 
     const startFadeOut = () => {
+      if (hasStartedFadeOut) return;
+      hasStartedFadeOut = true;
+
+      if (fadeOutStartTimer) {
+        clearTimeout(fadeOutStartTimer);
+        fadeOutStartTimer = null;
+      }
+
       if (fadeInInterval) { clearInterval(fadeInInterval); fadeInInterval = null; }
       if (gainNodeRef.current && audioCtxRef.current) {
         const ctx = audioCtxRef.current;
         const gain = gainNodeRef.current;
         gain.gain.cancelScheduledValues(ctx.currentTime);
         gain.gain.setValueAtTime(gain.gain.value, ctx.currentTime);
-        gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 8);
+        gain.gain.linearRampToValueAtTime(0, ctx.currentTime + fadeOutSeconds);
         currentVol = 0;
         // Pause audio after fade completes
-        fadeOutTimer = setTimeout(() => {
+        pauseAfterFadeTimer = setTimeout(() => {
           audio.pause();
-        }, 8200);
+        }, (fadeOutSeconds * 1000) + 200);
       } else {
-        const steps = 80;
+        const steps = Math.round(fadeOutSeconds * 10);
         const decrement = maxVol / steps;
         fadeOutInterval = setInterval(() => {
           if (currentVol > 0.001) {
@@ -139,9 +154,33 @@ const Index = () => {
       }
     };
 
+    const getFadeOutDelayMs = () => {
+      const duration = Number.isFinite(audio.duration) ? audio.duration : 0;
+      if (duration <= 0) return plannedFadeOutStart * 1000;
+
+      const maxSafeFadeOutStart = Math.max(0, duration - fadeOutSeconds);
+      return Math.min(plannedFadeOutStart, maxSafeFadeOutStart) * 1000;
+    };
+
+    const scheduleFadeOut = () => {
+      if (hasStartedFadeOut) return;
+
+      if (fadeOutStartTimer) {
+        clearTimeout(fadeOutStartTimer);
+      }
+
+      fadeOutStartTimer = setTimeout(startFadeOut, getFadeOutDelayMs());
+    };
+
+    const onMetadataReady = () => {
+      if (!audio.paused && !audio.ended) {
+        scheduleFadeOut();
+      }
+    };
+
     const onPlay = () => {
       startFadeIn();
-      fadeOutTimer = setTimeout(startFadeOut, 35500);
+      scheduleFadeOut();
     };
 
     const playAudio = () => {
@@ -155,6 +194,9 @@ const Index = () => {
       document.removeEventListener("touchstart", playAudio);
     };
 
+    audio.addEventListener("loadedmetadata", onMetadataReady);
+    audio.addEventListener("durationchange", onMetadataReady);
+
     setupWebAudio();
     audio.play().then(onPlay).catch(() => {
       document.addEventListener("click", playAudio, { once: true });
@@ -164,13 +206,16 @@ const Index = () => {
 
     return () => {
       if (fadeInInterval) clearInterval(fadeInInterval);
-      if (fadeOutTimer) clearTimeout(fadeOutTimer);
+      if (fadeOutStartTimer) clearTimeout(fadeOutStartTimer);
+      if (pauseAfterFadeTimer) clearTimeout(pauseAfterFadeTimer);
       if (fadeOutInterval) clearInterval(fadeOutInterval);
       audio.pause();
       audio.src = "";
       document.removeEventListener("click", playAudio);
       document.removeEventListener("scroll", playAudio);
       document.removeEventListener("touchstart", playAudio);
+      audio.removeEventListener("loadedmetadata", onMetadataReady);
+      audio.removeEventListener("durationchange", onMetadataReady);
     };
   }, [user, loading]);
 
