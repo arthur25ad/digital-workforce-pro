@@ -424,21 +424,47 @@ const Index = () => {
             >
               Built for businesses that live on appointments.
             </h2>
-            <div className="mt-10 md:mt-14 flex flex-wrap justify-center gap-3 md:gap-4">
+            <div className="mt-10 md:mt-14 flex flex-wrap justify-center gap-2.5 md:gap-3">
               {industries.map((ind, i) => (
-                <motion.span
+                <motion.button
                   key={ind.label}
+                  onClick={() => setActiveIndustry(i)}
                   initial={{ opacity: 0, scale: 0.9 }}
                   whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.4, delay: i * 0.08 }}
-                  className="inline-flex items-center gap-2 rounded-full border border-border/50 bg-card/60 backdrop-blur-sm px-5 py-2.5 text-sm font-medium text-foreground"
+                  className={`inline-flex items-center gap-2 rounded-full border px-5 py-2.5 text-sm font-medium transition-all duration-300 ${
+                    activeIndustry === i
+                      ? "border-primary/60 bg-primary/15 text-foreground shadow-[0_0_20px_-4px_hsl(var(--primary)/0.3)]"
+                      : "border-border/50 bg-card/60 backdrop-blur-sm text-foreground/70 hover:border-primary/30 hover:text-foreground"
+                  }`}
                 >
-                  <ind.icon size={16} className="text-primary" />
+                  <ind.icon size={16} className={activeIndustry === i ? "text-primary" : "text-primary/60"} />
                   {ind.label}
-                </motion.span>
+                </motion.button>
               ))}
             </div>
+
+            {/* Content switcher */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeIndustry}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                className="mt-8 md:mt-10 mx-auto max-w-md"
+              >
+                <div className="rounded-2xl border border-border/30 bg-card/40 backdrop-blur-sm p-6 md:p-8 text-left space-y-3">
+                  {industries[activeIndustry].benefits.map((benefit, bi) => (
+                    <div key={bi} className="flex items-start gap-3">
+                      <div className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary/70" />
+                      <span className="text-sm md:text-base text-muted-foreground">{benefit}</span>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            </AnimatePresence>
           </motion.div>
         </section>
 
@@ -452,14 +478,22 @@ const Index = () => {
             className="max-w-2xl text-center"
           >
             <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-foreground">
-              See VANTORY in action.
+              Get Started with VANTORY
             </h2>
             <p className="mt-4 md:mt-5 text-base md:text-lg text-muted-foreground max-w-md mx-auto">
-              Book a demo and see how the workflow would look for your business.
+              Set up your AI scheduling assistant and start saving hours every week.
             </p>
-            <div className="mt-8 flex flex-wrap justify-center gap-3 md:gap-4">
-              <button onClick={() => setDemoOpen(true)} className="btn-glow">Book Demo</button>
-              <Link to="/pricing" className="btn-outline-glow">Pricing</Link>
+            <div className="mt-8 flex flex-col items-center gap-4">
+              <a
+                href="https://aivantory.com/auth"
+                className="btn-glow inline-flex items-center justify-center px-10 py-3.5 text-base font-semibold"
+              >
+                Get Started
+              </a>
+              <div className="flex flex-wrap justify-center gap-3">
+                <button onClick={() => setDemoOpen(true)} className="btn-outline-glow text-sm">Book a Demo</button>
+                <Link to="/pricing" className="btn-outline-glow text-sm">Pricing</Link>
+              </div>
             </div>
           </motion.div>
         </section>
