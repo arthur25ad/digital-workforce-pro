@@ -119,6 +119,13 @@ const Index = () => {
     };
   }, [user, loading]);
 
+  const toggleMute = () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.muted = !muted;
+    setMuted(!muted);
+  };
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => setShowNav(!entry.isIntersecting),
