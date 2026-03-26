@@ -52,7 +52,7 @@ const Index = () => {
   // Background music - only for non-logged-in users
   useEffect(() => {
     if (loading || user) return;
-    const maxVol = 0.037;
+    const maxVol = 0.045;
     const audio = new Audio("/audio/background-music.mp3");
     audio.loop = false;
     audio.volume = 0;
