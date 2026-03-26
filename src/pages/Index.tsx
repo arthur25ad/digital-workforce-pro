@@ -74,10 +74,7 @@ const Index = () => {
         <MeshGradient
           style={{ width: "100%", height: "100%" }}
           speed={0.15}
-          color1="#0a0a0f"
-          color2="#1a1a2e"
-          color3="#16213e"
-          color4="#0f0f14"
+          colors={["#0a0a0f", "#1a1a2e", "#16213e", "#0f0f14"]}
         />
       </div>
 
