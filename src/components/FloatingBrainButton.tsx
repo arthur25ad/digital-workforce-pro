@@ -22,8 +22,14 @@ export default function FloatingBrainButton() {
 
   return (
     <>
-      {/* Floating button */}
-      <motion.button
+      {/* Floating button - only after scroll */}
+      <AnimatePresence>
+        {scrolled && (
+          <motion.button
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            transition={{ duration: 0.3 }}
         onClick={() => setOpen(!open)}
         className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-50 flex items-center gap-2 rounded-xl md:rounded-2xl border border-border/50 bg-card px-3 py-2.5 md:px-4 md:py-3 font-display text-xs md:text-sm font-semibold text-foreground transition-all duration-300 hover:border-purple-500/40"
         style={{
