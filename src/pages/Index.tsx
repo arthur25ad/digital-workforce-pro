@@ -73,7 +73,7 @@ const Index = () => {
       <div className="fixed inset-0 z-0">
         <MeshGradient
           style={{ width: "100%", height: "100%" }}
-          speed={0.15}
+          speed={1.2}
           colors={["#0a0a0f", "#1a1a2e", "#16213e", "#0f0f14"]}
         />
       </div>
