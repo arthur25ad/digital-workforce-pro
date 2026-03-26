@@ -50,37 +50,68 @@ const Index = () => {
   const heroRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
 
+  // Web Audio API refs for iOS-compatible volume control
+  const audioCtxRef = useRef<AudioContext | null>(null);
+  const gainNodeRef = useRef<GainNode | null>(null);
+
   // Background music - only for non-logged-in users
   useEffect(() => {
     if (loading || user) return;
     const maxVol = 0.045;
     const audio = new Audio("/audio/background-music.mp3");
+    audio.crossOrigin = "anonymous";
     audio.loop = false;
-    audio.volume = 0;
     audioRef.current = audio;
     let fadeInInterval: ReturnType<typeof setInterval> | null = null;
     let fadeOutTimer: ReturnType<typeof setTimeout> | null = null;
     let fadeOutInterval: ReturnType<typeof setInterval> | null = null;
 
+    const setupWebAudio = () => {
+      if (audioCtxRef.current) return;
+      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const source = ctx.createMediaElementSource(audio);
+      const gain = ctx.createGain();
+      gain.gain.value = 0;
+      source.connect(gain);
+      gain.connect(ctx.destination);
+      audioCtxRef.current = ctx;
+      gainNodeRef.current = gain;
+    };
+
+    const setVolume = (v: number) => {
+      if (gainNodeRef.current) {
+        gainNodeRef.current.gain.value = v;
+      } else {
+        audio.volume = v;
+      }
+    };
+
+    const getVolume = (): number => {
+      if (gainNodeRef.current) return gainNodeRef.current.gain.value;
+      return audio.volume;
+    };
+
     const startFadeIn = () => {
-      const steps = 55; // ~5.5 seconds / 100ms
+      const steps = 55;
       const increment = maxVol / steps;
       fadeInInterval = setInterval(() => {
-        if (audio.volume < maxVol - 0.001) {
-          audio.volume = Math.min(maxVol, audio.volume + increment);
+        const cur = getVolume();
+        if (cur < maxVol - 0.001) {
+          setVolume(Math.min(maxVol, cur + increment));
         } else {
-          audio.volume = maxVol;
+          setVolume(maxVol);
           if (fadeInInterval) clearInterval(fadeInInterval);
         }
       }, 100);
     };
 
     const startFadeOut = () => {
-      const steps = 80; // 8 seconds / 100ms
+      const steps = 80;
       const decrement = maxVol / steps;
       fadeOutInterval = setInterval(() => {
-        if (audio.volume > 0.001) {
-          audio.volume = Math.max(0, audio.volume - decrement);
+        const cur = getVolume();
+        if (cur > 0.001) {
+          setVolume(Math.max(0, cur - decrement));
         } else {
           audio.pause();
           if (fadeOutInterval) clearInterval(fadeOutInterval);
@@ -90,17 +121,21 @@ const Index = () => {
 
     const onPlay = () => {
       startFadeIn();
-      // Fade out starts 30s after reaching max volume (~5.5s fade-in + 30s)
       fadeOutTimer = setTimeout(startFadeOut, 35500);
     };
 
     const playAudio = () => {
+      setupWebAudio();
+      if (audioCtxRef.current?.state === "suspended") {
+        audioCtxRef.current.resume();
+      }
       audio.play().then(onPlay).catch(() => {});
       document.removeEventListener("click", playAudio);
       document.removeEventListener("scroll", playAudio);
       document.removeEventListener("touchstart", playAudio);
     };
 
+    setupWebAudio();
     audio.play().then(onPlay).catch(() => {
       document.addEventListener("click", playAudio, { once: true });
       document.addEventListener("scroll", playAudio, { once: true });
