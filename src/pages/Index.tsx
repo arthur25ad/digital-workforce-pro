@@ -49,8 +49,9 @@ const Index = () => {
   const heroRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
 
-  // Background music - autoplay on first interaction
+  // Background music - only for non-logged-in users
   useEffect(() => {
+    if (loading || user) return;
     const audio = new Audio("/audio/background-music.mp3");
     audio.loop = false;
     audio.volume = 0.02125;
