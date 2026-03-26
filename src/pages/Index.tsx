@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { CalendarCheck, Bell, RefreshCw, MessageSquare, Sparkles, Scissors, Home, Briefcase, Heart, Stethoscope } from "lucide-react";
-import { ShaderAnimation } from "@/components/ui/shader-lines";
+import { MeshGradient } from "@paper-design/shaders-react";
 import BookDemoModal from "@/components/BookDemoModal";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -69,24 +69,12 @@ const Index = () => {
         )}
       </AnimatePresence>
 
-      {/* ═══ FIXED CONTINUOUS SHADER BACKGROUND ═══ */}
+      {/* ═══ FIXED CONTINUOUS PAPER SHADER BACKGROUND ═══ */}
       <div className="fixed inset-0 z-0">
-        <ShaderAnimation />
-        {/* Gradient overlay: shader visible at top, fades to solid dark further down */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background: `linear-gradient(
-              to bottom,
-              transparent 0%,
-              transparent 12%,
-              hsl(225 25% 3% / 0.55) 25%,
-              hsl(225 25% 3% / 0.82) 40%,
-              hsl(225 25% 3% / 0.92) 55%,
-              hsl(225 25% 3% / 0.97) 70%,
-              hsl(225 25% 3%) 85%
-            )`,
-          }}
+        <MeshGradient
+          style={{ width: "100%", height: "100%" }}
+          speed={0.15}
+          colors={["#0a0a0f", "#1a1a2e", "#16213e", "#0f0f14"]}
         />
       </div>
 
@@ -94,7 +82,7 @@ const Index = () => {
         className="relative z-10 h-screen overflow-y-auto snap-y snap-mandatory"
         style={{ scrollBehavior: "smooth" }}
       >
-        {/* ═══ SECTION 1: HERO — Shader + Wordmark ═══ */}
+        {/* ═══ SECTION 1: HERO — Wordmark ═══ */}
         <section
           ref={heroRef}
           className="relative h-screen w-full snap-start snap-always flex items-center justify-center overflow-hidden"
