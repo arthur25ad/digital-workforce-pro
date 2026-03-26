@@ -64,7 +64,7 @@ const Index = () => {
 
     const startFadeOut = () => {
       const steps = 80; // 8 seconds / 100ms
-      const decrement = 0.12 / steps;
+      const decrement = 0.015 / steps;
       fadeInterval = setInterval(() => {
         if (audio.volume > 0.005) {
           audio.volume = Math.max(0, audio.volume - decrement);
