@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { CalendarCheck, Bell, RefreshCw, MessageSquare, Sparkles, Scissors, Home, Briefcase, Heart, Stethoscope } from "lucide-react";
-import { MeshGradient } from "@paper-design/shaders-react";
+import { GenerativeArtScene } from "@/components/ui/anomalous-matter-hero";
 import BookDemoModal from "@/components/BookDemoModal";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
