@@ -45,11 +45,7 @@ const Index = () => {
   const [demoOpen, setDemoOpen] = useState(false);
   const [showNav, setShowNav] = useState(false);
 
-  useEffect(() => {
-    if (!loading && user) {
-      navigate("/dashboard", { replace: true });
-    }
-  }, [user, loading, navigate]);
+  // Music only for non-logged-in users
   const heroRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
 
