@@ -179,8 +179,8 @@ const Index = () => {
     };
 
     const onPlay = () => {
-      // Mark as played so it never plays again
-      localStorage.setItem(PLAYED_KEY, "true");
+      // Mark as played for this session
+      sessionStorage.setItem(PLAYED_KEY, "true");
       startFadeIn();
       scheduleFadeOut();
     };
