@@ -59,9 +59,9 @@ const Index = () => {
   useEffect(() => {
     if (loading || user) return;
 
-    // Only play once ever per visitor
+    // Only play once per session (new tab/window = new play)
     const PLAYED_KEY = "vantory_hero_audio_played";
-    if (localStorage.getItem(PLAYED_KEY) === "true") return;
+    if (sessionStorage.getItem(PLAYED_KEY) === "true") return;
 
     const maxVol = 0.0375;
     const fadeInSeconds = 5.5;
@@ -179,8 +179,8 @@ const Index = () => {
     };
 
     const onPlay = () => {
-      // Mark as played so it never plays again
-      localStorage.setItem(PLAYED_KEY, "true");
+      // Mark as played for this session
+      sessionStorage.setItem(PLAYED_KEY, "true");
       startFadeIn();
       scheduleFadeOut();
     };
