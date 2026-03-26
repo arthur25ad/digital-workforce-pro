@@ -82,6 +82,8 @@ const Index = () => {
     });
 
     return () => {
+      if (fadeTimer) clearTimeout(fadeTimer);
+      if (fadeInterval) clearInterval(fadeInterval);
       audio.pause();
       audio.src = "";
       document.removeEventListener("click", playAudio);
