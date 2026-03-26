@@ -54,9 +54,11 @@ const Index = () => {
     let fadeInterval: ReturnType<typeof setInterval> | null = null;
 
     const startFadeOut = () => {
+      const steps = 80; // 8 seconds / 100ms
+      const decrement = 0.12 / steps;
       fadeInterval = setInterval(() => {
         if (audio.volume > 0.005) {
-          audio.volume = Math.max(0, audio.volume - 0.003);
+          audio.volume = Math.max(0, audio.volume - decrement);
         } else {
           audio.pause();
           if (fadeInterval) clearInterval(fadeInterval);
