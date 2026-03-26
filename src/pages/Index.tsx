@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
-import { CalendarCheck, Bell, RefreshCw, MessageSquare, Sparkles, Scissors, Home, Briefcase, Heart, Stethoscope } from "lucide-react";
+import { CalendarCheck, Bell, RefreshCw, MessageSquare, Sparkles, Scissors, Home, Briefcase, Heart, Stethoscope, Volume2, VolumeX } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { MeshGradient } from "@paper-design/shaders-react";
 import BookDemoModal from "@/components/BookDemoModal";
