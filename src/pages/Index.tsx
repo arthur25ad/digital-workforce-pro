@@ -54,12 +54,17 @@ const Index = () => {
   const audioCtxRef = useRef<AudioContext | null>(null);
   const gainNodeRef = useRef<GainNode | null>(null);
 
-  // Background music - only for non-logged-in users
+  // Background music - only for non-logged-in first-time visitors
   useEffect(() => {
     if (loading || user) return;
-    const maxVol = 0.045;
+
+    // Only play once ever per visitor
+    const PLAYED_KEY = "vantory_hero_audio_played";
+    if (localStorage.getItem(PLAYED_KEY) === "true") return;
+
+    const maxVol = 0.0375;
     const fadeInSeconds = 5.5;
-    const playAtMaxSeconds = 19;
+    const playAtMaxSeconds = 10;
     const fadeOutSeconds = 8;
     const plannedFadeOutStart = fadeInSeconds + playAtMaxSeconds;
 
@@ -135,7 +140,6 @@ const Index = () => {
         gain.gain.setValueAtTime(gain.gain.value, ctx.currentTime);
         gain.gain.linearRampToValueAtTime(0, ctx.currentTime + fadeOutSeconds);
         currentVol = 0;
-        // Pause audio after fade completes
         pauseAfterFadeTimer = setTimeout(() => {
           audio.pause();
         }, (fadeOutSeconds * 1000) + 200);
@@ -157,18 +161,13 @@ const Index = () => {
     const getFadeOutDelayMs = () => {
       const duration = Number.isFinite(audio.duration) ? audio.duration : 0;
       if (duration <= 0) return plannedFadeOutStart * 1000;
-
       const maxSafeFadeOutStart = Math.max(0, duration - fadeOutSeconds);
       return Math.min(plannedFadeOutStart, maxSafeFadeOutStart) * 1000;
     };
 
     const scheduleFadeOut = () => {
       if (hasStartedFadeOut) return;
-
-      if (fadeOutStartTimer) {
-        clearTimeout(fadeOutStartTimer);
-      }
-
+      if (fadeOutStartTimer) clearTimeout(fadeOutStartTimer);
       fadeOutStartTimer = setTimeout(startFadeOut, getFadeOutDelayMs());
     };
 
@@ -179,6 +178,8 @@ const Index = () => {
     };
 
     const onPlay = () => {
+      // Mark as played so it never plays again
+      localStorage.setItem(PLAYED_KEY, "true");
       startFadeIn();
       scheduleFadeOut();
     };
