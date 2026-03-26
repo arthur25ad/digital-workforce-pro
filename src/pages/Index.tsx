@@ -42,6 +42,37 @@ const Index = () => {
   const [demoOpen, setDemoOpen] = useState(false);
   const [showNav, setShowNav] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  // Background music - autoplay on first interaction
+  useEffect(() => {
+    const audio = new Audio("/audio/background-music.mp3");
+    audio.loop = true;
+    audio.volume = 0.12;
+    audioRef.current = audio;
+
+    const playAudio = () => {
+      audio.play().catch(() => {});
+      document.removeEventListener("click", playAudio);
+      document.removeEventListener("scroll", playAudio);
+      document.removeEventListener("touchstart", playAudio);
+    };
+
+    // Try autoplay first, fall back to first interaction
+    audio.play().catch(() => {
+      document.addEventListener("click", playAudio, { once: true });
+      document.addEventListener("scroll", playAudio, { once: true });
+      document.addEventListener("touchstart", playAudio, { once: true });
+    });
+
+    return () => {
+      audio.pause();
+      audio.src = "";
+      document.removeEventListener("click", playAudio);
+      document.removeEventListener("scroll", playAudio);
+      document.removeEventListener("touchstart", playAudio);
+    };
+  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
