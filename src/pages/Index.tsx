@@ -98,7 +98,7 @@ const Index = () => {
       document.removeEventListener("scroll", playAudio);
       document.removeEventListener("touchstart", playAudio);
     };
-  }, []);
+  }, [user, loading]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
