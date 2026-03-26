@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { CalendarCheck, Bell, RefreshCw, MessageSquare, Sparkles, Scissors, Home, Briefcase, Heart, Stethoscope } from "lucide-react";
-import { MeshGradient } from "@paper-design/shaders-react";
+import { GenerativeArtScene } from "@/components/ui/anomalous-matter-hero";
 import BookDemoModal from "@/components/BookDemoModal";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -69,13 +69,9 @@ const Index = () => {
         )}
       </AnimatePresence>
 
-      {/* ═══ FIXED CONTINUOUS PAPER SHADER BACKGROUND ═══ */}
-      <div className="fixed inset-0 z-0">
-        <MeshGradient
-          style={{ width: "100%", height: "100%" }}
-          speed={1.2}
-          colors={["#0a0a0f", "#1a1a2e", "#16213e", "#0f0f14"]}
-        />
+      {/* ═══ FIXED CONTINUOUS 3D SPHERE BACKGROUND ═══ */}
+      <div className="fixed inset-0 z-0 bg-background">
+        <GenerativeArtScene />
       </div>
 
       <div
