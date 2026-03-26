@@ -47,19 +47,35 @@ const Index = () => {
   // Background music - autoplay on first interaction
   useEffect(() => {
     const audio = new Audio("/audio/background-music.mp3");
-    audio.loop = true;
+    audio.loop = false;
     audio.volume = 0.12;
     audioRef.current = audio;
+    let fadeTimer: ReturnType<typeof setTimeout> | null = null;
+    let fadeInterval: ReturnType<typeof setInterval> | null = null;
+
+    const startFadeOut = () => {
+      fadeInterval = setInterval(() => {
+        if (audio.volume > 0.005) {
+          audio.volume = Math.max(0, audio.volume - 0.003);
+        } else {
+          audio.pause();
+          if (fadeInterval) clearInterval(fadeInterval);
+        }
+      }, 100);
+    };
+
+    const onPlay = () => {
+      fadeTimer = setTimeout(startFadeOut, 30000);
+    };
 
     const playAudio = () => {
-      audio.play().catch(() => {});
+      audio.play().then(onPlay).catch(() => {});
       document.removeEventListener("click", playAudio);
       document.removeEventListener("scroll", playAudio);
       document.removeEventListener("touchstart", playAudio);
     };
 
-    // Try autoplay first, fall back to first interaction
-    audio.play().catch(() => {
+    audio.play().then(onPlay).catch(() => {
       document.addEventListener("click", playAudio, { once: true });
       document.addEventListener("scroll", playAudio, { once: true });
       document.addEventListener("touchstart", playAudio, { once: true });
