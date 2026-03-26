@@ -94,8 +94,9 @@ const Index = () => {
             className="relative z-10 text-center"
           >
             <h1
-              className="font-display text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-bold tracking-tighter"
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold tracking-tight"
               style={{
+                fontFamily: "'SF Pro Display', 'SF Pro', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif",
                 backgroundImage:
                   "linear-gradient(135deg, hsl(0 0% 100%), hsl(225 60% 82%), hsl(0 0% 100%), hsl(225 50% 78%))",
                 WebkitBackgroundClip: "text",
