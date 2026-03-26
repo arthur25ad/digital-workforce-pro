@@ -67,6 +67,17 @@
   html {
     scroll-behavior: smooth;
   }
+
+  /* Snap scroll easing for homepage sections */
+  .snap-y {
+    scroll-snap-type: y mandatory;
+  }
+  .snap-start {
+    scroll-snap-align: start;
+  }
+  .snap-always {
+    scroll-snap-stop: always;
+  }
 }
 
 @layer components {
