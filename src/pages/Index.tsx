@@ -57,14 +57,14 @@ const Index = () => {
   useEffect(() => {
     const audio = new Audio("/audio/background-music.mp3");
     audio.loop = false;
-    audio.volume = 0.015;
+    audio.volume = 0.02125;
     audioRef.current = audio;
     let fadeTimer: ReturnType<typeof setTimeout> | null = null;
     let fadeInterval: ReturnType<typeof setInterval> | null = null;
 
     const startFadeOut = () => {
       const steps = 80; // 8 seconds / 100ms
-      const decrement = 0.015 / steps;
+      const decrement = 0.02125 / steps;
       fadeInterval = setInterval(() => {
         if (audio.volume > 0.005) {
           audio.volume = Math.max(0, audio.volume - decrement);
