@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { CalendarCheck, Bell, RefreshCw, MessageSquare, Sparkles, Scissors, Home, Briefcase, Heart, Stethoscope } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 import { MeshGradient } from "@paper-design/shaders-react";
 import BookDemoModal from "@/components/BookDemoModal";
 import Navbar from "@/components/Navbar";
@@ -39,8 +40,16 @@ const sectionVariants = {
 };
 
 const Index = () => {
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
   const [demoOpen, setDemoOpen] = useState(false);
   const [showNav, setShowNav] = useState(false);
+
+  useEffect(() => {
+    if (!loading && user) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [user, loading, navigate]);
   const heroRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
 
