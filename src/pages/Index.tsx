@@ -8,26 +8,10 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
 const features = [
-  {
-    icon: MessageSquare,
-    title: "Requests",
-    desc: "Catches new requests before they get lost.",
-  },
-  {
-    icon: CalendarCheck,
-    title: "Bookings",
-    desc: "Keeps bookings organized.",
-  },
-  {
-    icon: Bell,
-    title: "Reminders",
-    desc: "Sends reminders on time.",
-  },
-  {
-    icon: RefreshCw,
-    title: "Follow-up",
-    desc: "Keeps follow-up moving.",
-  },
+  { icon: MessageSquare, title: "Requests", desc: "Catches new requests before they get lost." },
+  { icon: CalendarCheck, title: "Bookings", desc: "Keeps bookings organized." },
+  { icon: Bell, title: "Reminders", desc: "Sends reminders on time." },
+  { icon: RefreshCw, title: "Follow-up", desc: "Keeps follow-up moving." },
 ];
 
 const steps = [
@@ -85,8 +69,29 @@ const Index = () => {
         )}
       </AnimatePresence>
 
+      {/* ═══ FIXED CONTINUOUS SHADER BACKGROUND ═══ */}
+      <div className="fixed inset-0 z-0">
+        <ShaderAnimation />
+        {/* Gradient overlay: shader visible at top, fades to solid dark further down */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: `linear-gradient(
+              to bottom,
+              transparent 0%,
+              transparent 12%,
+              hsl(225 25% 3% / 0.55) 25%,
+              hsl(225 25% 3% / 0.82) 40%,
+              hsl(225 25% 3% / 0.92) 55%,
+              hsl(225 25% 3% / 0.97) 70%,
+              hsl(225 25% 3%) 85%
+            )`,
+          }}
+        />
+      </div>
+
       <div
-        className="h-screen overflow-y-auto snap-y snap-mandatory"
+        className="relative z-10 h-screen overflow-y-auto snap-y snap-mandatory"
         style={{ scrollBehavior: "smooth" }}
       >
         {/* ═══ SECTION 1: HERO — Shader + Wordmark ═══ */}
@@ -94,7 +99,6 @@ const Index = () => {
           ref={heroRef}
           className="relative h-screen w-full snap-start snap-always flex items-center justify-center overflow-hidden"
         >
-          <ShaderAnimation />
           <motion.div
             initial={{ opacity: 0, scale: 0.92 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -115,7 +119,7 @@ const Index = () => {
             </h1>
           </motion.div>
 
-          {/* Subtle scroll hint */}
+          {/* Scroll hint */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 0.4 }}
@@ -132,7 +136,7 @@ const Index = () => {
         </section>
 
         {/* ═══ SECTION 2: WHAT THIS IS ═══ */}
-        <section className="relative h-screen w-full snap-start snap-always flex items-center justify-center bg-background px-6">
+        <section className="relative h-screen w-full snap-start snap-always flex items-center justify-center px-6">
           <motion.div
             variants={sectionVariants}
             initial="hidden"
@@ -153,7 +157,7 @@ const Index = () => {
         </section>
 
         {/* ═══ SECTION 3: WHAT IT HANDLES ═══ */}
-        <section className="relative min-h-screen w-full snap-start snap-always flex items-center justify-center bg-background px-6 py-16">
+        <section className="relative min-h-screen w-full snap-start snap-always flex items-center justify-center px-6 py-16">
           <motion.div
             variants={sectionVariants}
             initial="hidden"
@@ -172,7 +176,7 @@ const Index = () => {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
-                  className="group rounded-2xl border border-border/40 bg-card/50 p-6 md:p-8 text-left transition-colors hover:border-primary/30"
+                  className="group rounded-2xl border border-border/40 bg-card/50 backdrop-blur-sm p-6 md:p-8 text-left transition-colors hover:border-primary/30"
                 >
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary mb-4">
                     <f.icon size={20} />
@@ -186,7 +190,7 @@ const Index = () => {
         </section>
 
         {/* ═══ SECTION 4: HOW IT WORKS ═══ */}
-        <section className="relative min-h-screen w-full snap-start snap-always flex items-center justify-center bg-background px-6 py-16">
+        <section className="relative min-h-screen w-full snap-start snap-always flex items-center justify-center px-6 py-16">
           <motion.div
             variants={sectionVariants}
             initial="hidden"
@@ -219,7 +223,7 @@ const Index = () => {
         </section>
 
         {/* ═══ SECTION 5: WHO IT'S FOR ═══ */}
-        <section className="relative min-h-screen w-full snap-start snap-always flex items-center justify-center bg-background px-6 py-16">
+        <section className="relative min-h-screen w-full snap-start snap-always flex items-center justify-center px-6 py-16">
           <motion.div
             variants={sectionVariants}
             initial="hidden"
@@ -241,7 +245,7 @@ const Index = () => {
                   whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.4, delay: i * 0.08 }}
-                  className="inline-flex items-center gap-2 rounded-full border border-border/50 bg-card/60 px-5 py-2.5 text-sm font-medium text-foreground"
+                  className="inline-flex items-center gap-2 rounded-full border border-border/50 bg-card/60 backdrop-blur-sm px-5 py-2.5 text-sm font-medium text-foreground"
                 >
                   <ind.icon size={16} className="text-primary" />
                   {ind.label}
@@ -252,7 +256,7 @@ const Index = () => {
         </section>
 
         {/* ═══ SECTION 6: CTA ═══ */}
-        <section className="relative min-h-screen w-full snap-start snap-always flex items-center justify-center bg-background px-6 py-16 blue-ambient">
+        <section className="relative min-h-screen w-full snap-start snap-always flex items-center justify-center px-6 py-16">
           <motion.div
             variants={sectionVariants}
             initial="hidden"
@@ -273,7 +277,7 @@ const Index = () => {
           </motion.div>
         </section>
 
-        {/* Footer — snaps to last section */}
+        {/* Footer */}
         <div className="snap-start">
           <Footer />
         </div>
