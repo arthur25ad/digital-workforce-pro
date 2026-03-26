@@ -52,28 +52,45 @@ const Index = () => {
   // Background music - only for non-logged-in users
   useEffect(() => {
     if (loading || user) return;
+    const maxVol = 0.02125;
     const audio = new Audio("/audio/background-music.mp3");
     audio.loop = false;
-    audio.volume = 0.02125;
+    audio.volume = 0;
     audioRef.current = audio;
-    let fadeTimer: ReturnType<typeof setTimeout> | null = null;
-    let fadeInterval: ReturnType<typeof setInterval> | null = null;
+    let fadeInInterval: ReturnType<typeof setInterval> | null = null;
+    let fadeOutTimer: ReturnType<typeof setTimeout> | null = null;
+    let fadeOutInterval: ReturnType<typeof setInterval> | null = null;
+
+    const startFadeIn = () => {
+      const steps = 55; // ~5.5 seconds / 100ms
+      const increment = maxVol / steps;
+      fadeInInterval = setInterval(() => {
+        if (audio.volume < maxVol - 0.001) {
+          audio.volume = Math.min(maxVol, audio.volume + increment);
+        } else {
+          audio.volume = maxVol;
+          if (fadeInInterval) clearInterval(fadeInInterval);
+        }
+      }, 100);
+    };
 
     const startFadeOut = () => {
       const steps = 80; // 8 seconds / 100ms
-      const decrement = 0.02125 / steps;
-      fadeInterval = setInterval(() => {
-        if (audio.volume > 0.005) {
+      const decrement = maxVol / steps;
+      fadeOutInterval = setInterval(() => {
+        if (audio.volume > 0.001) {
           audio.volume = Math.max(0, audio.volume - decrement);
         } else {
           audio.pause();
-          if (fadeInterval) clearInterval(fadeInterval);
+          if (fadeOutInterval) clearInterval(fadeOutInterval);
         }
       }, 100);
     };
 
     const onPlay = () => {
-      fadeTimer = setTimeout(startFadeOut, 30000);
+      startFadeIn();
+      // Fade out starts 30s after reaching max volume (~5.5s fade-in + 30s)
+      fadeOutTimer = setTimeout(startFadeOut, 35500);
     };
 
     const playAudio = () => {
@@ -90,8 +107,9 @@ const Index = () => {
     });
 
     return () => {
-      if (fadeTimer) clearTimeout(fadeTimer);
-      if (fadeInterval) clearInterval(fadeInterval);
+      if (fadeInInterval) clearInterval(fadeInInterval);
+      if (fadeOutTimer) clearTimeout(fadeOutTimer);
+      if (fadeOutInterval) clearInterval(fadeOutInterval);
       audio.pause();
       audio.src = "";
       document.removeEventListener("click", playAudio);
