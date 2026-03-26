@@ -45,6 +45,7 @@ const Index = () => {
   const [demoOpen, setDemoOpen] = useState(false);
   const [showNav, setShowNav] = useState(false);
   const [muted, setMuted] = useState(false);
+  const [activeIndustry, setActiveIndustry] = useState(0);
 
   // Music only for non-logged-in users
   const heroRef = useRef<HTMLDivElement>(null);
