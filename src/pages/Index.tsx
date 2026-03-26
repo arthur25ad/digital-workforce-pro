@@ -78,26 +78,23 @@ const Index = () => {
       gainNodeRef.current = gain;
     };
 
+    let currentVol = 0;
+
     const setVolume = (v: number) => {
+      currentVol = v;
       if (gainNodeRef.current) {
-        gainNodeRef.current.gain.value = v;
+        gainNodeRef.current.gain.setValueAtTime(v, audioCtxRef.current?.currentTime ?? 0);
       } else {
         audio.volume = v;
       }
-    };
-
-    const getVolume = (): number => {
-      if (gainNodeRef.current) return gainNodeRef.current.gain.value;
-      return audio.volume;
     };
 
     const startFadeIn = () => {
       const steps = 55;
       const increment = maxVol / steps;
       fadeInInterval = setInterval(() => {
-        const cur = getVolume();
-        if (cur < maxVol - 0.001) {
-          setVolume(Math.min(maxVol, cur + increment));
+        if (currentVol < maxVol - 0.001) {
+          setVolume(Math.min(maxVol, currentVol + increment));
         } else {
           setVolume(maxVol);
           if (fadeInInterval) clearInterval(fadeInInterval);
@@ -109,10 +106,10 @@ const Index = () => {
       const steps = 80;
       const decrement = maxVol / steps;
       fadeOutInterval = setInterval(() => {
-        const cur = getVolume();
-        if (cur > 0.001) {
-          setVolume(Math.max(0, cur - decrement));
+        if (currentVol > 0.001) {
+          setVolume(Math.max(0, currentVol - decrement));
         } else {
+          setVolume(0);
           audio.pause();
           if (fadeOutInterval) clearInterval(fadeOutInterval);
         }
