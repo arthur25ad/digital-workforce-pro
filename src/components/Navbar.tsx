@@ -1,30 +1,21 @@
 import { useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import { ArrowUpRight, Menu, Shield, X, LogOut } from "lucide-react";
+import { Menu, X, LogOut, Shield } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-
 import { useAuth } from "@/hooks/useAuth";
-import { cn } from "@/lib/utils";
+import { getTopNavLinks } from "@/config/siteNav";
+import BookDemoModal from "./BookDemoModal";
 
-const navLinks = [
-  { label: "How It Works", href: "/#how-it-works" },
-  { label: "Capabilities", href: "/features" },
-  { label: "Industries", href: "/industries" },
-  { label: "Pricing", href: "/pricing" },
-  { label: "FAQ", href: "/faq" },
-];
+const navLinks = getTopNavLinks();
 
-export default function Navbar() {
+const Navbar = () => {
   const [open, setOpen] = useState(false);
+  const [demoOpen, setDemoOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { user, profile, signOut } = useAuth();
 
-  const isActive = (href: string) => {
-    const [path] = href.split("#");
-    if (!path || path === "/") return location.pathname === "/";
-    return location.pathname === path;
-  };
+  const isApp = location.pathname.startsWith("/dashboard") || location.pathname.startsWith("/ai-employees/") || location.pathname.startsWith("/vantabrain") || location.pathname.startsWith("/choose-roles") || location.pathname.startsWith("/get-started") || location.pathname.startsWith("/change-plan") || location.pathname.startsWith("/subscription-details");
 
   const handleSignOut = async () => {
     await signOut();
@@ -33,137 +24,106 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="fixed inset-x-0 top-0 z-50 px-3 pt-3 md:px-6 md:pt-4">
-        <div className="site-container">
-          <div className="surface-panel flex items-center justify-between px-4 py-3 md:px-6">
-            <Link to="/" className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-border/80 bg-background/70">
-                <span className="font-display text-sm font-semibold tracking-[-0.08em] text-foreground">V</span>
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-[1600px] items-center justify-between px-4 py-3 md:px-12 md:py-4 lg:px-16">
+          <Link to={user ? "/dashboard" : "/"} className="font-display text-xl md:text-2xl font-bold tracking-tight">
+            <span style={{
+              backgroundImage: "linear-gradient(135deg, hsl(0 0% 100%), hsl(225 60% 82%), hsl(0 0% 100%), hsl(225 50% 78%))",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+            }}>VANTORY</span>
+          </Link>
+
+          <div className="hidden items-center gap-8 lg:flex">
+            {!isApp && navLinks.map((link) => (
+              <Link
+                key={link.href}
+                to={link.href}
+                className={`text-sm transition-colors duration-200 hover:text-foreground ${
+                  location.pathname === link.href ? "text-foreground" : "text-muted-foreground"
+                }`}
+              >
+                {link.label.toUpperCase()}
+              </Link>
+            ))}
+            {!isApp && (
+              <button
+                onClick={() => setDemoOpen(true)}
+                className="text-sm text-muted-foreground transition-colors duration-200 hover:text-foreground"
+              >
+                DEMO
+              </button>
+            )}
+            {user ? (
+              <div className="flex items-center gap-3">
+                {profile?.email === "arthur25.ad@gmail.com" && (
+                  <Link to="/staff-portal" className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors" title="Staff Portal">
+                    <Shield size={14} />
+                  </Link>
+                )}
+                {!isApp && (
+                  <Link to="/dashboard" className="btn-glow inline-block text-xs uppercase tracking-wide">DASHBOARD</Link>
+                )}
+                <button onClick={handleSignOut} className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors" title="Sign out">
+                  <LogOut size={14} />
+                </button>
               </div>
-              <div>
-                <p className="font-display text-lg font-semibold tracking-[-0.08em] text-foreground md:text-xl">VANTORY</p>
-                <p className="hidden font-mono text-[10px] uppercase tracking-[0.24em] text-muted-foreground md:block">
-                  AI operations for appointment teams
-                </p>
+            ) : (
+              <div className="flex items-center gap-3">
+                <Link to="/auth" className="rounded-md border border-primary/40 px-4 py-1.5 text-xs uppercase tracking-wide font-medium text-primary transition-all duration-200 hover:border-primary hover:bg-primary/10">LOG IN</Link>
+                <Link to="/get-started" className="btn-glow inline-block text-xs uppercase tracking-wide">GET STARTED</Link>
               </div>
-            </Link>
-
-            <nav className="hidden items-center gap-8 lg:flex">
-              {navLinks.map((item) => (
-                <Link
-                  key={item.href}
-                  to={item.href}
-                  className={cn(
-                    "text-sm font-medium text-muted-foreground hover:text-foreground",
-                    isActive(item.href) && "text-foreground",
-                  )}
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </nav>
-
-            <div className="hidden items-center gap-3 lg:flex">
-              {user ? (
-                <>
-                  {profile?.email === "arthur25.ad@gmail.com" ? (
-                    <Link
-                      to="/staff-portal"
-                      className="pill-muted"
-                      title="Staff Portal"
-                    >
-                      <Shield size={14} className="text-primary" />
-                      Staff
-                    </Link>
-                  ) : null}
-                  <Link to="/dashboard" className="btn-outline-glow">
-                    Dashboard
-                  </Link>
-                  <button type="button" onClick={handleSignOut} className="pill-muted">
-                    <LogOut size={14} />
-                    Sign Out
-                  </button>
-                </>
-              ) : (
-                <>
-                  <Link to="/auth" className="btn-outline-glow">
-                    Log In
-                  </Link>
-                  <Link to="/#final-cta" className="btn-glow">
-                    Book a Demo
-                    <ArrowUpRight size={16} />
-                  </Link>
-                </>
-              )}
-            </div>
-
-            <button
-              type="button"
-              onClick={() => setOpen((current) => !current)}
-              className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-border/80 bg-background/60 text-foreground lg:hidden"
-              aria-label="Toggle navigation"
-            >
-              {open ? <X size={18} /> : <Menu size={18} />}
-            </button>
+            )}
           </div>
-        </div>
-      </header>
 
-      <AnimatePresence>
-        {open ? (
-          <motion.div
-            initial={{ opacity: 0, y: -12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -12 }}
-            transition={{ duration: 0.22 }}
-            className="fixed inset-x-3 top-[84px] z-40 md:inset-x-6 md:top-[96px] lg:hidden"
-          >
-            <div className="surface-panel p-4">
-              <nav className="flex flex-col gap-2">
-                {navLinks.map((item) => (
-                  <Link
-                    key={item.href}
-                    to={item.href}
-                    onClick={() => setOpen(false)}
-                    className="rounded-2xl px-4 py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary/80 hover:text-foreground"
-                  >
-                    {item.label}
+          <button className="text-foreground lg:hidden" onClick={() => setOpen(!open)} aria-label="Toggle menu">
+            {open ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
+
+        <AnimatePresence>
+          {open && (
+            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}
+              className="overflow-hidden border-t border-border/50 bg-background/95 backdrop-blur-xl lg:hidden">
+              <div className="flex flex-col gap-3 px-4 py-4">
+                {!isApp && navLinks.map((link) => (
+                  <Link key={link.href} to={link.href}
+                    className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                    onClick={() => setOpen(false)}>
+                    {link.label.toUpperCase()}
                   </Link>
                 ))}
-              </nav>
-
-              <div className="mt-4 flex flex-col gap-2 border-t border-border/70 pt-4">
+                {!isApp && (
+                  <button onClick={() => { setDemoOpen(true); setOpen(false); }}
+                    className="text-left text-sm text-muted-foreground transition-colors hover:text-foreground">
+                    DEMO
+                  </button>
+                )}
                 {user ? (
                   <>
-                    <Link to="/dashboard" onClick={() => setOpen(false)} className="btn-glow">
-                      Dashboard
-                    </Link>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setOpen(false);
-                        void handleSignOut();
-                      }}
-                      className="btn-outline-glow"
-                    >
-                      Sign Out
-                    </button>
+                    {profile?.email === "arthur25.ad@gmail.com" && (
+                      <Link to="/staff-portal" className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors" onClick={() => setOpen(false)}>
+                        <Shield size={14} /> Staff Portal
+                      </Link>
+                    )}
+                    {!isApp && <Link to="/dashboard" className="btn-glow mt-2 inline-block text-center text-sm" onClick={() => setOpen(false)}>Dashboard</Link>}
+                    <button onClick={() => { handleSignOut(); setOpen(false); }} className="text-sm text-muted-foreground hover:text-foreground">Sign Out</button>
                   </>
                 ) : (
                   <>
-                    <Link to="/auth" onClick={() => setOpen(false)} className="btn-outline-glow">
-                      Log In
-                    </Link>
-                    <Link to="/#final-cta" onClick={() => setOpen(false)} className="btn-glow">
-                      Book a Demo
-                    </Link>
+                    <Link to="/auth" className="rounded-md border border-primary/40 px-4 py-2 text-center text-sm font-medium text-primary transition-all duration-200 hover:border-primary hover:bg-primary/10" onClick={() => setOpen(false)}>Log In</Link>
+                    <Link to="/get-started" className="btn-glow mt-2 inline-block text-center text-sm" onClick={() => setOpen(false)}>Get Started</Link>
                   </>
                 )}
               </div>
-            </div>
-          </motion.div>
-        ) : null}
-      </AnimatePresence>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </nav>
+      <BookDemoModal open={demoOpen} onClose={() => setDemoOpen(false)} />
     </>
   );
-}
+};
+
+export default Navbar;

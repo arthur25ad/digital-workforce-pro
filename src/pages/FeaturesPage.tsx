@@ -1,148 +1,213 @@
-import { ArrowRight } from "lucide-react";
+import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-
 import PageLayout from "@/components/PageLayout";
-import Reveal from "@/components/marketing/Reveal";
-import SectionIntro from "@/components/marketing/SectionIntro";
 import {
-  featureGroups,
-  homeOutcomes,
-  roleDirectory,
-} from "@/content/marketing";
+  Users, Settings2, Layers, PenLine, MessageSquare,
+  CalendarClock, Plug, Eye, LayoutDashboard,
+} from "lucide-react";
 
-const platformLayers = [
+const groups = [
   {
-    title: "Intake layer",
-    copy: "Capture requests clearly before they fragment across channels.",
+    heading: "Core Platform Capabilities",
+    description: "The foundation that powers your digital workforce — role assignment, automation, and intelligent task routing.",
+    features: [
+      {
+        icon: Users, title: "Role-Based AI Workers",
+        desc: "Deploy specialized employees for social, support, email, and admin.",
+        items: ["Social Media Manager", "Customer Support", "Email Marketer", "Virtual Assistant"],
+      },
+      {
+        icon: Settings2, title: "Workflow Automation",
+        desc: "Custom triggers, conditions, and multi-step sequences that run on schedule.",
+        items: ["Custom triggers", "Conditional logic", "Scheduled runs"],
+      },
+      {
+        icon: Layers, title: "Task Routing",
+        desc: "Incoming work is assigned to the right AI role by type and urgency.",
+        items: ["Smart assignment", "Priority detection", "Role matching"],
+      },
+    ],
   },
   {
-    title: "Calendar layer",
-    copy: "Keep appointment logic, availability, and reminders consistent.",
+    heading: "Daily Execution Tools",
+    description: "The hands-on capabilities your AI team uses every day to produce real output.",
+    features: [
+      {
+        icon: PenLine, title: "Draft Generation",
+        desc: "Ready-to-review drafts for posts, emails, replies, and documents.",
+        items: ["Social captions", "Email campaigns", "Support replies"],
+      },
+      {
+        icon: MessageSquare, title: "Messaging Support",
+        desc: "Consistent handling of inquiries, follow-ups, and internal communication.",
+        items: ["Auto-replies", "FAQ handling", "Escalation tagging"],
+      },
+      {
+        icon: CalendarClock, title: "Scheduling Support",
+        desc: "Organized calendars, automated reminders, and coordinated meetings.",
+        items: ["Calendar sync", "Reminder automation", "Follow-up scheduling"],
+      },
+    ],
   },
   {
-    title: "Follow-up layer",
-    copy: "Stay close to warm leads, pending bookings, and post-appointment communication.",
+    heading: "Visibility & Control",
+    description: "Stay in the loop — connect your tools and review everything your AI team produces.",
+    features: [
+      {
+        icon: Plug, title: "Platform Connections",
+        desc: "Link social, email, calendar, and productivity tools you already use.",
+        items: ["Social platforms", "Email providers", "Productivity tools"],
+      },
+      {
+        icon: Eye, title: "Team Visibility",
+        desc: "See what every AI employee is working on and review all outputs.",
+        items: ["Activity timeline", "Output review", "Performance metrics"],
+      },
+    ],
   },
 ];
 
-export default function FeaturesPage() {
-  return (
-    <PageLayout>
-      <section className="section-padding">
-        <div className="site-container">
-          <Reveal>
-            <SectionIntro
-              kicker="Capabilities"
-              title="Everything VANTORY needs to run the booking-side of your operation with real discipline."
-              copy="The product is not trying to be a generic AI toolkit. It is built around operational work that directly affects appointments, response time, and follow-up consistency."
-            />
-          </Reveal>
+const FeaturesPage = () => (
+  <PageLayout>
+    {/* Hero */}
+    <section className="section-padding blue-ambient pb-12 md:pb-16">
+      <div className="mx-auto max-w-[1600px]">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center">
+          <h1 className="font-display text-4xl font-bold text-foreground md:text-5xl">
+            Everything Your AI Team Needs to <span className="gradient-text">Get Work Done</span>
+          </h1>
+          <p className="mx-auto mt-5 max-w-2xl text-lg text-muted-foreground">
+            A complete platform for deploying, managing, and scaling your digital workforce.
+          </p>
+        </motion.div>
+      </div>
+    </section>
 
-          <div className="mt-10 grid gap-4 lg:grid-cols-3">
-            {platformLayers.map((layer, index) => (
-              <Reveal key={layer.title} delay={index * 0.06}>
-                <article className="surface-panel h-full p-6">
-                  <p className="font-mono text-[11px] uppercase tracking-[0.24em] text-muted-foreground">
-                    Layer 0{index + 1}
-                  </p>
-                  <h2 className="mt-6 font-display text-2xl font-semibold tracking-[-0.06em] text-foreground">
-                    {layer.title}
-                  </h2>
-                  <p className="mt-4 text-sm leading-7 text-muted-foreground">{layer.copy}</p>
-                </article>
-              </Reveal>
+    {/* Dashboard preview band */}
+    <section className="px-4 pb-16 md:px-8 md:pb-24">
+      <div className="mx-auto max-w-[1200px]">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="overflow-hidden rounded-2xl border border-border/50 bg-card"
+        >
+          <div className="flex items-center gap-2 border-b border-border/40 px-5 py-3">
+            <span className="h-2.5 w-2.5 rounded-full bg-destructive/60" />
+            <span className="h-2.5 w-2.5 rounded-full bg-yellow-500/60" />
+            <span className="h-2.5 w-2.5 rounded-full bg-green-500/60" />
+            <span className="ml-3 text-xs text-muted-foreground">VANTORY Dashboard</span>
+          </div>
+          <div className="grid grid-cols-4 gap-4 p-6">
+            {[
+              { label: "Active Roles", value: "4" },
+              { label: "Tasks Completed", value: "128" },
+              { label: "Drafts Pending", value: "7" },
+              { label: "Platforms Connected", value: "6" },
+            ].map((stat) => (
+              <div key={stat.label} className="rounded-lg bg-secondary/60 p-4 text-center">
+                <p className="font-display text-2xl font-bold text-foreground">{stat.value}</p>
+                <p className="mt-1 text-xs text-muted-foreground">{stat.label}</p>
+              </div>
             ))}
           </div>
-        </div>
-      </section>
-
-      <section className="section-padding pt-4">
-        <div className="site-container grid gap-4 lg:grid-cols-2">
-          {featureGroups.map((group, index) => (
-            <Reveal key={group.heading} delay={index * 0.06}>
-              <article className="surface-panel h-full p-6 md:p-8">
-                <p className="font-display text-3xl font-semibold tracking-[-0.07em] text-foreground">{group.heading}</p>
-                <p className="mt-4 text-sm leading-7 text-muted-foreground">{group.description}</p>
-
-                <div className="mt-8 space-y-4">
-                  {group.features.map((feature) => (
-                    <div key={feature.title} className="rounded-[1.25rem] border border-border/70 bg-background/35 p-4">
-                      <div className="flex items-center gap-3">
-                        <feature.icon size={16} className="text-primary" />
-                        <p className="font-semibold text-foreground">{feature.title}</p>
-                      </div>
-                      <p className="mt-3 text-sm leading-7 text-muted-foreground">{feature.copy}</p>
-                    </div>
-                  ))}
-                </div>
-              </article>
-            </Reveal>
-          ))}
-        </div>
-      </section>
-
-      <section className="section-padding pt-4">
-        <div className="site-container">
-          <Reveal>
-            <SectionIntro
-              kicker="Outcome set"
-              title="The platform is judged by what it helps teams stop dropping."
-              copy="These are the operational outcomes the product is built to improve first."
-            />
-          </Reveal>
-
-          <div className="mt-10 grid gap-4 lg:grid-cols-4">
-            {homeOutcomes.map((outcome, index) => (
-              <Reveal key={outcome.title} delay={index * 0.05}>
-                <article className="surface-panel h-full p-6">
-                  <outcome.icon size={18} className="text-primary" />
-                  <h3 className="mt-5 font-display text-xl font-semibold tracking-[-0.05em] text-foreground">
-                    {outcome.title}
-                  </h3>
-                  <p className="mt-3 text-sm leading-7 text-muted-foreground">{outcome.copy}</p>
-                </article>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="section-padding pt-4">
-        <div className="site-container">
-          <Reveal>
-            <div className="surface-panel p-6 md:p-8">
-              <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
-                <div>
-                  <span className="section-kicker">Specialist roles</span>
-                  <h2 className="section-title max-w-3xl">
-                    VANTORY can coordinate dedicated roles when the workflow expands beyond the calendar.
-                  </h2>
-                </div>
-                <Link to="/ai-employees" className="marketing-link">
-                  See role details
-                  <ArrowRight size={16} />
-                </Link>
-              </div>
-
-              <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-                {roleDirectory.map((role) => (
-                  <Link
-                    key={role.slug}
-                    to={`/ai-employees/${role.slug}`}
-                    className="rounded-[1.25rem] border border-border/70 bg-background/35 p-5 transition-transform duration-300 hover:-translate-y-1"
-                  >
-                    <role.icon size={18} className="text-primary" />
-                    <p className="mt-5 font-display text-xl font-semibold tracking-[-0.05em] text-foreground">
-                      {role.title}
-                    </p>
-                    <p className="mt-3 text-sm leading-7 text-muted-foreground">{role.copy}</p>
-                  </Link>
-                ))}
-              </div>
+          <div className="flex items-center justify-between border-t border-border/40 px-6 py-4">
+            <div className="flex items-center gap-2">
+              <LayoutDashboard size={16} className="text-primary" />
+              <span className="text-sm text-muted-foreground">All systems operational</span>
             </div>
-          </Reveal>
+            <span className="text-xs text-muted-foreground/60">Last updated 2 min ago</span>
+          </div>
+        </motion.div>
+      </div>
+    </section>
+
+    {/* Feature groups */}
+    {groups.map((group, gi) => (
+      <section
+        key={group.heading}
+        className={`px-4 md:px-8 ${gi === groups.length - 1 ? "pb-24 pt-8 md:pb-32" : "py-8 md:py-12"} ${gi === 1 ? "blue-ambient-bottom" : ""}`}
+      >
+        <div className="mx-auto max-w-[1600px]">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mb-10"
+          >
+            <h2 className="font-display text-2xl font-bold text-foreground md:text-3xl">{group.heading}</h2>
+            <p className="mt-3 max-w-xl text-sm text-muted-foreground">{group.description}</p>
+          </motion.div>
+
+          {/* Alternate layout: group 0 = 3-col, group 1 = split-row, group 2 = 2-col wide */}
+          {gi === 1 ? (
+            <div className="space-y-5">
+              {group.features.map((feat, fi) => (
+                <motion.div
+                  key={feat.title}
+                  initial={{ opacity: 0, x: fi % 2 === 0 ? -20 : 20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: fi * 0.08 }}
+                  className="card-glass flex flex-col gap-5 rounded-xl p-6 sm:flex-row sm:items-start"
+                >
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                    <feat.icon size={22} />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-display text-base font-semibold text-foreground">{feat.title}</h3>
+                    <p className="mt-1.5 text-sm text-muted-foreground">{feat.desc}</p>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                     {feat.items.map((item, idx) => {
+                        const pillColors = ["bg-primary/8 text-primary/60", "bg-accent-violet/8 text-accent-violet/60", "bg-accent-teal/8 text-accent-teal/60"];
+                        return <span key={item} className={`rounded-full px-2.5 py-0.5 text-[11px] ${pillColors[idx % pillColors.length]}`}>{item}</span>;
+                      })}
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          ) : (
+            <div className={`grid gap-6 ${group.features.length === 2 ? "md:grid-cols-2" : "md:grid-cols-3"}`}>
+              {group.features.map((feat, fi) => (
+                <motion.div
+                  key={feat.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: fi * 0.08 }}
+                  className="card-glass rounded-xl p-6"
+                >
+                  <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                    <feat.icon size={20} />
+                  </div>
+                  <h3 className="font-display text-base font-semibold text-foreground">{feat.title}</h3>
+                  <p className="mt-2 text-sm text-muted-foreground">{feat.desc}</p>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {feat.items.map((item, idx) => {
+                      const pillColors = ["bg-primary/8 text-primary/60", "bg-accent-violet/8 text-accent-violet/60", "bg-accent-teal/8 text-accent-teal/60"];
+                      return <span key={item} className={`rounded-full px-2.5 py-0.5 text-[11px] ${pillColors[idx % pillColors.length]}`}>{item}</span>;
+                    })}
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
-    </PageLayout>
-  );
-}
+    ))}
+
+    {/* CTA */}
+    <section className="px-4 pb-24 md:px-8 md:pb-32">
+      <div className="mx-auto max-w-2xl text-center">
+        <h2 className="font-display text-2xl font-bold text-foreground md:text-3xl">Ready to put your AI team to work?</h2>
+        <p className="mt-3 text-muted-foreground">Get started in minutes — no technical experience required.</p>
+        <div className="mt-8">
+          <Link to="/get-started" className="btn-glow text-base">Get Started</Link>
+        </div>
+      </div>
+    </section>
+  </PageLayout>
+);
+
+export default FeaturesPage;

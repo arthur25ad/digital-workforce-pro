@@ -6,7 +6,6 @@ import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-route
 import { useEffect } from "react";
 import { AppProvider } from "./context/AppContext";
 import { AuthProvider, useAuth } from "./hooks/useAuth";
-import SmoothScrollProvider from "./components/SmoothScrollProvider";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import FeaturesPage from "./pages/FeaturesPage";
@@ -33,12 +32,9 @@ import FloatingBrainButton from "./components/FloatingBrainButton";
 
 const queryClient = new QueryClient();
 
-const ScrollManager = () => {
+const ScrollToTop = () => {
   const { pathname } = useLocation();
-  useEffect(() => {
-    if (window.location.hash) return;
-    window.scrollTo(0, 0);
-  }, [pathname]);
+  useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
   return null;
 };
 
@@ -73,34 +69,32 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
-            <SmoothScrollProvider>
-              <ScrollManager />
-              <FloatingBrainButton />
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/features" element={<FeaturesPage />} />
-                <Route path="/ai-employees" element={<AIEmployeesPage />} />
-                <Route path="/ai-employees/:slug" element={<AIEmployeeDetailPage />} />
-                <Route path="/how-it-works" element={<HowItWorksPage />} />
-                <Route path="/industries" element={<IndustriesPage />} />
-                <Route path="/pricing" element={<PricingPage />} />
-                <Route path="/faq" element={<FAQPage />} />
-                <Route path="/auth" element={<AuthPage />} />
-                <Route path="/reset-password" element={<ResetPasswordPage />} />
-                <Route path="/get-started" element={<ProtectedRoute><GetStartedPage /></ProtectedRoute>} />
-                <Route path="/choose-roles" element={<ProtectedRoute skipRoleGuard><ChooseRolesPage /></ProtectedRoute>} />
-                <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
-                <Route path="/vantabrain" element={<VantaBrainPage />} />
-                <Route path="/staff-portal" element={<ProtectedRoute><StaffPortalPage /></ProtectedRoute>} />
-                <Route path="/support" element={<SupportPage />} />
-                <Route path="/subscription-details" element={<ProtectedRoute><SubscriptionDetailsPage /></ProtectedRoute>} />
-                <Route path="/change-plan" element={<ProtectedRoute><ChangePlanPage /></ProtectedRoute>} />
-                <Route path="/privacy" element={<PrivacyPage />} />
-                <Route path="/notion-callback" element={<NotionCallbackPage />} />
-                <Route path="/terms" element={<TermsPage />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </SmoothScrollProvider>
+            <ScrollToTop />
+            <FloatingBrainButton />
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/features" element={<FeaturesPage />} />
+              <Route path="/ai-employees" element={<AIEmployeesPage />} />
+              <Route path="/ai-employees/:slug" element={<AIEmployeeDetailPage />} />
+              <Route path="/how-it-works" element={<HowItWorksPage />} />
+              <Route path="/industries" element={<IndustriesPage />} />
+              <Route path="/pricing" element={<PricingPage />} />
+              <Route path="/faq" element={<FAQPage />} />
+              <Route path="/auth" element={<AuthPage />} />
+              <Route path="/reset-password" element={<ResetPasswordPage />} />
+              <Route path="/get-started" element={<ProtectedRoute><GetStartedPage /></ProtectedRoute>} />
+              <Route path="/choose-roles" element={<ProtectedRoute skipRoleGuard><ChooseRolesPage /></ProtectedRoute>} />
+              <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+              <Route path="/vantabrain" element={<VantaBrainPage />} />
+              <Route path="/staff-portal" element={<ProtectedRoute><StaffPortalPage /></ProtectedRoute>} />
+              <Route path="/support" element={<SupportPage />} />
+              <Route path="/subscription-details" element={<ProtectedRoute><SubscriptionDetailsPage /></ProtectedRoute>} />
+              <Route path="/change-plan" element={<ProtectedRoute><ChangePlanPage /></ProtectedRoute>} />
+              <Route path="/privacy" element={<PrivacyPage />} />
+              <Route path="/notion-callback" element={<NotionCallbackPage />} />
+              <Route path="/terms" element={<TermsPage />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
           </BrowserRouter>
         </AppProvider>
       </AuthProvider>
