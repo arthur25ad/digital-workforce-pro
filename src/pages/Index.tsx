@@ -90,30 +90,53 @@ const Index = () => {
     };
 
     const startFadeIn = () => {
-      const steps = 55;
-      const increment = maxVol / steps;
-      fadeInInterval = setInterval(() => {
-        if (currentVol < maxVol - 0.001) {
-          setVolume(Math.min(maxVol, currentVol + increment));
-        } else {
-          setVolume(maxVol);
-          if (fadeInInterval) clearInterval(fadeInInterval);
-        }
-      }, 100);
+      if (gainNodeRef.current && audioCtxRef.current) {
+        const ctx = audioCtxRef.current;
+        const gain = gainNodeRef.current;
+        gain.gain.cancelScheduledValues(ctx.currentTime);
+        gain.gain.setValueAtTime(0, ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(maxVol, ctx.currentTime + 5.5);
+        currentVol = maxVol;
+      } else {
+        const steps = 55;
+        const increment = maxVol / steps;
+        fadeInInterval = setInterval(() => {
+          if (currentVol < maxVol - 0.001) {
+            setVolume(Math.min(maxVol, currentVol + increment));
+          } else {
+            setVolume(maxVol);
+            if (fadeInInterval) clearInterval(fadeInInterval);
+          }
+        }, 100);
+      }
     };
 
     const startFadeOut = () => {
-      const steps = 80;
-      const decrement = maxVol / steps;
-      fadeOutInterval = setInterval(() => {
-        if (currentVol > 0.001) {
-          setVolume(Math.max(0, currentVol - decrement));
-        } else {
-          setVolume(0);
+      if (fadeInInterval) { clearInterval(fadeInInterval); fadeInInterval = null; }
+      if (gainNodeRef.current && audioCtxRef.current) {
+        const ctx = audioCtxRef.current;
+        const gain = gainNodeRef.current;
+        gain.gain.cancelScheduledValues(ctx.currentTime);
+        gain.gain.setValueAtTime(gain.gain.value, ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 8);
+        currentVol = 0;
+        // Pause audio after fade completes
+        fadeOutTimer = setTimeout(() => {
           audio.pause();
-          if (fadeOutInterval) clearInterval(fadeOutInterval);
-        }
-      }, 100);
+        }, 8200);
+      } else {
+        const steps = 80;
+        const decrement = maxVol / steps;
+        fadeOutInterval = setInterval(() => {
+          if (currentVol > 0.001) {
+            setVolume(Math.max(0, currentVol - decrement));
+          } else {
+            setVolume(0);
+            audio.pause();
+            if (fadeOutInterval) clearInterval(fadeOutInterval);
+          }
+        }, 100);
+      }
     };
 
     const onPlay = () => {
