@@ -20,7 +20,18 @@ export default function FloatingBrainButton() {
   }, []);
 
   // Hide on home page and when not logged in
-  if (location.pathname === "/") return null;
+  // On homepage, only show after scrolling past hero; on other pages, show after 200px
+  const isHome = location.pathname === "/";
+  const threshold = isHome ? 600 : 200;
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > threshold);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [threshold]);
+
+  if (!user && !isHome) return null;
 
   return (
     <AnimatePresence>
