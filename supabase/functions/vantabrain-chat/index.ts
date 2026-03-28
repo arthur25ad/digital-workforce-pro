@@ -15,31 +15,24 @@ serve(async (req) => {
 
   try {
     const authHeader = req.headers.get("Authorization");
-    if (!authHeader?.startsWith("Bearer ")) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
 
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_ANON_KEY")!,
-      { global: { headers: { Authorization: authHeader } } }
-    );
-
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
-    if (userError || !user) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    // Try to authenticate, but allow guest access
+    let user = null;
+    let supabaseClient = null;
+    if (authHeader?.startsWith("Bearer ")) {
+      supabaseClient = createClient(
+        Deno.env.get("SUPABASE_URL")!,
+        Deno.env.get("SUPABASE_ANON_KEY")!,
+        { global: { headers: { Authorization: authHeader } } }
+      );
+      const { data: { user: authUser } } = await supabaseClient.auth.getUser();
+      user = authUser;
     }
 
     const body = await req.json();
     const { messages, workspaceId, conversationId } = body;
 
-    if (!workspaceId || !messages || !Array.isArray(messages)) {
+    if (!messages || !Array.isArray(messages)) {
       return new Response(JSON.stringify({ error: "Missing required fields" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -49,42 +42,50 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    // Fetch full brain context across all roles for the assistant
-    const brainContext = await fetchBrainIntelligence(supabase, workspaceId, "shared");
+    let brainContextBlock = "";
+    let accountContext = "";
 
-    // Also fetch role-specific stats
-    const [profileRes, memoriesCountRes, patternsCountRes, interactionsCountRes, draftsRes, ticketsRes, tasksRes] = await Promise.all([
-      supabase.from("profiles").select("active_package, unlocked_roles, subscription_status").eq("id", user.id).maybeSingle(),
-      supabase.from("brain_memories").select("scope", { count: "exact" }).eq("workspace_id", workspaceId),
-      supabase.from("brain_patterns").select("role_scope", { count: "exact" }).eq("workspace_id", workspaceId).eq("is_active", true),
-      supabase.from("brain_interactions").select("role_scope", { count: "exact" }).eq("workspace_id", workspaceId),
-      supabase.from("social_drafts").select("status", { count: "exact" }).eq("workspace_id", workspaceId).eq("status", "draft"),
-      supabase.from("support_tickets").select("status", { count: "exact" }).eq("workspace_id", workspaceId).eq("status", "new"),
-      supabase.from("assistant_tasks").select("status", { count: "exact" }).eq("workspace_id", workspaceId).in("status", ["new", "in_progress"]),
-    ]);
+    // Only fetch brain context and account info for authenticated users with a workspace
+    if (user && workspaceId && supabaseClient) {
+      const brainContext = await fetchBrainIntelligence(supabaseClient, workspaceId, "shared");
+      brainContextBlock = brainContext.fullPromptBlock || "";
 
-    const profile = profileRes.data;
-    const unlockedRoles = profile?.unlocked_roles || [];
+      const [profileRes, memoriesCountRes, patternsCountRes, interactionsCountRes, draftsRes, ticketsRes, tasksRes] = await Promise.all([
+        supabaseClient.from("profiles").select("active_package, unlocked_roles, subscription_status").eq("id", user.id).maybeSingle(),
+        supabaseClient.from("brain_memories").select("scope", { count: "exact" }).eq("workspace_id", workspaceId),
+        supabaseClient.from("brain_patterns").select("role_scope", { count: "exact" }).eq("workspace_id", workspaceId).eq("is_active", true),
+        supabaseClient.from("brain_interactions").select("role_scope", { count: "exact" }).eq("workspace_id", workspaceId),
+        supabaseClient.from("social_drafts").select("status", { count: "exact" }).eq("workspace_id", workspaceId).eq("status", "draft"),
+        supabaseClient.from("support_tickets").select("status", { count: "exact" }).eq("workspace_id", workspaceId).eq("status", "new"),
+        supabaseClient.from("assistant_tasks").select("status", { count: "exact" }).eq("workspace_id", workspaceId).in("status", ["new", "in_progress"]),
+      ]);
 
-    const roleNames: Record<string, string> = {
-      "social-media-manager": "Social Media Manager",
-      "customer-support": "Customer Support",
-      "email-marketer": "Email Marketer",
-      "calendar-assistant": "AI Calendar Assistant",
-    };
+      const profile = profileRes.data;
+      const unlockedRoles = profile?.unlocked_roles || [];
+      const roleNames: Record<string, string> = {
+        "social-media-manager": "Social Media Manager",
+        "customer-support": "Customer Support",
+        "email-marketer": "Email Marketer",
+        "calendar-assistant": "AI Calendar Assistant",
+      };
 
-    const accountContext = [
-      `USER ACCOUNT STATE:`,
-      `Plan: ${profile?.active_package || "starter"}`,
-      `Subscription: ${profile?.subscription_status || "unknown"}`,
-      `Unlocked AI Employees: ${unlockedRoles.map((r: string) => roleNames[r] || r).join(", ") || "None"}`,
-      `Total Memories: ${memoriesCountRes.count || 0}`,
-      `Total Active Patterns: ${patternsCountRes.count || 0}`,
-      `Total Interactions Tracked: ${interactionsCountRes.count || 0}`,
-      `Pending Social Drafts: ${draftsRes.count || 0}`,
-      `Open Support Tickets: ${ticketsRes.count || 0}`,
-      `Active Tasks: ${tasksRes.count || 0}`,
-    ].join("\n");
+      accountContext = [
+        `USER ACCOUNT STATE:`,
+        `Plan: ${profile?.active_package || "starter"}`,
+        `Subscription: ${profile?.subscription_status || "unknown"}`,
+        `Unlocked AI Employees: ${unlockedRoles.map((r: string) => roleNames[r] || r).join(", ") || "None"}`,
+        `Total Memories: ${memoriesCountRes.count || 0}`,
+        `Total Active Patterns: ${patternsCountRes.count || 0}`,
+        `Total Interactions Tracked: ${interactionsCountRes.count || 0}`,
+        `Pending Social Drafts: ${draftsRes.count || 0}`,
+        `Open Support Tickets: ${ticketsRes.count || 0}`,
+        `Active Tasks: ${tasksRes.count || 0}`,
+      ].join("\n");
+    }
+
+    const guestNote = !user
+      ? "\nNOTE: This user is a guest visitor (not logged in). They are exploring Vantory. Help them understand what Vantory and VANTABRAIN can do for their business. Encourage them to sign up to get started."
+      : "";
 
     const systemPrompt = `${INTELLIGENCE_ENGINE_PREAMBLE}
 
@@ -98,9 +99,10 @@ YOUR ROLE:
 - Be warm, clear, and helpful — like a smart business advisor who knows their account.
 
 WHAT YOU KNOW:
-${brainContext.fullPromptBlock || "No brain context available yet — the user is likely new."}
+${brainContextBlock || "No brain context available yet — the user is likely new."}
 
 ${accountContext}
+${guestNote}
 
 AI EMPLOYEE DESCRIPTIONS:
 - Social Media Manager: Generates social media content ideas, captions, hooks, and CTAs based on brand profile and learned posting preferences.
