@@ -12,17 +12,43 @@ export default function FloatingBrainButton() {
   const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
 
-  // Hide on home page and when not logged in
-  // On homepage, only show after scrolling past hero; on other pages, show after 200px
   const isHome = location.pathname === "/";
-  const threshold = isHome ? 600 : 200;
+  const threshold = isHome ? 300 : 200;
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > threshold);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
-    return () => window.removeEventListener("scroll", onScroll);
-  }, [threshold]);
+    const check = () => {
+      // Homepage uses a snap-scroll container, not window scroll
+      if (isHome) {
+        const container = document.querySelector(".snap-y");
+        if (container) {
+          setScrolled(container.scrollTop > threshold);
+        }
+      } else {
+        setScrolled(window.scrollY > threshold);
+      }
+    };
+
+    if (isHome) {
+      // Poll briefly for the container to mount, then attach listener
+      const interval = setInterval(() => {
+        const container = document.querySelector(".snap-y");
+        if (container) {
+          clearInterval(interval);
+          container.addEventListener("scroll", check, { passive: true });
+          check();
+        }
+      }, 100);
+      return () => {
+        clearInterval(interval);
+        const container = document.querySelector(".snap-y");
+        if (container) container.removeEventListener("scroll", check);
+      };
+    } else {
+      window.addEventListener("scroll", check, { passive: true });
+      check();
+      return () => window.removeEventListener("scroll", check);
+    }
+  }, [isHome, threshold]);
 
   if (!user && !isHome) return null;
 
