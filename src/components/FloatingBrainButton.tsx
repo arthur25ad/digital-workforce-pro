@@ -20,7 +20,7 @@ export default function FloatingBrainButton() {
   }, []);
 
   // Hide on home page and when not logged in
-  if (!user || location.pathname === "/") return null;
+  if (location.pathname === "/") return null;
 
   return (
     <AnimatePresence>
