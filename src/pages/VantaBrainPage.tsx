@@ -57,11 +57,14 @@ const PublicView = () => (
           The intelligence layer that makes your AI team smarter.{" "}
           <span className="text-foreground/60">It learns how your business works.</span>
         </motion.p>
-        <motion.div {...fadeUp} transition={{ delay: 0.18 }} className="mt-8 flex justify-center gap-4">
-          <Link to="/auth" className="inline-flex items-center gap-2 rounded-lg px-7 py-3 text-sm font-semibold uppercase tracking-wide transition-all hover:-translate-y-0.5"
-            style={{ backgroundColor: "white", color: "hsl(280 70% 50%)", boxShadow: "0 0 30px hsl(280 70% 65% / 0.2)" }}>
-            Get Started <ArrowRight size={16} />
-          </Link>
+      </div>
+    </section>
+
+    {/* AI Chat — open by default */}
+    <section className="px-6 pb-8 md:px-12 lg:px-16">
+      <div className="mx-auto max-w-[1200px]">
+        <motion.div {...fadeUp} transition={{ delay: 0.18 }}>
+          <VantaBrainAssistant variant="flagship" />
         </motion.div>
       </div>
     </section>
