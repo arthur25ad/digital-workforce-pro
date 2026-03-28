@@ -28,9 +28,14 @@ export function useVantaBrainChat() {
   const [loadingConversations, setLoadingConversations] = useState(true);
   const abortRef = useRef<AbortController | null>(null);
 
-  // Load conversations list
+  const isGuest = !workspace?.id;
+
+  // Load conversations list (authenticated only)
   const loadConversations = useCallback(async () => {
-    if (!workspace?.id) return;
+    if (isGuest) {
+      setLoadingConversations(false);
+      return;
+    }
     setLoadingConversations(true);
     const { data } = await supabase
       .from("brain_conversations")
@@ -40,7 +45,7 @@ export function useVantaBrainChat() {
       .limit(20);
     setConversations((data as Conversation[]) || []);
     setLoadingConversations(false);
-  }, [workspace?.id]);
+  }, [workspace?.id, isGuest]);
 
   useEffect(() => { loadConversations(); }, [loadConversations]);
 
@@ -61,12 +66,12 @@ export function useVantaBrainChat() {
     await loadMessages(convId);
   }, [loadMessages]);
 
-  // Start a new conversation
+  // Start a new conversation (authenticated only)
   const startNewConversation = useCallback(async () => {
-    if (!workspace?.id) return null;
+    if (isGuest) return null;
     const { data, error } = await supabase
       .from("brain_conversations")
-      .insert({ workspace_id: workspace.id, title: "New conversation" })
+      .insert({ workspace_id: workspace!.id, title: "New conversation" })
       .select()
       .single();
     if (error || !data) {
@@ -78,19 +83,21 @@ export function useVantaBrainChat() {
     setActiveConversationId(conv.id);
     setMessages([]);
     return conv.id;
-  }, [workspace?.id]);
+  }, [workspace?.id, isGuest]);
 
   // Send a message and stream response
   const sendMessage = useCallback(async (content: string) => {
-    if (!workspace?.id || isStreaming) return;
+    if (isStreaming) return;
 
     let convId = activeConversationId;
-    if (!convId) {
+
+    // For authenticated users, create a conversation if needed
+    if (!isGuest && !convId) {
       convId = await startNewConversation();
       if (!convId) return;
     }
 
-    // Save user message
+    // Save user message locally
     const userMsg: ChatMessage = {
       id: crypto.randomUUID(),
       role: "user",
@@ -99,18 +106,21 @@ export function useVantaBrainChat() {
     };
     setMessages(prev => [...prev, userMsg]);
 
-    await supabase.from("brain_chat_messages").insert({
-      conversation_id: convId,
-      workspace_id: workspace.id,
-      role: "user",
-      content,
-    });
+    // Persist to DB for authenticated users
+    if (!isGuest && convId) {
+      await supabase.from("brain_chat_messages").insert({
+        conversation_id: convId,
+        workspace_id: workspace!.id,
+        role: "user",
+        content,
+      });
 
-    // Update conversation title from first message
-    if (messages.length === 0) {
-      const title = content.slice(0, 60) + (content.length > 60 ? "…" : "");
-      await supabase.from("brain_conversations").update({ title }).eq("id", convId);
-      setConversations(prev => prev.map(c => c.id === convId ? { ...c, title } : c));
+      // Update conversation title from first message
+      if (messages.length === 0) {
+        const title = content.slice(0, 60) + (content.length > 60 ? "…" : "");
+        await supabase.from("brain_conversations").update({ title }).eq("id", convId);
+        setConversations(prev => prev.map(c => c.id === convId ? { ...c, title } : c));
+      }
     }
 
     // Prepare messages for API (include history)
@@ -136,7 +146,11 @@ export function useVantaBrainChat() {
           Authorization: `Bearer ${session?.access_token || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
           apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
         },
-        body: JSON.stringify({ messages: allMessages, workspaceId: workspace.id, conversationId: convId }),
+        body: JSON.stringify({
+          messages: allMessages,
+          workspaceId: isGuest ? null : workspace!.id,
+          conversationId: convId || null,
+        }),
         signal: controller.signal,
       });
 
@@ -181,21 +195,19 @@ export function useVantaBrainChat() {
         }
       }
 
-      // Save assistant message to DB
-      if (assistantContent) {
+      // Save assistant message to DB (authenticated only)
+      if (!isGuest && assistantContent && convId) {
         await supabase.from("brain_chat_messages").insert({
           conversation_id: convId,
-          workspace_id: workspace.id,
+          workspace_id: workspace!.id,
           role: "assistant",
           content: assistantContent,
         });
-        // Touch conversation updated_at
         await supabase.from("brain_conversations").update({ updated_at: new Date().toISOString() }).eq("id", convId);
       }
     } catch (e: any) {
       if (e.name !== "AbortError") {
         toast.error(e.message || "Failed to get response");
-        // Remove empty assistant message on error
         if (!assistantContent) {
           setMessages(prev => prev.filter(m => m.id !== assistantId));
         }
@@ -204,20 +216,23 @@ export function useVantaBrainChat() {
       setIsStreaming(false);
       abortRef.current = null;
     }
-  }, [workspace?.id, activeConversationId, isStreaming, messages, startNewConversation]);
+  }, [workspace?.id, isGuest, activeConversationId, isStreaming, messages, startNewConversation]);
 
   const stopStreaming = useCallback(() => {
     abortRef.current?.abort();
   }, []);
 
   const clearHistory = useCallback(async () => {
-    if (!workspace?.id) return;
-    await supabase.from("brain_conversations").delete().eq("workspace_id", workspace.id);
+    if (isGuest) {
+      setMessages([]);
+      return;
+    }
+    await supabase.from("brain_conversations").delete().eq("workspace_id", workspace!.id);
     setConversations([]);
     setActiveConversationId(null);
     setMessages([]);
     toast.success("Conversation history cleared");
-  }, [workspace?.id]);
+  }, [workspace?.id, isGuest]);
 
   return {
     conversations,
